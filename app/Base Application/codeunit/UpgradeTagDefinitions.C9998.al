@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -28,11 +28,6 @@ codeunit 9998 "Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetNewSalesQuoteEntityBufferUpgradeTag());
         PerCompanyUpgradeTags.Add(GetNewSalesCrMemoEntityBufferUpgradeTag());
         PerCompanyUpgradeTags.Add(GetNewSalesShipmentLineUpgradeTag());
-#if not CLEAN23
-        PerCompanyUpgradeTags.Add(GetSetCoupledFlagsUpgradeTag());
-        PerCompanyUpgradeTags.Add(GetRepeatedSetCoupledFlagsUpgradeTag());
-        PerCompanyUpgradeTags.Add(GetSetOptionMappingCoupledFlagsUpgradeTag());
-#endif
         PerCompanyUpgradeTags.Add(GetDataverseAuthenticationUpgradeTag());
         PerCompanyUpgradeTags.Add(GetCleanupDataExchUpgradeTag());
         PerCompanyUpgradeTags.Add(GetDefaultDimensionAPIUpgradeTag());
@@ -167,6 +162,8 @@ codeunit 9998 "Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetCountryVATSchemeDKTag());
         PerCompanyUpgradeTags.Add(GetUpgradeJobConsumpWhseHandlingForDirectedPutAwayAndPickLocationUpgradeTag());
         PerCompanyUpgradeTags.Add(GetIntegrationTableMappingTemplatesUpgradeTag());
+        PerCompanyUpgradeTags.Add(GetPopulateUserSetupEmailUpgradeTag());
+        PerCompanyUpgradeTags.Add(GetPurchaseCreditMemoVendorCrMemoNoUpgradeTag());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Upgrade Tag", 'OnGetPerDatabaseUpgradeTags', '', false, false)]
@@ -184,9 +181,6 @@ codeunit 9998 "Upgrade Tag Definitions"
         PerDatabaseUpgradeTags.Add(GetSharePointConnectionUpgradeTag());
         PerDatabaseUpgradeTags.Add(GetCreateDefaultAADApplicationTag());
         PerDatabaseUpgradeTags.Add(GetCreateDefaultPowerPagesAADApplicationsTag());
-#if not CLEAN23
-        PerDatabaseUpgradeTags.Add(GetDefaultAADApplicationDescriptionTag());
-#endif
         PerDatabaseUpgradeTags.Add(GetMonitorSensitiveFieldPermissionUpgradeTag());
         PerDatabaseUpgradeTags.Add(GetUpdateInitialPrivacyNoticesTag());
         PerDatabaseUpgradeTags.Add(GetDataOutOfGeoAppUpgradeTag());
@@ -306,21 +300,6 @@ codeunit 9998 "Upgrade Tag Definitions"
         exit('MS-383010-SalesShipmentLineDocumentId-20201210');
     end;
 
-#if not CLEAN23
-#pragma warning disable AS0072, AS0074, AS0022
-    [Obsolete('Function will be removed', '23.0')]
-    internal procedure GetSetCoupledFlagsUpgradeTag(): Code[250]
-    begin
-        exit('MS-394960-SetCoupledFlags-20210327');
-    end;
-
-    [Obsolete('Function will be removed', '23.0')]
-    internal procedure GetRepeatedSetCoupledFlagsUpgradeTag(): Code[250]
-    begin
-        exit('MS-437085-RepeatSetCoupledFlags-20220617');
-    end;
-#pragma warning restore AS0072, AS0074, AS0022
-#endif
     internal procedure GetNewISVPlansUpgradeTag(): Code[250]
     begin
         exit('MS-287563-NewISVPlansAdded-20181105');
@@ -665,12 +644,6 @@ codeunit 9998 "Upgrade Tag Definitions"
     begin
         exit('MS-385184-PurchaseOrderEntityBuffer-20210104');
     end;
-#if not CLEAN23
-    internal procedure GetDefaultAADApplicationDescriptionTag(): Code[250]
-    begin
-        exit('MS-379473-DefaultAADApplicationDescriptionTag-20201217');
-    end;
-#endif    
 
     procedure GetUpdateInitialPrivacyNoticesTag(): Code[250]
     begin
@@ -687,12 +660,6 @@ codeunit 9998 "Upgrade Tag Definitions"
         exit('MS-385481-UserTaskDescriptionToUTF8-20210112');
     end;
 
-#if not CLEAN23
-    internal procedure GetRestartSetCoupledFlagJQEsUpgradeTag(): Code[250]
-    begin
-        exit('MS-417920-RestartSetCoupledFlagJQEs-20211207');
-    end;
-#endif
     internal procedure GetUpgradeNativeAPIWebServiceUpgradeTag(): Code[250]
     begin
         exit('MS-386191-NativeAPIWebService-20210121');
@@ -903,15 +870,6 @@ codeunit 9998 "Upgrade Tag Definitions"
         exit('MS-290460-IntercompanySetup-20211110');
     end;
 
-#if not CLEAN23
-#pragma warning disable AS0072, AS0074, AS0022
-    [Obsolete('Function will be removed', '23.0')]
-    internal procedure GetSetOptionMappingCoupledFlagsUpgradeTag(): Code[250]
-    begin
-        exit('MS-413173-GetSetOptionMappingCoupledFlagsUpgradeTag-20211120');
-    end;
-#pragma warning restore AS0072, AS0074, AS0022
-#endif
     internal procedure GetItemCrossReferenceInPEPPOLUpgradeTag(): Code[250]
     begin
         exit('MS-422103-GetItemCrossReferenceInPEPPOLUpgradeTag-20220114');
@@ -1200,5 +1158,15 @@ codeunit 9998 "Upgrade Tag Definitions"
     internal procedure GetIntegrationTableMappingTemplatesUpgradeTag(): Code[250]
     begin
         exit('MS-527500-IntegrationTableMappingTemplatesUpgradeTag-20240710');
+    end;
+
+    internal procedure GetPopulateUserSetupEmailUpgradeTag(): Code[250]
+    begin
+        exit('MS-GIT-736-PopulateUserSetupEmailUpgradeTag-20241117');
+    end;
+
+    internal procedure GetPurchaseCreditMemoVendorCrMemoNoUpgradeTag(): Code[250]
+    begin
+        exit('MS-559602-PurchaseCreditMemoVendorCrMemoNoUpgradeTag-20241206');
     end;
 }

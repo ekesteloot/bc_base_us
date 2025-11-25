@@ -1,4 +1,8 @@
-﻿namespace Microsoft.Bank.Reconciliation;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Bank.Reconciliation;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Check;
@@ -89,15 +93,6 @@ table 274 "Bank Acc. Reconciliation Line"
             begin
                 Difference := "Statement Amount" - "Applied Amount";
             end;
-        }
-        field(10; Type; Option)
-        {
-            Caption = 'Type';
-            OptionCaption = 'Bank Account Ledger Entry,Check Ledger Entry,Difference';
-            OptionMembers = "Bank Account Ledger Entry","Check Ledger Entry",Difference;
-            ObsoleteReason = 'This field is prone to confusion and is redundant. A type Difference can be manually tracked and a type Check Ledger Entry has a related Bank Account Ledger Entry';
-            ObsoleteState = Removed;
-            ObsoleteTag = '24.0';
         }
         field(11; "Applied Entries"; Integer)
         {
@@ -477,7 +472,13 @@ table 274 "Bank Acc. Reconciliation Line"
     end;
 
     procedure ShowDimensions()
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeShowDimensions(Rec, IsHandled);
+        if IsHandled then
+            exit;
         "Dimension Set ID" :=
           DimMgt.EditDimensionSet("Dimension Set ID", StrSubstNo('%1 %2 %3', TableCaption(), "Statement No.", "Statement Line No."));
         DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
@@ -879,7 +880,13 @@ table 274 "Bank Acc. Reconciliation Line"
     local procedure GetCustomerLedgerEntriesInAmountRange(var CustLedgerEntry: Record "Cust. Ledger Entry"; AccountNo: Code[20]; AmountFilter: Text; MinAmount: Decimal; MaxAmount: Decimal): Integer
     var
         BankAccount: Record "Bank Account";
+        Result: Integer;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetCustomerLedgerEntriesInAmountRange(Rec, CustLedgerEntry, AccountNo, AmountFilter, MinAmount, MaxAmount, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
         CustLedgerEntry.SetAutoCalcFields("Remaining Amount", "Remaining Amt. (LCY)");
         BankAccount.Get("Bank Account No.");
         GetApplicableCustomerLedgerEntries(CustLedgerEntry, BankAccount."Currency Code", AccountNo);
@@ -895,7 +902,13 @@ table 274 "Bank Acc. Reconciliation Line"
     local procedure GetVendorLedgerEntriesInAmountRange(var VendorLedgerEntry: Record "Vendor Ledger Entry"; AccountNo: Code[20]; AmountFilter: Text; MinAmount: Decimal; MaxAmount: Decimal): Integer
     var
         BankAccount: Record "Bank Account";
+        Result: Integer;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetVendorLedgerEntriesInAmountRange(Rec, VendorLedgerEntry, AccountNo, AmountFilter, MinAmount, MaxAmount, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
         VendorLedgerEntry.SetAutoCalcFields("Remaining Amount", "Remaining Amt. (LCY)");
 
         BankAccount.Get("Bank Account No.");
@@ -1485,4 +1498,18 @@ table 274 "Bank Acc. Reconciliation Line"
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetCustomerLedgerEntriesInAmountRange(BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var CustLedgerEntry: Record "Cust. Ledger Entry"; AccountNo: Code[20]; AmountFilter: Text; MinAmount: Decimal; MaxAmount: Decimal; var Result: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetVendorLedgerEntriesInAmountRange(BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var VendorLedgerEntry: Record "Vendor Ledger Entry"; AccountNo: Code[20]; AmountFilter: Text; MinAmount: Decimal; MaxAmount: Decimal; var Result: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeShowDimensions(var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var IsHandled: Boolean)
+    begin
+    end;
 }

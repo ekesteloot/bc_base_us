@@ -25,6 +25,8 @@ codeunit 799 "VAT Reporting Date Mgt"
                   TableData "Issued Fin. Charge Memo Header" = rm,
                   TableData "Purch. Inv. Header" = rm,
                   TableData "Purch. Cr. Memo Hdr." = rm,
+                  tabledata "Sales Invoice Header" = rm,
+                  tabledata "Sales Cr.Memo Header" = rm,
                   TableData "G/L Entry" = rm,
                   TableData "VAT Entry" = rm,
                   TableData "VAT Return Period" = r,
@@ -94,9 +96,6 @@ codeunit 799 "VAT Reporting Date Mgt"
     var
         IsHandled: Boolean;
     begin
-#if not CLEAN23
-        OnBeforeIsVATDateEnabled(IsEnabled, IsHandled);
-#endif
         if not IsHandled then
             OnBeforeIsVATDateEnabledForUse(IsEnabled, IsHandled);
         if IsHandled then
@@ -357,7 +356,7 @@ codeunit 799 "VAT Reporting Date Mgt"
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"General Ledger Setup", OnAfterModifyEvent, '', false, false)]
-    local procedure OnAfterMofidyEventCheckVATReportingDate(var Rec: Record "General Ledger Setup"; var xRec: Record "General Ledger Setup"; RunTrigger: Boolean)
+    local procedure OnAfterModifyEventCheckVATReportingDate(var Rec: Record "General Ledger Setup"; var xRec: Record "General Ledger Setup"; RunTrigger: Boolean)
     var
         UserSetup: Record "User Setup";
         VATSetup: Record "VAT Setup";
@@ -394,16 +393,6 @@ codeunit 799 "VAT Reporting Date Mgt"
     local procedure OnBeforeIsVATDateEnabledForUse(var IsEnabled: Boolean; var IsHandled: Boolean);
     begin
     end;
-
-#if not CLEAN23
-#pragma warning disable AS0025
-    [Obsolete('Replaced by OnBeforeIsVATDateEnabledForUse with correct parameter name', '23.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeIsVATDateEnabled(var IsModifiable: Boolean; var IsHandled: Boolean);
-    begin
-    end;
-#pragma warning restore AS0025
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdateLinkedEntries(VATEntry: Record "VAT Entry"; var IsHandled: Boolean);

@@ -1,4 +1,8 @@
-﻿namespace Microsoft.FixedAssets.Ledger;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.FixedAssets.Ledger;
 
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Journal;
@@ -366,7 +370,7 @@ codeunit 5600 "FA Insert Ledger Entry"
         FAReg.Modify();
     end;
 
-    local procedure FAName(DeprBookCode: Code[10]): Text[200]
+    procedure FAName(DeprBookCode: Code[10]): Text[200]
     var
         DepreciationCalc: Codeunit "Depreciation Calculation";
     begin

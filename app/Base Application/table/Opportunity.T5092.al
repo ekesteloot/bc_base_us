@@ -1,4 +1,8 @@
-﻿namespace Microsoft.CRM.Opportunity;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.CRM.Opportunity;
 
 using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Campaign;
@@ -193,7 +197,7 @@ table 5092 Opportunity
                 IsHandled: Boolean;
             begin
                 IsHandled := false;
-                OnBeforeValidateContactNo(Rec, CurrFieldNo, IsHandled);
+                OnBeforeValidateContactNo(Rec, CurrFieldNo, IsHandled, xRec);
                 if IsHandled then
                     exit;
 
@@ -504,19 +508,16 @@ table 5092 Opportunity
             Editable = false;
             FieldClass = FlowField;
         }
+#if not CLEANSCHEMA26
         field(720; "Coupled to CRM"; Boolean)
         {
             Caption = 'Coupled to Dynamics 365 Sales';
             Editable = false;
             ObsoleteReason = 'Replaced by flow field Coupled to Dataverse';
-#if not CLEAN23
-            ObsoleteState = Pending;
-            ObsoleteTag = '23.0';
-#else
             ObsoleteState = Removed;
             ObsoleteTag = '26.0';
-#endif
         }
+#endif
         field(721; "Coupled to Dataverse"; Boolean)
         {
             FieldClass = FlowField;
@@ -590,14 +591,6 @@ table 5092 Opportunity
         key(Key8; SystemModifiedAt)
         {
         }
-#if not CLEAN23
-        key(Key9; "Coupled to CRM")
-        {
-            ObsoleteState = Pending;
-            ObsoleteReason = 'Replaced by flow field Coupled to Dataverse';
-            ObsoleteTag = '23.0';
-        }
-#endif
     }
 
     fieldgroups
@@ -1154,6 +1147,7 @@ table 5092 Opportunity
             TestField("Sales Cycle Code");
             TestField(Status, Status::"Not Started");
             SalesCycleStage.SetRange("Sales Cycle Code", "Sales Cycle Code");
+            OnStartActivateFirstStageOnBeforeSalesCycleStageFind(Rec, SalesCycleStage);
             if SalesCycleStage.FindFirst() then begin
                 OpportunityEntry.Init();
                 OpportunityEntry."Sales Cycle Stage" := SalesCycleStage.Stage;
@@ -1393,12 +1387,17 @@ table 5092 Opportunity
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateContactNo(var Opportunity: Record Opportunity; CurrentFieldNo: Integer; var IsHandled: Boolean)
+    local procedure OnBeforeValidateContactNo(var Opportunity: Record Opportunity; CurrentFieldNo: Integer; var IsHandled: Boolean; xOpportunity: Record Opportunity)
     begin
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnStartWizardBeforeInsert(var Opportunity: Record Opportunity)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnStartActivateFirstStageOnBeforeSalesCycleStageFind(var Opportunity: Record Opportunity; var SalesCycleStage: Record "Sales Cycle Stage")
     begin
     end;
 }

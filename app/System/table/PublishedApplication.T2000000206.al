@@ -321,6 +321,22 @@ table 2000000206 "Published Application"
         {
             Caption = 'Source Commit ID';
         }
+
+        /// <summary>
+        /// Specifies the name of the system that assisted in the compilation.
+        /// </summary>
+        field(40; "Build By"; Text[64])
+        {
+            Caption = 'Build By';
+        }
+
+        /// <summary>
+        /// Specifies the URL of where the package can be found.
+        /// </summary>
+        field(41; "Build Url"; Text[250])
+        {
+            Caption = 'Build Url';
+        }
     }
 
     keys

@@ -16,7 +16,6 @@ codeunit 130000 Assert
         FailFailedMsg: Label 'Assert.Fail failed. %1';
         TableIsEmptyErr: Label 'Assert.TableIsEmpty failed. Table <%1> with filter <%2> must not contain records.', Locked = true;
         TableIsNotEmptyErr: Label 'Assert.TableIsNotEmpty failed. Table <%1> with filter <%2> must contain records.', Locked = true;
-        KnownFailureMsg: Label 'Known failure: see VSTF Bug #%1.';
         ExpectedErrorFailed: Label 'Assert.ExpectedError failed. Expected: %1. Actual: %2.';
         ExpectedTestFieldFailedErr: Label 'Assert.ExpectedError failed. Could not find the value: %1 in the raised error text: %2.';
         WrongErrorCodeErr: Label 'Assert.ExpectedErrorCode failed. Error code raised: %1. Actual error message: %2.', Comment = '%1 - Error code that was raised. %2 - Error message reported.', Locked = true;
@@ -27,6 +26,7 @@ codeunit 130000 Assert
         ExpectedStrMenuOptionsFailedErr: Label 'Assert.ExpectedStrMenu failed. Expected options: %1. Actual options: %2.';
         IsSubstringFailedErr: Label 'Assert.IsSubstring failed. Expected <%1> to be a substring of <%2>.';
         RecordCountErr: Label 'Assert.RecordCount failed. Expected number of %1 entries: %2. Actual: %3. Filters: %4.', Locked = true;
+        RecordCountWithListErr: Label 'Assert.RecordCount failed. Expected number of %1 entries: %2. Actual: %3. Filters: %4. Records: %5', Locked = true;
         UnsupportedTypeErr: Label 'Equality assertions only support Boolean, Option, Integer, BigInteger, Decimal, Code, Text, Date, DateFormula, Time, Duration, and DateTime values. Current value:%1.';
         RecordNotFoundErrorCode: Label 'DB:RecordNotFound';
         RecordAlreadyExistsErrorCode: Label 'DB:RecordExists';
@@ -159,17 +159,26 @@ codeunit 130000 Assert
     procedure RecordCount(RecVariant: Variant; ExpectedCount: Integer)
     var
         RecRef: RecordRef;
+        RecordsList: TextBuilder;
+        FieldIndex: Integer;
+        RecordIndex: Integer;
     begin
         RecRef.GetTable(RecVariant);
-        if ExpectedCount <> RecRef.Count then
+        if ExpectedCount <> RecRef.Count then begin
+            if RecRef.FindFirst() then begin
+                repeat
+                    RecordIndex += 1;
+                    for FieldIndex := 1 to RecRef.FieldCount() do begin
+                        RecordsList.Append(RecRef.FieldIndex(FieldIndex).Value());
+                        RecordsList.Append(', ')
+                    end;
+                    RecordsList.Append('; ');
+                until (RecRef.Next() = 0) or (RecordIndex = 50);
+                Error(RecordCountWithListErr, RecRef.Caption, ExpectedCount, RecRef.Count, RecRef.GetFilters, RecordsList.ToText());
+            end;
             Error(RecordCountErr, RecRef.Caption, ExpectedCount, RecRef.Count, RecRef.GetFilters);
+        end;
         RecRef.Close();
-    end;
-
-    procedure KnownFailure(Expected: Text; WorkItemNo: Integer)
-    begin
-        ExpectedError(Expected);
-        Error(KnownFailureMsg, WorkItemNo)
     end;
 
     procedure ExpectedError(Expected: Text)

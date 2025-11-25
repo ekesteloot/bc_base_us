@@ -23,7 +23,8 @@ codeunit 9200 "Matrix Management"
         Text002: Label 'The period could not be found.';
         Text003: Label 'There are no Calendar entries within the filter.';
 #pragma warning restore AA0074
-        RoundingFormatTxt: Label '<Precision,%1><Standard Format,0>', Locked = true;
+        RoundingFormatTxt: Label '<Precision,%1><Standard Format,0>%2', Locked = true;
+        NegativeInParenthesesFormatTxt: Label ';(#,##0.00)', Locked = true;
 
     procedure SetPeriodColumnSet(DateFilter: Text; PeriodType: Enum "Analysis Period Type"; Direction: Option Backward,Forward; var FirstColumn: Date; var LastColumn: Date; NoOfColumns: Integer)
     var
@@ -280,6 +281,8 @@ codeunit 9200 "Matrix Management"
                         RecRef.Get(RecRef.RecordId);
                     end;
                 end;
+            else
+                OnMatrixPageStepTypeInGenerateMatrixDataExtended(SetWanted, MaximumSetLength, RecRef);
         end;
 
         RecordPosition := RecRef.GetPosition();
@@ -402,7 +405,7 @@ codeunit 9200 "Matrix Management"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeGeneratePeriodAndCaption(PeriodType, Calendar, IsHandled, UseNameForCaption);
+        OnBeforeGeneratePeriodAndCaption(PeriodType, Calendar, IsHandled, UseNameForCaption, CurrSetLength, CaptionSet, PeriodRecords);
         if IsHandled then
             exit;
 
@@ -530,6 +533,11 @@ codeunit 9200 "Matrix Management"
     end;
 
     procedure FormatRoundingFactor(RoundingFactor: Enum "Analysis Rounding Factor"; AddCurrency: Boolean): Text
+    begin
+        exit(FormatRoundingFactor(RoundingFactor, AddCurrency, Enum::"Analysis Negative Format"::"Minus Sign"));
+    end;
+
+    procedure FormatRoundingFactor(RoundingFactor: Enum "Analysis Rounding Factor"; AddCurrency: Boolean; NegativeAmountFormat: Enum "Analysis Negative Format") Result: Text
     var
         AmountDecimal: Text;
     begin
@@ -543,7 +551,14 @@ codeunit 9200 "Matrix Management"
             else
                 OnFormatRoundingFactorOnElse(AmountDecimal, RoundingFactor);
         end;
-        exit(StrSubstNo(RoundingFormatTxt, AmountDecimal));
+        case NegativeAmountFormat of
+            NegativeAmountFormat::"Minus Sign":
+                Result := StrSubstNo(RoundingFormatTxt, AmountDecimal, '');
+            NegativeAmountFormat::"Parentheses":
+                Result := StrSubstNo(RoundingFormatTxt, AmountDecimal, NegativeInParenthesesFormatTxt);
+            else
+                OnFormatRoundingFactorNegativeFormatOnElse(AmountDecimal, NegativeAmountFormat, Result);
+        end;
     end;
 
     [IntegrationEvent(false, false)]
@@ -552,7 +567,7 @@ codeunit 9200 "Matrix Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeGeneratePeriodAndCaption(PeriodType: Enum "Analysis Period Type"; Calendar: Record Date; var IsHandled: Boolean; UseNameForCaption: Boolean)
+    local procedure OnBeforeGeneratePeriodAndCaption(PeriodType: Enum "Analysis Period Type"; Calendar: Record Date; var IsHandled: Boolean; UseNameForCaption: Boolean; var CurrSetLength: Integer; var CaptionSet: array[32] of Text[80]; var PeriodRecords: array[32] of Record Date temporary)
     begin
     end;
 
@@ -563,6 +578,11 @@ codeunit 9200 "Matrix Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnFormatRoundingFactorOnElse(var AmountDecimal: Text; RoundingFactor: Enum "Analysis Rounding Factor")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnFormatRoundingFactorNegativeFormatOnElse(AmountDecimal: Text; NegativeAmountFormat: Enum "Analysis Negative Format"; var Result: Text)
     begin
     end;
 
@@ -583,6 +603,11 @@ codeunit 9200 "Matrix Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnGeneratePeriodMatrixDataOnBeforeFindDateBasedOnStepType(SetWanted: Option; var CalendarDate: Record Date; PeriodType: Enum "Analysis Period Type")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnMatrixPageStepTypeInGenerateMatrixDataExtended(SetWanted: Option; MaximumSetLength: Integer; var RecRef: RecordRef)
     begin
     end;
 }

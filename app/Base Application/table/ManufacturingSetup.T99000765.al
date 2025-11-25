@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Manufacturing.Setup;
 
 using Microsoft.Foundation.Calendar;
@@ -9,17 +13,20 @@ using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Forecast;
 using Microsoft.Manufacturing.MachineCenter;
 using Microsoft.Manufacturing.ProductionBOM;
+using System.Utilities;
 
 table 99000765 "Manufacturing Setup"
 {
     Caption = 'Manufacturing Setup';
-    LookupPageID = "Manufacturing Setup";
     DataClassification = CustomerContent;
+    DrillDownPageID = "Manufacturing Setup";
+    LookupPageID = "Manufacturing Setup";
 
     fields
     {
         field(1; "Primary Key"; Code[10])
         {
+            AllowInCustomizations = Never;
             Caption = 'Primary Key';
             Editable = false;
         }
@@ -156,12 +163,19 @@ table 99000765 "Manufacturing Setup"
             Caption = 'Show Capacity In';
             TableRelation = "Capacity Unit of Measure".Code;
         }
-        field(3687; "Optimize low-level code calc."; Boolean)
+        field(210; "Finish Order without Output"; Boolean)
         {
-            Caption = 'Optimize low-level code calculation';
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Codeunit Calc. Low-level code is obsolete. Use Codeunit Low-Level Code Calculator instead.';
-            ObsoleteTag = '23.0';
+            Caption = 'Finish Order without Output';
+
+            trigger OnValidate()
+            begin
+                CheckAndConfirmFinishOrderWithoutOutput();
+            end;
+        }
+        field(250; "Inc. Non. Inv. Cost To Prod"; Boolean)
+        {
+            Caption = 'Include Non-Inventory Items to Produced Items';
+            ToolTip = 'Specifies whether to include the non-inventory items cost to produce items.';
         }
         field(5500; "Preset Output Quantity"; Option)
         {
@@ -182,5 +196,31 @@ table 99000765 "Manufacturing Setup"
     fieldgroups
     {
     }
-}
 
+    var
+        RecordHasBeenRead: Boolean;
+        FinishOrderWithoutOutputQst: Label 'You will not be able to disable %1 once you have enabled it.\\Do you want to continue?', Comment = '%1 = Field Caption';
+        NotAllowedDisableFinishOrderWithoutOutputErr: Label 'You are not allowed to disable %1 once you have enabled it.', Comment = '%1 = Field Caption';
+
+    procedure GetRecordOnce()
+    begin
+        if RecordHasBeenRead then
+            exit;
+        Get();
+        RecordHasBeenRead := true;
+    end;
+
+    local procedure CheckAndConfirmFinishOrderWithoutOutput()
+    var
+        ConfirmManagement: Codeunit "Confirm Management";
+    begin
+        if (xRec."Finish Order without Output") and (not Rec."Finish Order without Output") then
+            Error(NotAllowedDisableFinishOrderWithoutOutputErr, Rec.FieldCaption("Finish Order without Output"));
+
+        if not ConfirmManagement.GetResponseOrDefault(
+            StrSubstNo(FinishOrderWithoutOutputQst, Rec.FieldCaption("Finish Order without Output")),
+            false)
+        then
+            Error('');
+    end;
+}

@@ -152,7 +152,7 @@ codeunit 5402 "Unit of Measure Management"
         exit(QtyRounded);
     end;
 
-    internal procedure ValidateQtyIsBalanced(TotalQty: Decimal; TotalQtyBase: Decimal; QtyToHandle: Decimal; QtyToHandleBase: Decimal; QtyHandled: Decimal; QtyHandledBase: Decimal)
+    procedure ValidateQtyIsBalanced(TotalQty: Decimal; TotalQtyBase: Decimal; QtyToHandle: Decimal; QtyToHandleBase: Decimal; QtyHandled: Decimal; QtyHandledBase: Decimal)
     var
         RemainingQty: Decimal;
         RemainingQtyBase: Decimal;
@@ -208,6 +208,18 @@ codeunit 5402 "Unit of Measure Management"
         if RoundingPrecision = 0 then
             RoundingPrecision := 0.00001;
         exit(RoundingPrecision);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Item Unit of Measure", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure ClearItemUnitOfMeasureRec()
+    begin
+        Clear(ItemUnitOfMeasure);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Resource Unit of Measure", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure ClearResourceUnitOfMeasureRec()
+    begin
+        Clear(ResourceUnitOfMeasure);
     end;
 
     [IntegrationEvent(false, false)]

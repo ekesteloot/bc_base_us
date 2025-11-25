@@ -1,4 +1,8 @@
-﻿namespace Microsoft.Bank.Reconciliation;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Bank.Reconciliation;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.DirectDebit;
@@ -101,8 +105,6 @@ codeunit 1255 "Match Bank Payments"
         PaymentRecPreformanceCategoryLbl: Label 'PaymentRecPerformance', Locked = true;
         MatchedLineTelemetryTxt: Label 'Line with SystemId: %1 Matched, Total Time: %2.  Total time Customer Matching %3, Total time Vendor Matching: %4, Total time Employee Matching: %5,Total time Bank Ledger Entries: %6, Total Time TextMappings: %7', Locked = true;
         AppliedEntriesToBankStatementLineTxt: Label 'Line with SystemId: %1 - Applied entries - Account Type: %2, One-To-Many match: %3, Match Quality: %4.', Locked = true;
-        TotalLedgerEntriesSummaryTxt: Label 'Count: Cust. Ledg. Entries: %1, Vendor Ledg. Entries: %2, Bank Ledg. Entries: %3.', Locked = true;
-        TotalTimeSummaryTxt: Label 'TimeSummary: Total Time: Customer Ledger Entries: %1, Vendor Ledger Entries: %2, Employee Ledger Entries: %3, Bank Ledger Entries: %4, TextMappings: %5.', Locked = true;
         SpecificTaskSummaryTxt: Label 'Specific Task Summary: TotalTimeDirectCollection: %1, TotalTimeRelatedPartyMatching: %2, TotalTimeDocumentNoMatching: %3, TotalTimeAmountMatching: %4, TotalTimeStringNearness: %5, TotalTimeDocumentNoMatchingForBankLedgerEntry: %6, TotalTimeSearchingDocumentNoInLedgerEntries: %7, HitCountClosingDocumentMatches: %8 out of %9', Locked = true;
         MissingRelatedPartyTelemetryMsg: Label 'The ledger entries contain the entries that do not exist in master data. This is indication of corrupted ledger entries. Master data type %1.', Locked = true, Comment = '%1 Master Data Type';
         PmtRecNoSeriesNotificationNameLbl: Label 'Payment reconciliation journals need a number series.';
@@ -272,7 +274,13 @@ codeunit 1255 "Match Bank Payments"
         EmployeeLedgerEntry: Record "Employee Ledger Entry";
         Prefix: Code[50];
         MaxEntriesToCheck: Integer;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeNotifyIfEntriesMatchedElsewhere(BankAccReconciliationLine, IsHandled);
+        if IsHandled then
+            exit;
+
         if not GuiAllowed() then
             exit;
         MaxEntriesToCheck := 600;
@@ -564,9 +572,6 @@ codeunit 1255 "Match Bank Payments"
 
             UpdateOneToManyMatches(BankAccReconciliationLine);
 
-            Session.LogMessage('0000DKB', StrSubstNo(TotalLedgerEntriesSummaryTxt, TempCustomerLedgerEntryMatchingBuffer.Count(), TempVendorLedgerEntryMatchingBuffer.Count(), TempBankAccLedgerEntryMatchingBuffer.Count()), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PaymentRecPreformanceCategoryLbl);
-
-            Session.LogMessage('0000DKC', StrSubstNo(TotalTimeSummaryTxt, TotalTimeMatchingCustomerLedgerEntriesPerLine, TotalTimeMatchingVendorLedgerEntriesPerLine, TotalTimeMatchingEmployeeLedgerEntriesPerLine, TotalTimeMatchingBankLedgerEntriesPerLine, TotalTimeTimeTextMappingsPerLine), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PaymentRecPreformanceCategoryLbl);
             Session.LogMessage('0000DKD', StrSubstNo(SpecificTaskSummaryTxt, TotalTimeDirectCollection, TotalTimeRelatedPartyMatching, TotalTimeDocumentNoMatching, TotalTimeAmountMatching, TotalTimeStringNearness, TotalTimeDocumentNoMatchingForBankLedgerEntry, TotalTimeSearchingDocumentNoInLedgerEntries, HitCountClosingDocumentMatches, TotalNoClosingDocumentMatches), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PaymentRecPreformanceCategoryLbl);
 
             Window.Close();
@@ -653,6 +658,8 @@ codeunit 1255 "Match Bank Payments"
         LineSplitMsg: Text;
         ParentLineNo: Integer;
         TransactionID: Text[50];
+        DifferenceTransferred: Boolean;
+        SuppressMessage: Boolean;
     begin
         if BankAccReconciliationLine.IsEmpty() or (BankAccReconciliationLine.Difference = 0) then
             exit;
@@ -662,7 +669,8 @@ codeunit 1255 "Match Bank Payments"
         if not TempGenJournalLine.Insert() then
             TempGenJournalLine.Modify();
 
-        if PAGE.RunModal(PAGE::"Transfer Difference to Account", TempGenJournalLine) = ACTION::LookupOK then begin
+        RunTransferDifferencetoAccount(BankAccReconciliationLine, TempGenJournalLine, DifferenceTransferred);
+        if DifferenceTransferred then begin
             if TempGenJournalLine."Account No." = '' then
                 Error(MustChooseAccountErr);
 
@@ -707,9 +715,25 @@ codeunit 1255 "Match Bank Payments"
             BankAccReconciliationLine.SetRange("Statement No.", BankAccReconciliationLine."Statement No.");
             BankAccReconciliationLine.SetRange("Statement Line No.", BankAccReconciliationLine."Statement Line No.");
             UpdatePaymentMatchDetails(BankAccReconciliationLine);
-            if LineSplitMsg <> '' then
-                Message(LineSplitMsg);
+            if LineSplitMsg <> '' then begin
+                OnBeforeShowLineSplitMessage(BankAccReconciliationLine, SuppressMessage);
+                if not SuppressMessage then
+                    Message(LineSplitMsg);
+            end;
         end;
+    end;
+
+    local procedure RunTransferDifferencetoAccount(BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var TempGenJnlLine: Record "Gen. Journal Line" temporary; var DifferenceTransferred: Boolean)
+    begin
+        DifferenceTransferred := false;
+        OnTransferDifference(BankAccReconciliationLine, TempGenJnlLine, DifferenceTransferred);
+        if DifferenceTransferred then
+            exit;
+
+        if not GuiAllowed() then
+            exit;
+
+        DifferenceTransferred := Page.RunModal(Page::"Transfer Difference to Account", TempGenJnlLine) = Action::LookupOK;
     end;
 
     procedure MatchSingleLineCustomer(var BankPmtApplRule: Record "Bank Pmt. Appl. Rule"; BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; AppliesToEntryNo: Integer; var NoOfLedgerEntriesWithinTolerance: Integer; var NoOfLedgerEntriesOutsideTolerance: Integer)
@@ -834,7 +858,7 @@ codeunit 1255 "Match Bank Payments"
     begin
         InitializeBankPmtApplSettings();
         TempLedgerEntryMatchingBuffer.Reset();
-        OnFindMatchingEntriesOnBeforeFindFirst(TempBankAccReconciliationLine, TempLedgerEntryMatchingBuffer, AccountType, ApplyEntries);
+        OnFindMatchingEntriesOnBeforeFindFirst(TempBankAccReconciliationLine, TempLedgerEntryMatchingBuffer, AccountType, SkipOtherEntries, ApplyEntries);
         if TempLedgerEntryMatchingBuffer.FindFirst() then
             repeat
                 FindMatchingEntry(TempLedgerEntryMatchingBuffer, TempBankAccReconciliationLine, AccountType, BankPmtApplRule);
@@ -2337,6 +2361,7 @@ codeunit 1255 "Match Bank Payments"
         CustLedgEntry.CalcFields("Remaining Amount");
         CustLedgEntry."Applies-to ID" := AppliesToID;
         CustLedgEntry."Amount to Apply" := CustLedgEntry."Remaining Amount";
+        OnSetCustAppicationDataOnBeforeCustEntryEdit(CustLedgEntry);
         CODEUNIT.Run(CODEUNIT::"Cust. Entry-Edit", CustLedgEntry);
     end;
 
@@ -2348,6 +2373,7 @@ codeunit 1255 "Match Bank Payments"
         VendLedgEntry.CalcFields("Remaining Amount");
         VendLedgEntry."Applies-to ID" := AppliesToID;
         VendLedgEntry."Amount to Apply" := VendLedgEntry."Remaining Amount";
+        OnSetVendAppicationDataOnBeforeVendEntryEdit(VendLedgEntry);
         CODEUNIT.Run(CODEUNIT::"Vend. Entry-Edit", VendLedgEntry);
     end;
 
@@ -2443,6 +2469,11 @@ codeunit 1255 "Match Bank Payments"
     begin
     end;
 
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeNotifyIfEntriesMatchedElsewhere(BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var IsHandled: Boolean)
+    begin
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeIsVendorBankAccountMatching(ValueFromBankStatement: Text; VendorNo: Code[20]; BankAccountNo: Code[20]; var Result: Boolean; var IsHandled: Boolean)
     begin
@@ -2459,7 +2490,7 @@ codeunit 1255 "Match Bank Payments"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnFindMatchingEntriesOnBeforeFindFirst(var TempBankAccReconciliationLine: Record "Bank Acc. Reconciliation Line" temporary; var TempLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; AccountType: Enum "Gen. Journal Account Type"; var SkipOtherEntries: Boolean)
+    local procedure OnFindMatchingEntriesOnBeforeFindFirst(var TempBankAccReconciliationLine: Record "Bank Acc. Reconciliation Line" temporary; var TempLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; AccountType: Enum "Gen. Journal Account Type"; var SkipOtherEntries: Boolean; var ApplyEntries: Boolean)
     begin
     end;
 
@@ -2600,6 +2631,26 @@ codeunit 1255 "Match Bank Payments"
 
     [IntegrationEvent(false, false)]
     local procedure OnFindTextMappingsOnAfterTextMapperMatched(var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var TextToAccountMapping: Record "Text-to-Account Mapping"; var TempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSetCustAppicationDataOnBeforeCustEntryEdit(var CustLedgerEntry: Record "Cust. Ledger Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnTransferDifference(BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var TempGenJnlLine: Record "Gen. Journal Line" temporary; var DifferenceTransferred: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSetVendAppicationDataOnBeforeVendEntryEdit(var VendorLedgerEntry: Record "Vendor Ledger Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeShowLineSplitMessage(BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var SuppressMessage: Boolean)
     begin
     end;
 }

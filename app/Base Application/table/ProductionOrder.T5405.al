@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Manufacturing.Document;
 
 using Microsoft.Finance.Dimension;
@@ -61,6 +65,7 @@ table 5405 "Production Order"
         field(3; Description; Text[100])
         {
             Caption = 'Description';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             begin
@@ -74,6 +79,7 @@ table 5405 "Production Order"
         field(5; "Description 2"; Text[50])
         {
             Caption = 'Description 2';
+            OptimizeForTextSearch = true;
         }
         field(6; "Creation Date"; Date)
         {
@@ -98,7 +104,7 @@ table 5405 "Production Order"
         field(10; "Source No."; Code[20])
         {
             Caption = 'Source No.';
-            TableRelation = if ("Source Type" = const(Item)) Item where(Type = const(Inventory))
+            TableRelation = if ("Source Type" = const(Item)) Item where(Type = const(Inventory), "Production Blocked" = filter(<> Output))
             else
             if ("Source Type" = const(Family)) Family
             else
@@ -171,7 +177,8 @@ table 5405 "Production Order"
         {
             Caption = 'Variant Code';
             TableRelation = if ("Source Type" = const(Item)) "Item Variant".Code where("Item No." = field("Source No."),
-                                                                                        Code = field("Variant Code"));
+                                                                                        Code = field("Variant Code"),
+                                                                                        "Production Blocked" = filter(<> Output));
 
             trigger OnValidate()
             var
@@ -569,6 +576,18 @@ table 5405 "Production Order"
                 Validate("Ending Time");
             end;
         }
+        field(110; "Document Put-away Status"; Option)
+        {
+            Caption = 'Document Put-away Status';
+            Editable = false;
+            OptionCaption = ' ,Partially Put Away,Completely Put Away';
+            OptionMembers = " ","Partially Put Away","Completely Put Away";
+        }
+        field(200; "Reopened"; Boolean)
+        {
+            Caption = 'Reopened';
+            Editable = false;
+        }
         field(480; "Dimension Set ID"; Integer)
         {
             Caption = 'Dimension Set ID';
@@ -633,7 +652,7 @@ table 5405 "Production Order"
 
     fieldgroups
     {
-        fieldgroup(DropDown; "No.", Description, "Source No.", "Source Type")
+        fieldgroup(DropDown; "No.", Description, "Source No.", "Source Type", "Due Date")
         {
         }
         fieldgroup(Brick; "No.", Description, "Source No.", Status, "Due Date")
@@ -1103,6 +1122,32 @@ table 5405 "Production Order"
         NavigatePage.Run();
     end;
 
+    procedure GetHeaderStatus(SkipLineNo: Integer): Integer
+    var
+        ProdOrderLine: Record "Prod. Order Line";
+    begin
+        ProdOrderLine.SetLoadFields("Put-away Status");
+        ProdOrderLine.SetRange(Status, Status);
+        ProdOrderLine.SetRange("Prod. Order No.", "No.");
+        if SkipLineNo <> 0 then
+            ProdOrderLine.SetFilter("Line No.", '<>%1', SkipLineNo);
+
+        ProdOrderLine.SetRange("Put-away Status", ProdOrderLine."Put-away Status"::"Completely Put Away");
+        if not ProdOrderLine.IsEmpty() then begin
+            ProdOrderLine.SetFilter("Put-away Status", '<>%1', ProdOrderLine."Put-away Status"::"Completely Put Away");
+            if not ProdOrderLine.IsEmpty() then
+                exit(ProdOrderLine."Put-away Status"::"Partially Put Away");
+
+            exit(ProdOrderLine."Put-away Status"::"Completely Put Away");
+        end else begin
+            ProdOrderLine.SetRange("Put-away Status", ProdOrderLine."Put-away Status"::"Partially Put Away");
+            if not ProdOrderLine.IsEmpty() then
+                exit(ProdOrderLine."Put-away Status"::"Partially Put Away");
+        end;
+
+        exit(ProdOrderLine."Put-away Status"::" ");
+    end;
+
     procedure CreatePick(AssignedUserID: Code[50]; SortingMethod: Option; SetBreakBulkFilter: Boolean; DoNotFillQtyToHandle: Boolean; PrintDocument: Boolean)
     var
         ProdOrderCompLine: Record "Prod. Order Component";
@@ -1409,6 +1454,7 @@ table 5405 "Production Order"
                       ProdOrderLine."Dimension Set ID", ProdOrderLine."Shortcut Dimension 1 Code", ProdOrderLine."Shortcut Dimension 2 Code");
                     ProdOrderLine.Modify();
                     ProdOrderLine.UpdateProdOrderCompDim(NewDimSetID, OldDimSetID);
+                    OnUpdateAllLineDimOnAfterUpdateProdOrderCompDim(Rec, ProdOrderLine, NewParentDimSetID, OldParentDimSetID);
                 end;
             until ProdOrderLine.Next() = 0;
     end;
@@ -1682,6 +1728,11 @@ table 5405 "Production Order"
 
     [IntegrationEvent(false, false)]
     local procedure OnShowDocDimOnAfterSetDimensionSetID(var ProductionOrder: Record "Production Order"; xProductionOrder: Record "Production Order")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateAllLineDimOnAfterUpdateProdOrderCompDim(var ProductionOrder: Record "Production Order"; var  ProdOrderLine: Record "Prod. Order Line"; NewParentDimSetID: Integer; OldParentDimSetID: Integer);
     begin
     end;
 }

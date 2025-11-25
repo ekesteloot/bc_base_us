@@ -1,8 +1,14 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Manufacturing.Document;
 
 using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Attachment;
 using Microsoft.Inventory.Ledger;
 using Microsoft.Manufacturing.Capacity;
+using Microsoft.Warehouse.Activity;
 using Microsoft.Warehouse.Activity.History;
 using Microsoft.Warehouse.InventoryDocument;
 using Microsoft.Warehouse.Ledger;
@@ -89,6 +95,12 @@ page 99000867 "Finished Production Order"
                     Editable = false;
                     ToolTip = 'Specifies when the production order card was last modified.';
                 }
+                field(Reopened; Rec."Reopened")
+                {
+                    ApplicationArea = Manufacturing;
+                    Editable = false;
+                    ToolTip = 'Specifies if the production order is reopened.';
+                }
             }
             part(ProdOrderLines; "Finished Prod. Order Lines")
             {
@@ -168,6 +180,15 @@ page 99000867 "Finished Production Order"
             {
                 ApplicationArea = Notes;
                 Visible = true;
+            }
+            part("Attached Documents List"; "Doc. Attachment List Factbox")
+            {
+                ApplicationArea = Manufacturing;
+                Caption = 'Documents';
+                UpdatePropagation = Both;
+                SubPageLink = "Table ID" = const(Database::"Production Order"),
+                              "Document Type" = const("Finished Production Order"),
+                              "No." = field("No.");
             }
         }
     }
@@ -291,6 +312,71 @@ page 99000867 "Finished Production Order"
                     RunPageView = sorting("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
                     ToolTip = 'View the list of inventory movements that have been made for the order.';
                 }
+                action("Create Warehouse Put-Away")
+                {
+                    ApplicationArea = Warehouse;
+                    Caption = 'Create Warehouse Put-Away';
+                    Image = CreatePutAway;
+                    ToolTip = 'Create warehouse put-away documents for the production order lines.';
+
+                    trigger OnAction()
+                    var
+                        CreatePutAway: Codeunit "Create Put-away";
+                    begin
+                        CreatePutAway.CreateProdPutAwayFromProdOrder(Rec);
+                    end;
+                }
+                action(DocAttach)
+                {
+                    ApplicationArea = Manufacturing;
+                    Caption = 'Attachments';
+                    Image = Attach;
+                    ToolTip = 'Add a file as an attachment. You can attach images as well as documents.';
+
+                    trigger OnAction()
+                    var
+                        DocumentAttachmentDetails: Page "Document Attachment Details";
+                        RecRef: RecordRef;
+                    begin
+                        RecRef.GetTable(Rec);
+                        DocumentAttachmentDetails.OpenForRecRef(RecRef);
+                        DocumentAttachmentDetails.RunModal();
+                    end;
+                }
+            }
+        }
+        area(Processing)
+        {
+            action(PrintLabel)
+            {
+                ApplicationArea = Manufacturing;
+                Image = Print;
+                Caption = 'Print Label';
+                ToolTip = 'Print Labels for the items on the order lines.';
+
+                trigger OnAction()
+                var
+                    ItemLedgerEntry: Record "Item Ledger Entry";
+                    OutputItemLabel: Report "Output Item Label";
+                begin
+                    ItemLedgerEntry.SetRange("Order No.", Rec."No.");
+                    OutputItemLabel.SetTableView(ItemLedgerEntry);
+                    OutputItemLabel.RunModal();
+                end;
+            }
+            action(ReopenFinishedProdOrder)
+            {
+                ApplicationArea = Manufacturing;
+                Caption = 'Reopen';
+                Image = ReOpen;
+                ToolTip = 'Reopen the production order to change it after it has been finished.';
+
+                trigger OnAction()
+                var
+                    ProdOrderStatusManagement: Codeunit "Prod. Order Status Management";
+                begin
+                    ProdOrderStatusManagement.ReopenFinishedProdOrder(Rec);
+                end;
             }
         }
         area(Promoted)
@@ -306,6 +392,9 @@ page 99000867 "Finished Production Order"
                 {
                 }
                 actionref("Co&mments_Promoted"; "Co&mments")
+                {
+                }
+                actionref(DocAttach_Promoted; DocAttach)
                 {
                 }
             }

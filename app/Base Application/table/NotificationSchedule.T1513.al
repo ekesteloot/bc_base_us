@@ -116,9 +116,9 @@ table 1513 "Notification Schedule"
         JobQueueEntry: Record "Job Queue Entry";
     begin
         if Rec.Recurrence = Rec.Recurrence::Instantly then
-            JobQueueEntry.ReuseExistingJobFromCategoryAndUser(NotifyNowLbl, UserId(), OneMinuteFromNow())
+            JobQueueEntry.ReuseExistingJobFromUserCategoryCodeunitAndParamString(UserId(), NotifyNowLbl, CODEUNIT::"Notification Entry Dispatcher", '', OneMinuteFromNow())
         else
-            JobQueueEntry.ReuseExistingJobFromCategoryAndUser(NotifyLaterLbl, UserId(), OneMinuteFromNow());
+            JobQueueEntry.ReuseExistingJobFromUserCategoryCodeunitAndParamString(UserId(), NotifyLaterLbl, CODEUNIT::"Notification Entry Dispatcher", '', OneMinuteFromNow());
     end;
 
     trigger OnModify()
@@ -126,13 +126,13 @@ table 1513 "Notification Schedule"
         JobQueueEntry: Record "Job Queue Entry";
     begin
         if Rec.Recurrence = Rec.Recurrence::Instantly then
-            JobQueueEntry.ReuseExistingJobFromCategoryAndUser(NotifyNowLbl, UserId(), OneMinuteFromNow())
+            JobQueueEntry.ReuseExistingJobFromUserCategoryCodeunitAndParamString(UserId(), NotifyNowLbl, CODEUNIT::"Notification Entry Dispatcher", '', OneMinuteFromNow())
         else
-            JobQueueEntry.ReuseExistingJobFromCategoryAndUser(NotifyLaterLbl, UserId(), OneMinuteFromNow());
+            JobQueueEntry.ReuseExistingJobFromUserCategoryCodeunitAndParamString(UserId(), NotifyLaterLbl, CODEUNIT::"Notification Entry Dispatcher", '', OneMinuteFromNow());
     end;
 
     var
-        NotifyNowDescriptionTxt: Label 'Instant Notification Job';
+        NotifyNowDescriptionTxt: Label 'Instant Notification Job', MaxLength = 30;
         NoPermissionsErr: Label 'You are not allowed to send notifications, but your system administrator can give you permission to do so. Specifically, ask for the %1 for the %2 table.', Comment = '%1 Permission Type; %2 Table Name';
         NotifyNowLbl: Label 'NOTIFYNOW', Locked = true;
         WritePermissionTok: Label 'Insert, Modify, and Delete permissions';
@@ -368,13 +368,13 @@ table 1513 "Notification Schedule"
     begin
         CheckRequiredPermissions();
 
-        if JobQueueEntry.ReuseExistingJobFromCategoryAndUser(NotifyNowLbl, UserId(), OneMinuteFromNow()) then
+        if JobQueueEntry.ReuseExistingJobFromUserCategoryCodeunitAndParamString(UserId(), NotifyNowLbl, CODEUNIT::"Notification Entry Dispatcher", '', OneMinuteFromNow()) then
             exit;
 
         if AzureADGraphUser.IsUserDelegatedAdmin() or AzureADGraphUser.IsUserDelegatedHelpdesk() then // can't use JQ
             SendNotificationInForeground()
         else begin
-            JobQueueCategory.InsertRec(NotifyNowLbl, NotifyNowDescriptionTxt);
+            JobQueueCategory.InsertRec(NotifyNowLbl, CopyStr(NotifyNowDescriptionTxt, 1, 30));
             JobQueueEntry.ScheduleJobQueueEntryForLater(
               CODEUNIT::"Notification Entry Dispatcher", OneMinuteFromNow(), NotifyNowLbl, '');
         end;
@@ -404,7 +404,7 @@ table 1513 "Notification Schedule"
         NotificationEntry.SetRange("Recipient User ID", RecipientUserID);
         NotificationEntry.SetRange(Type, "Notification Type");
 
-        if JobQueueEntry.ReuseExistingJobFromUserCategoryAndParamString(UserId(), NotifyLaterLbl, CopyStr(NotificationEntry.GetView(), 1, MaxStrLen(JobQueueEntry."Parameter String")), ExecutionDateTime) then
+        if JobQueueEntry.ReuseExistingJobFromUserCategoryCodeunitAndParamString(UserId(), NotifyLaterLbl, CODEUNIT::"Notification Entry Dispatcher", CopyStr(NotificationEntry.GetView(), 1, MaxStrLen(JobQueueEntry."Parameter String")), ExecutionDateTime) then
             exit;
 
         JobQueueEntry.ScheduleJobQueueEntryForLater(

@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Inventory.Availability;
 
 using Microsoft.Foundation.Company;
@@ -96,6 +100,7 @@ codeunit 99000886 "Capable to Promise"
             exit(NeededDate);
         RemoveReqLines(LocOrderPromisingID, LocSourceLineNo, LastValidLine, false);
         SetOrderPromisingParameters(LocOrderPromisingID, LocSourceLineNo, PeriodLengthFormula);
+        OnCalcCapableToPromiseDateOnAfterSetOrderPromisingParameters(ItemNo, VariantCode, LocationCode, PeriodLengthFormula, OrderPromisingStart, OrderPromisingEnd);
 
         CapableToPromiseDate := 0D;
         CalculationStartDate := NeededDate;
@@ -189,8 +194,8 @@ codeunit 99000886 "Capable to Promise"
           LeadTimeMgt.GetPlannedEndingDate(
             ItemNo, LocationCode, VariantCode, DueDate, ReqLine."Vendor No.", ReqLine."Ref. Order Type"));
         ReqLine."Ending Time" := 235959T;
-        ReqLine.Validate(Quantity, Quantity);
         ReqLine.Validate("Unit of Measure Code", Unit);
+        ReqLine.Validate(Quantity, Quantity);
         if ReqLine."Starting Date" = 0D then
             ReqLine."Starting Date" := WorkDate();
         OnBeforeReqLineInsert(ReqLine);
@@ -234,6 +239,7 @@ codeunit 99000886 "Capable to Promise"
         PlanningComponent.SetRange("Worksheet Template Name", ReqLine."Worksheet Template Name");
         PlanningComponent.SetRange("Worksheet Batch Name", ReqLine."Journal Batch Name");
         PlanningComponent.SetRange("Worksheet Line No.", ReqLine."Line No.");
+        PlanningComponent.SetFilter(Quantity, '<>%1', 0);
         if PlanningComponent.FindSet() then
             repeat
                 if (PlanningComponent."Supplied-by Line No." = 0) and PlanningComponent.Critical then begin
@@ -399,11 +405,16 @@ codeunit 99000886 "Capable to Promise"
         NoSeries: Codeunit "No. Series";
 #if not CLEAN24
         NoSeriesManagement: Codeunit NoSeriesManagement;
-        IsHandled: Boolean;
 #endif
         NewRefOrderNo: Code[20];
         LastRefOrderNo: Code[20];
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeReassignRefOrderNos(OrderPromisingID, IsHandled);
+        if IsHandled then
+            exit;
+
         RequisitionLine.SetCurrentKey("Ref. Order Type", "Ref. Order Status", "Ref. Order No.", "Ref. Line No.");
         RequisitionLine.SetRange("Order Promising ID", OrderPromisingID);
         RequisitionLine.SetRange("Ref. Order Type", RequisitionLine."Ref. Order Type"::"Prod. Order");
@@ -434,6 +445,7 @@ codeunit 99000886 "Capable to Promise"
             end;
 #endif
             RequisitionLine.ModifyAll("Ref. Order No.", NewRefOrderNo);
+            OnReassignRefOrderNosOnAfterRequisitionLineModifyAll(RequisitionLine);
             RequisitionLine.SetFilter("Ref. Order No.", '<>%1&<=%2', '', LastRefOrderNo);
         until RequisitionLine.Next() = 0;
     end;
@@ -470,6 +482,21 @@ codeunit 99000886 "Capable to Promise"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckTransferShptCTP(RequisitionLine: Record "Requisition Line"; PeriodType: Enum "Analysis Period Type"; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnCalcCapableToPromiseDateOnAfterSetOrderPromisingParameters(ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10]; PeriodLengthFormula: DateFormula; var OrderPromisingStart: Date; var OrderPromisingEnd: Date);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeReassignRefOrderNos(OrderPromisingID: Code[20]; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnReassignRefOrderNosOnAfterRequisitionLineModifyAll(var RequisitionLine: Record "Requisition Line");
     begin
     end;
 }

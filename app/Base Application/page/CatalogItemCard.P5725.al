@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Inventory.Item.Catalog;
 
 using Microsoft.Foundation.Comment;
@@ -142,7 +146,7 @@ page 5725 "Catalog Item Card"
                     RunObject = Page "Item Substitution Entry";
                     RunPageLink = Type = const("Nonstock Item"),
                                   "No." = field("Entry No.");
-                    ToolTip = 'View substitute items that are set up to be sold instead of the item.';
+                    ToolTip = ' View or edit substitute items that are set up to be traded instead of the item in case it is not available.';
                 }
                 action("Co&mments")
                 {

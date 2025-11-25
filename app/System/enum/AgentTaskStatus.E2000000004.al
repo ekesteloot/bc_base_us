@@ -65,12 +65,4 @@ enum 2000000004 "Agent Task Status"
     {
         Caption = 'Stopped by System';
     }
-
-    /// <summary>
-    /// The task has encountered an internal error and will not continue running. However, the task may be manually resumed by a user.
-    /// </summary>
-    value(7; "Internal Error")
-    {
-        Caption = 'Internal Error';
-    }
 }

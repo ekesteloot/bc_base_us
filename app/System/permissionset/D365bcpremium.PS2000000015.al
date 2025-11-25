@@ -44,5 +44,6 @@ permissionset 2000000015 D365BCPremium
                   tabledata "Table Mappings" = RIMD,
                   tabledata "User Default Style Sheet" = RIMD,
                   tabledata "User Page Metadata" = RIMD,
-                  tabledata "Webhook Notification" = RIMD;
+                  tabledata "Webhook Notification" = RIMD,
+                  system "Manage Agent Tasks" = X;
 }

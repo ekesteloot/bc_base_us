@@ -3444,7 +3444,7 @@ codeunit 7201 "CDS Integration Impl."
         [NonDebuggable]
         FirstPartyAppId: Text;
         [NonDebuggable]
-        FirstPartyAppCertificate: Text;
+        FirstPartyAppCertificate: SecretText;
         RedirectUrl: Text;
         AuthCodeError: Text;
     begin
@@ -3454,13 +3454,13 @@ codeunit 7201 "CDS Integration Impl."
         FirstPartyAppId := GetCDSConnectionFirstPartyAppId();
         FirstPartyAppCertificate := GetCDSConnectionFirstPartyAppCertificate();
 
-        if (FirstPartyAppId = '') or (FirstPartyAppCertificate = '') then
+        if (FirstPartyAppId = '') or (FirstPartyAppCertificate.IsEmpty()) then
             if (ClientId = '') or (ClientSecret.IsEmpty()) then
                 Error(GetMissingClientIdOrSecretErr());
 
         RedirectUrl := GetRedirectURL();
         if GetTokenFromCache then
-            if (FirstPartyAppId <> '') and (FirstPartyAppCertificate <> '') then begin
+            if (FirstPartyAppId <> '') and (not FirstPartyAppCertificate.IsEmpty()) then begin
                 Session.LogMessage('0000EI9', AttemptingAuthCodeTokenFromCacheWithCertTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
                 OAuth2.AcquireAuthorizationCodeTokenFromCacheWithCertificate(FirstPartyAppId, FirstPartyAppCertificate, RedirectUrl, OAuthAuthorityUrlTxt, ResourceURL, AccessToken)
             end else begin
@@ -3473,7 +3473,7 @@ codeunit 7201 "CDS Integration Impl."
                 exit;
             end;
 
-            if (FirstPartyAppId <> '') and (FirstPartyAppCertificate <> '') then begin
+            if (FirstPartyAppId <> '') and (not FirstPartyAppCertificate.IsEmpty()) then begin
                 Session.LogMessage('0000EIB', AttemptingAuthCodeTokenWithCertTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
                 OAuth2.AcquireTokenByAuthorizationCodeWithCertificate(
                     FirstPartyAppId,
@@ -3517,7 +3517,7 @@ codeunit 7201 "CDS Integration Impl."
         [NonDebuggable]
         FirstPartyAppId: Text;
         [NonDebuggable]
-        FirstPartyAppCertificate: Text;
+        FirstPartyAppCertificate: SecretText;
         RedirectUrl: Text;
         AuthCodeError: Text;
         IdToken: Text;
@@ -3528,13 +3528,13 @@ codeunit 7201 "CDS Integration Impl."
         FirstPartyAppId := GetCDSConnectionFirstPartyAppId();
         FirstPartyAppCertificate := GetCDSConnectionFirstPartyAppCertificate();
 
-        if (FirstPartyAppId = '') or (FirstPartyAppCertificate = '') then
+        if (FirstPartyAppId = '') or (FirstPartyAppCertificate.IsEmpty()) then
             if (ClientId = '') or (ClientSecret.IsEmpty()) then
                 Error(GetMissingClientIdOrSecretErr());
 
         RedirectUrl := GetRedirectURL();
         if GetTokenFromCache then
-            if (FirstPartyAppId <> '') and (FirstPartyAppCertificate <> '') then begin
+            if (FirstPartyAppId <> '') and (not FirstPartyAppCertificate.IsEmpty()) then begin
                 Session.LogMessage('0000GIG', AttemptingClientCredentialsTokenFromCacheWithCertTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
                 OAuth2.AcquireTokensFromCacheWithCertificate(FirstPartyAppId, FirstPartyAppCertificate, RedirectUrl, ClientCredentialsTokenAuthorityUrlTxt, Scopes, AccessToken, IdToken);
             end else begin
@@ -3543,7 +3543,7 @@ codeunit 7201 "CDS Integration Impl."
             end;
 
         if AccessToken.IsEmpty() then
-            if (FirstPartyAppId <> '') and (FirstPartyAppCertificate <> '') then begin
+            if (FirstPartyAppId <> '') and (not FirstPartyAppCertificate.IsEmpty()) then begin
                 Session.LogMessage('0000GII', AttemptingClientCredentialsTokenWithCertTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
                 OAuth2.AcquireTokensWithCertificate(FirstPartyAppId, FirstPartyAppCertificate, RedirectUrl, ClientCredentialsTokenAuthorityUrlTxt, Scopes, AccessToken, IdToken);
             end else begin
@@ -5266,11 +5266,6 @@ codeunit 7201 "CDS Integration Impl."
         Hyperlink('https://go.microsoft.com/fwlink/?linkid=2206514');
     end;
 
-    internal procedure CleanCDSIntegration()
-    begin
-        CleanCDSIntegration(CompanyName());
-    end;
-
     internal procedure CleanCDSIntegration(CompanyName: Text)
     var
         CDSConnectionSetup: Record "CDS Connection Setup";
@@ -5279,7 +5274,6 @@ codeunit 7201 "CDS Integration Impl."
         IntegrationSyncJob: Record "Integration Synch. Job";
         IntegrationsSyncJobErrors: Record "Integration Synch. Job Errors";
         TableKey: Codeunit "Table Key";
-        DisableIntegrationSyncJobCleanup: Boolean;
         DisableIntegrationRecordCleanup: Boolean;
     begin
         if CompanyName() <> CompanyName then begin
@@ -5294,16 +5288,6 @@ codeunit 7201 "CDS Integration Impl."
         CDSConnectionSetup.DeleteAll();
         CRMConnectionSetup.DeleteAll();
 
-        // Here we delete the integration links
-        OnBeforeCleanCRMIntegrationSyncJob(DisableIntegrationSyncJobCleanup);
-        if not DisableIntegrationSyncJobCleanup then begin
-            // Deleting all jobs can timeout so disable the keys before deleting
-            TableKey.DisableAll(Database::"Integration Synch. Job");
-            IntegrationSyncJob.DeleteAll();
-            TableKey.DisableAll(Database::"Integration Synch. Job Errors");
-            IntegrationsSyncJobErrors.DeleteAll();
-        end;
-
         OnBeforeCleanCRMIntegrationRecords(DisableIntegrationRecordCleanup);
         if not DisableIntegrationRecordCleanup then begin
             // Deleting all couplings can timeout so disable the keys before deleting
@@ -5317,10 +5301,13 @@ codeunit 7201 "CDS Integration Impl."
     begin
     end;
 
+#if not CLEAN26
+    [Obsolete('This event is not used. Integration Sync Job records are not cleaned up.', '26.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCleanCRMIntegrationSyncJob(var DisableIntegrationSyncJobCleanup: Boolean)
     begin
     end;
+#endif
 
     [EventSubscriber(ObjectType::Table, Database::"Integration Synch. Job Errors", 'OnIsDataIntegrationEnabled', '', false, false)]
     local procedure IsDataIntegrationEnabled(var IsIntegrationEnabled: Boolean)

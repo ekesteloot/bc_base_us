@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.CostAccounting.Setup;
 
 using Microsoft.CostAccounting.Account;
@@ -225,7 +229,14 @@ codeunit 1100 "Cost Account Mgt"
     end;
 
     local procedure ShouldNotUpdateCostTypeFromGLAcc(var GLAcc: Record "G/L Account"; var xGLAcc: Record "G/L Account"; var CostAccSetup: Record "Cost Accounting Setup"; CallingTrigger: Option OnInsert,OnModify,,OnRename) ShouldNotUpdate: Boolean
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeShouldNotUpdateCostTypeFromGLAcc(GLAcc, xGLAcc, CostAccSetup, CallingTrigger, ShouldNotUpdate, IsHandled);
+        if IsHandled then
+            exit(ShouldNotUpdate);
+
         ShouldNotUpdate :=
             (GLAcc."Income/Balance" <> GLAcc."Income/Balance"::"Income Statement") or
             ((CallingTrigger = CallingTrigger::OnModify) and (Format(GLAcc) = Format(xGLAcc))) or
@@ -1065,6 +1076,11 @@ codeunit 1100 "Cost Account Mgt"
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdateCostTypeFromGLAccOnRenameCostTypeBeforeModify(var CostType: Record "Cost Type")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeShouldNotUpdateCostTypeFromGLAcc(var GLAccount: Record "G/L Account"; var xGLAccount: Record "G/L Account"; var CostAccSetup: Record "Cost Accounting Setup"; CallingTrigger: Option OnInsert,OnModify,,OnRename; var ShouldNotUpdate: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

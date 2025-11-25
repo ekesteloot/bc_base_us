@@ -1,4 +1,8 @@
-﻿namespace Microsoft.Manufacturing.Journal;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Manufacturing.Journal;
 
 using Microsoft.Foundation.UOM;
 using Microsoft.Inventory.Costing;
@@ -428,14 +432,14 @@ codeunit 5510 "Production Journal Mgt"
 
     local procedure CalculateQtyToPostForProdOrder(ProdOrderLine: Record "Prod. Order Line"; ProdOrderRoutingLine: Record "Prod. Order Routing Line"; var QtyToPost: Decimal)
     var
-        CostCalcMgt: Codeunit "Cost Calculation Management";
+        MfgCostCalcMgt: Codeunit "Mfg. Cost Calculation Mgt.";
     begin
         QtyToPost :=
-            CostCalcMgt.CalcQtyAdjdForRoutingScrap(
+            MfgCostCalcMgt.CalcQtyAdjdForRoutingScrap(
                 ProdOrderLine."Quantity (Base)",
                 ProdOrderRoutingLine."Scrap Factor % (Accumulated)",
                 ProdOrderRoutingLine."Fixed Scrap Qty. (Accum.)") -
-            CostCalcMgt.CalcActOutputQtyBase(ProdOrderLine, ProdOrderRoutingLine);
+            MfgCostCalcMgt.CalcActOutputQtyBase(ProdOrderLine, ProdOrderRoutingLine);
         QtyToPost := QtyToPost / ProdOrderLine."Qty. per Unit of Measure";
 
         OnAfterCalculateQtyToPostForProdOrder(ProdOrderLine, ProdOrderRoutingLine, QtyToPost);

@@ -273,8 +273,10 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
         InvoicePostingBuffer.UpdateVATBase(TotalVATBase, TotalVATBaseACY);
         NonDeductibleVAT.SetNonDeductibleVAT(InvoicePostingBuffer, TotalNonDedVATBase, TotalNonDedVATAmount, TotalNonDedVATBaseACY, TotalNonDedVATAmountACY, TotalNonDedVATDiff);
         InvoicePostingBuffer."Deferral Code" := PurchLine."Deferral Code";
-        PurchPostInvoiceEvents.RunOnPrepareLineOnAfterFillInvoicePostingBuffer(InvoicePostingBuffer, PurchLine);
-        UpdateInvoicePostingBuffer(InvoicePostingBuffer);
+        IsHandled := false;
+        PurchPostInvoiceEvents.RunOnPrepareLineOnAfterFillInvoicePostingBuffer(InvoicePostingBuffer, PurchLine, TempInvoicePostingBuffer, FALineNo, InvDefLineNo, DeferralLineNo, IsHandled);
+        if not IsHandled then
+            UpdateInvoicePostingBuffer(InvoicePostingBuffer);
 
         PurchPostInvoiceEvents.RunOnPrepareLineOnAfterUpdateInvoicePostingBuffer(
             PurchHeader, PurchLine, InvoicePostingBuffer, TempInvoicePostingBuffer);
@@ -329,7 +331,7 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
         InvoicePostingBuffer."Global Dimension 2 Code" := PurchLine."Shortcut Dimension 2 Code";
         InvoicePostingBuffer."Dimension Set ID" := PurchLine."Dimension Set ID";
         InvoicePostingBuffer."Job No." := PurchLine."Job No.";
-        InvoicePostingBuffer."VAT %" := PurchLine."VAT %";
+        InvoicePostingBuffer."VAT %" := PurchLine.GetVATPct();
         NonDeductibleVAT.Copy(InvoicePostingBuffer, PurchLine);
         InvoicePostingBuffer."VAT Difference" := PurchLine."VAT Difference";
         if InvoicePostingBuffer.Type = InvoicePostingBuffer.Type::"Fixed Asset" then begin
@@ -378,7 +380,8 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
             PurchSetup."Copy Line Descr. to G/L Entry",
             PurchaseLine."Line No.",
             PurchaseLine.Description,
-            PurchaseHeader."Posting Description", true);
+            PurchaseHeader."Posting Description",
+            (PurchaseLine.Type = PurchaseLine.Type::"Fixed Asset") or PurchSetup."Copy Line Descr. to G/L Entry");
     end;
 
     procedure SetSalesTax(var PurchaseLine: Record "Purchase Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer")
@@ -884,7 +887,7 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
                     InvoicePostingBuffer."VAT Calculation Type"::"Reverse Charge VAT":
                         begin
                             VATPostingSetup.Get(InvoicePostingBuffer."VAT Bus. Posting Group", InvoicePostingBuffer."VAT Prod. Posting Group");
-                            PurchPostInvoiceEvents.RunOnCalculateVATAmountsOnAfterGetReverseChargeVATPostingSetup(VATPostingSetup);
+                            PurchPostInvoiceEvents.RunOnCalculateVATAmountsOnAfterGetReverseChargeVATPostingSetup(VATPostingSetup, PurchHeader, TempInvoicePostingBuffer);
 
                             VATBaseAmount := InvoicePostingBuffer."VAT Base Amount" * (1 - PurchHeader."VAT Base Discount %" / 100);
                             VATBaseAmountACY := InvoicePostingBuffer."VAT Base Amount (ACY)" * (1 - PurchHeader."VAT Base Discount %" / 100);
@@ -940,7 +943,13 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
     var
         DeferralTemplate: Record "Deferral Template";
         DeferralPostingBuffer: Record "Deferral Posting Buffer";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        PurchPostInvoiceEvents.RunOnBeforePrepareDeferralLine(TempDeferralHeader, TempDeferralLine, PurchHeader, PurchLine, AmountLCY, AmountACY, RemainAmtToDefer, RemainAmtToDeferACY, DeferralAccount, PurchAccount, InvoicePostingParameters."Document No.", InvDefLineNo, IsHandled);
+        if IsHandled then
+            exit;
+
         DeferralTemplate.Get(PurchLine."Deferral Code");
 
         if TempDeferralHeader.Get(

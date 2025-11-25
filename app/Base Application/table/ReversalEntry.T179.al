@@ -181,12 +181,10 @@ table 179 "Reversal Entry"
             else
             if ("Bal. Account Type" = const("Fixed Asset")) "Fixed Asset";
         }
-        field(27; "FA Posting Category"; Option)
+        field(27; "FA Posting Category"; Enum "FA Ledger Posting Category")
         {
             AccessByPermission = TableData "Fixed Asset" = R;
             Caption = 'FA Posting Category';
-            OptionCaption = ' ,Disposal,Bal. Disposal';
-            OptionMembers = " ",Disposal,"Bal. Disposal";
         }
         field(28; "FA Posting Type"; Enum "Reversal Entry FA Posting Type")
         {
@@ -283,6 +281,7 @@ table 179 "Reversal Entry"
         UnrealizedVATReverseErr: Label 'You cannot reverse %1 No. %2 because the entry has an associated Unrealized VAT Entry.';
 #pragma warning restore AA0470
         CaptionTxt: Label '%1 %2 %3', Locked = true;
+        ReversalWithACYErr: Label 'Due to how Business Central posts and updates amounts in an additional reporting currency (ACY), you can''t use this feature if you use ACY. Business Central converts amounts in local currency to the alternate currency, but doesn''t net transactions. If you use ACY, you must manually reverse the amounts.';
 
     protected var
         GLSetup: Record "General Ledger Setup";
@@ -688,6 +687,18 @@ table 179 "Reversal Entry"
         if not DetailedCustLedgEntry.IsEmpty() then
             Error(ReversalErrorForChangedEntry(CustLedgerEntry.TableCaption(), CustLedgerEntry."Entry No."));
 
+        GLSetup.Get();
+        if GLSetup."Additional Reporting Currency" <> '' then begin
+            DetailedCustLedgEntry.Reset();
+            DetailedCustLedgEntry.SetCurrentKey("Transaction No.", "Customer No.", "Entry Type");
+            DetailedCustLedgEntry.SetRange("Transaction No.", CustLedgerEntry."Transaction No.");
+            DetailedCustLedgEntry.SetRange("Customer No.", CustLedgerEntry."Customer No.");
+            DetailedCustLedgEntry.SetFilter("Entry Type", '%1|%2',
+              DetailedCustLedgEntry."Entry Type"::"Realized Gain", DetailedCustLedgEntry."Entry Type"::"Realized Loss");
+            if not DetailedCustLedgEntry.IsEmpty() then
+                Error(ReversalWithACYErr);
+        end;
+
         OnAfterCheckDtldCustLedgEntry(DetailedCustLedgEntry, CustLedgerEntry);
     end;
 
@@ -708,6 +719,17 @@ table 179 "Reversal Entry"
         if not DetailedVendorLedgEntry.IsEmpty() then
             Error(ReversalErrorForChangedEntry(VendorLedgerEntry.TableCaption(), VendorLedgerEntry."Entry No."));
 
+        GLSetup.Get();
+        if GLSetup."Additional Reporting Currency" <> '' then begin
+            DetailedVendorLedgEntry.Reset();
+            DetailedVendorLedgEntry.SetCurrentKey("Transaction No.", "Vendor No.", "Entry Type");
+            DetailedVendorLedgEntry.SetRange("Transaction No.", VendorLedgerEntry."Transaction No.");
+            DetailedVendorLedgEntry.SetRange("Vendor No.", VendorLedgerEntry."Vendor No.");
+            DetailedVendorLedgEntry.SetFilter("Entry Type", '%1|%2',
+              DetailedVendorLedgEntry."Entry Type"::"Realized Gain", DetailedVendorLedgEntry."Entry Type"::"Realized Loss");
+            if not DetailedVendorLedgEntry.IsEmpty() then
+                Error(ReversalWithACYErr);
+        end;
         OnAfterCheckDtldVendLedgEntry(DetailedVendorLedgEntry, VendorLedgerEntry);
     end;
 

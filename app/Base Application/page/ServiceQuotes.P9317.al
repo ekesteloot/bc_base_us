@@ -276,7 +276,6 @@ page 9317 "Service Quotes"
 
                     trigger OnAction()
                     begin
-                        OnBeforeCalculateSalesTaxStatistics(Rec, true);
                         Rec.OpenStatistics();
                     end;
                 }
@@ -318,8 +317,7 @@ page 9317 "Service Quotes"
                 trigger OnAction()
                 begin
                     CurrPage.Update();
-                    CODEUNIT.Run(CODEUNIT::"Serv-Quote to Order (Yes/No)", Rec);
-                    CurrPage.Update();
+                    Codeunit.Run(Codeunit::"Serv-Quote to Order (Yes/No)", Rec);
                 end;
             }
             action("&Print")
@@ -403,11 +401,6 @@ page 9317 "Service Quotes"
         Rec.SetSecurityFilterOnRespCenter();
 
         Rec.CopyCustomerFilter();
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalculateSalesTaxStatistics(var ServiceHeader: Record "Service Header"; ShowDialog: Boolean)
-    begin
     end;
 }
 

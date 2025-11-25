@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Warehouse.Posting;
 
 using Microsoft.Foundation.Navigate;
@@ -268,6 +272,8 @@ codeunit 5749 "Serv. Whse Post-Shipment"
                     ServiceInvoiceHeader.Get(DocumentEntryToPrint."Document No.");
                     ServiceInvoiceHeader.Mark(true);
                 until DocumentEntryToPrint.Next() = 0;
+
+            ServiceInvoiceHeader.MarkedOnly(true);
             ServiceInvoiceHeader.PrintRecords(false);
         end;
 
@@ -278,6 +284,8 @@ codeunit 5749 "Serv. Whse Post-Shipment"
                     ServiceShipmentHeader.Get(DocumentEntryToPrint."Document No.");
                     ServiceShipmentHeader.Mark(true);
                 until DocumentEntryToPrint.Next() = 0;
+
+            ServiceShipmentHeader.MarkedOnly(true);
             ServiceShipmentHeader.PrintRecords(false);
         end;
     end;

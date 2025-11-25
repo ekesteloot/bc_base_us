@@ -143,6 +143,19 @@ page 953 "Manager Time Sheet List"
     {
         area(processing)
         {
+            action("Edit Time Sheet")
+            {
+                ApplicationArea = Jobs;
+                Caption = 'Review Time Sheet';
+                Image = OpenJournal;
+                ShortCutKey = 'Return';
+                ToolTip = 'Open the time sheet to approve its details. This requires that you''re the time sheet owner, administrator, or approver.';
+
+                trigger OnAction()
+                begin
+                    ReviewTimeSheet();
+                end;
+            }
             action(MoveTimeSheetsToArchive)
             {
                 ApplicationArea = Jobs;
@@ -217,6 +230,9 @@ page 953 "Manager Time Sheet List"
             {
                 Caption = 'Process', Comment = 'Generated from the PromotedActionCategories property index 1.';
 
+                actionref("Edit Time Sheet_Promoted"; "Edit Time Sheet")
+                {
+                }
                 actionref(MoveTimeSheetsToArchive_Promoted; MoveTimeSheetsToArchive)
                 {
                 }
@@ -231,15 +247,31 @@ page 953 "Manager Time Sheet List"
     }
 
     trigger OnOpenPage()
+    var
+        IsHandled: Boolean;
     begin
-        TimeSheetAdminActionsVisible := true;
-        if UserSetup.Get(UserId) then
-            CurrPage.Editable := UserSetup."Time Sheet Admin.";
-        TimeSheetAdminActionsVisible := UserSetup."Time Sheet Admin.";
+        IsHandled := false;
+        OnBeforeOnOpenPage(Rec, IsHandled);
+        if not IsHandled then begin
+            TimeSheetAdminActionsVisible := true;
+            if UserSetup.Get(UserId) then
+                CurrPage.Editable := UserSetup."Time Sheet Admin.";
+            TimeSheetAdminActionsVisible := UserSetup."Time Sheet Admin.";
 
-        TimeSheetMgt.FilterTimeSheets(Rec, Rec.FieldNo("Approver User ID"));
+            TimeSheetMgt.FilterTimeSheets(Rec, Rec.FieldNo("Approver User ID"));
+        end;
 
         OnAfterOnOpenPage(Rec);
+    end;
+
+    local procedure ReviewTimeSheet()
+    var
+        TimeSheetCard: Page "Time Sheet Card";
+    begin
+        TimeSheetCard.SetManagerTimeSheetMode();
+        TimeSheetCard.SetTableView(Rec);
+        TimeSheetCard.SetRecord(Rec);
+        TimeSheetCard.Run();
     end;
 
     trigger OnAfterGetCurrRecord()
@@ -255,6 +287,11 @@ page 953 "Manager Time Sheet List"
 
     [IntegrationEvent(true, false)]
     local procedure OnAfterOnOpenPage(var TimeSheetHeader: Record "Time Sheet Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOnOpenPage(var TimeSheetHeader: Record "Time Sheet Header"; var IsHandled: Boolean);
     begin
     end;
 }

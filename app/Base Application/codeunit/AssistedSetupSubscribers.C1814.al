@@ -138,9 +138,11 @@ codeunit 1814 "Assisted Setup Subscribers"
         SetupPaymentServicesShortTitleTxt: Label 'Set up payment services', MaxLength = 50;
         SetupPaymentServicesHelpTxt: Label 'https://go.microsoft.com/fwlink/?linkid=2115183', Locked = true;
         SetupPaymentServicesDescriptionTxt: Label 'Connect to a payment service so that your customers can pay you electronically.';
+#if not CLEAN25
         SetupConsolidationReportingTitleTxt: Label 'Process Consolidations';
         SetupConsolidationReportingShortTitleTxt: Label 'Consolidate companies', MaxLength = 50;
         SetupConsolidationReportingDescriptionTxt: Label 'Consolidate the general ledger entries of two or more separate companies (subsidiaries) into a consolidated company.';
+#endif
         AccessAllFeaturesTxt: Label 'Access all features';
         VideoAccessAllFeaturesTxt: Label 'https://go.microsoft.com/fwlink/?linkid=857610', Locked = true;
         AnalyzeDataUsingAccSchedulesTxt: Label 'Analyze data using account schedules';
@@ -170,9 +172,9 @@ codeunit 1814 "Assisted Setup Subscribers"
         SetupTimeSheetsShortTitleTxt: Label 'Set up Time Sheets', MaxLength = 50;
         SetupTimeSheetsHelpTxt: Label 'https://go.microsoft.com/fwlink/?linkid=2166666';
         SetupTimeSheetsDescriptionTxt: Label 'Track the time used on projects, register absences, or create simple time registrations for team members on any device.';
-        SetupCopilotAICapabilitiesTitleTxt: Label 'Set up Copilot & AI capabilities';
-        SetupCopilotAICapabilitiesShortTitleTxt: Label 'Set up Copilot & AI capabilities', MaxLength = 50;
-        SetupCopilotAICapabilitiesDescriptionTxt: Label 'Set up Copilot & AI capabilities to unlock AI-powered experiences.';
+        SetupCopilotAICapabilitiesTitleTxt: Label 'Set up Copilot & agent capabilities';
+        SetupCopilotAICapabilitiesShortTitleTxt: Label 'Set up Copilot & agent capabilities', MaxLength = 50;
+        SetupCopilotAICapabilitiesDescriptionTxt: Label 'Set up Copilot & agent capabilities to unlock AI-powered experiences.';
         SetupCopilotAICapabilitiesHelpTxt: Label 'https://aka.ms/bcai', Locked = true;
         SetupJobQueueNotificationTitleTxt: Label 'Set up Job Queue Notifications';
         SetupJobQueueNotificationShortTitleTxt: Label 'Set up Job Queue Notifications', MaxLength = 50;
@@ -359,6 +361,7 @@ codeunit 1814 "Assisted Setup Subscribers"
         GlobalLanguage(Language.GetDefaultApplicationLanguageId());
         GuidedExperience.AddTranslationForSetupObjectTitle(GuidedExperienceType::"Assisted Setup", ObjectType::Page,
             Page::"Payment Services", Language.GetDefaultApplicationLanguageId(), SetupPaymentServicesTitleTxt);
+#if not CLEAN25
         GlobalLanguage(CurrentGlobalLanguage);
 
         GuidedExperience.InsertAssistedSetup(SetupConsolidationReportingTitleTxt, SetupConsolidationReportingShortTitleTxt, SetupConsolidationReportingDescriptionTxt, 5, ObjectType::Page,
@@ -367,7 +370,7 @@ codeunit 1814 "Assisted Setup Subscribers"
         GuidedExperience.AddTranslationForSetupObjectTitle(GuidedExperienceType::"Assisted Setup", ObjectType::Page,
             PAGE::"Company Consolidation Wizard", Language.GetDefaultApplicationLanguageId(), SetupConsolidationReportingTitleTxt);
         GLOBALLANGUAGE(CurrentGlobalLanguage);
-
+#endif
         if not EnvironmentInfo.IsSaaS() then begin
             GuidedExperience.InsertAssistedSetup(SetupMexicanCFDITitleTxt, SetupMexicanCFDIShortTitleTxt, SetupMexicanCFDIDescriptionTxt, 5, ObjectType::Page,
                 Page::"Mexican CFDI Wizard", AssistedSetupGroup::Customize, '', VideoCategory::Uncategorized, '');

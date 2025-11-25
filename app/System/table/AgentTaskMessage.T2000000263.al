@@ -39,8 +39,8 @@ table 2000000263 "Agent Task Message"
         {
             Caption = 'Status';
             ToolTip = 'Specifies the message status.';
-            OptionCaption = ',Draft,Sent,Reviewed,Rejected';
-            OptionMembers = " ",Draft,Sent,Reviewed,Rejected;
+            OptionCaption = ',Draft,Sent,Reviewed,Rejected,Discarded';
+            OptionMembers = " ",Draft,Sent,Reviewed,Rejected,Discarded;
         }
         field(5; Content; Blob)
         {

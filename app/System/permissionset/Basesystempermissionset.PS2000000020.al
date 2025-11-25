@@ -135,5 +135,6 @@ permissionset 2000000020 BaseSystemPermissionSet
                   tabledata "Agent Task Message Attachment" = RIMD,
                   tabledata "Agent Task Timeline Entry" = RIMD,
                   tabledata "Agent Task Timeline Entry Step" = RIMD,
-                  tabledata "Agent Task Pane Entry" = RIMD;
+                  tabledata "Agent Task Pane Entry" = RIMD,
+                  system "Configure All Agents" = X;
 }

@@ -62,12 +62,6 @@ table 2000000267 "Agent Task Data"
         {
             Caption = 'Title';
         }
-        field(10; "New Input Message Count"; Integer)
-        {
-            Caption = 'New Input Message Count';
-            FieldClass = FlowField;
-            CalcFormula = count("Agent Task Message Data" where("Task ID" = field(ID), Type = const(Input), Status = const(" ")));
-        }
         field(11; "Instructions Hash"; Text[64])
         {
             Caption = 'Instructions Hash';
@@ -100,6 +94,11 @@ table 2000000267 "Agent Task Data"
             FieldClass = FlowField;
             CalcFormula = lookup("Agent Task Step Data".Type where("Task ID" = field(ID), "Step Number" = field("Last Step Number")));
         }
+        field(16; "Not Before"; DateTime)
+        {
+            Caption = 'Not Before';
+            ToolTip = 'Specifies the earliest time the task can be executed.';
+        }
     }
 
     keys
@@ -118,6 +117,9 @@ table 2000000267 "Agent Task Data"
         {
         }
         key(ExternalID; "External ID")
+        {
+        }
+        key(NeedsAttention; "Agent User Security ID", "Company Name", "Needs Attention")
         {
         }
     }

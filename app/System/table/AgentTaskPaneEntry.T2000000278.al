@@ -53,13 +53,11 @@ table 2000000278 "Agent Task Pane Entry"
             Caption = 'Last Step Timestamp';
             Tooltip = 'Specifies the timestamp of the last step executed for the agent task.';
         }
-        field(7; "Current Entry Type"; Option)
+        field(7; "Current Entry Type"; Enum "Agent Task Timeline Entry Type")
         {
             Editable = false;
             Caption = 'Current Entry Type';
             ToolTip = 'Specifies the type of the current timeline entry.';
-            OptionMembers = Default,Message;
-            OptionCaption = 'Default,Message';
         }
         field(8; "Summary"; Blob)
         {

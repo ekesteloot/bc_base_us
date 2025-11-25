@@ -18,6 +18,7 @@ codeunit 324 "No. Series Copilot Impl."
     InherentEntitlements = X;
 
     var
+        NoSeriesCopilotTelemetry: Codeunit "No. Series Copilot Telemetry";
         IncorrectCompletionErr: Label 'Incorrect completion. The property %1 is empty', Comment = '%1 = property name';
         EmptyCompletionErr: Label 'Incorrect completion. The completion is empty.';
         IncorrectCompletionNumberOfGeneratedNoSeriesErr: Label 'Incorrect completion. The number of generated number series is incorrect. Expected %1, but got %2', Comment = '%1 = Expected Number, %2 = Actual Number';
@@ -29,11 +30,10 @@ codeunit 324 "No. Series Copilot Impl."
         FeatureNameLbl: Label 'Number Series with AI', Locked = true;
         TelemetryToolsSelectionPromptRetrievalErr: Label 'Unable to retrieve the prompt for No. Series Copilot Tools Selection from Azure Key Vault.', Locked = true;
         ToolLoadingErr: Label 'Unable to load the No. Series Copilot Tool. Please try again later.';
-        InvalidPromptTxt: Label 'Sorry, I couldn''t generate a good result from your input. Please rephrase and try again.';
+        InvalidPromptTxt: Label 'Sorry, I couldn''t generate a good result from your input. Please rephrase and try again.\Error details: %1', Comment = '%1 = Error details';
 
     procedure GetNoSeriesSuggestions()
     var
-        FeatureTelemetry: Codeunit "Feature Telemetry";
         NoSeriesCopilotRegister: Codeunit "No. Series Copilot Register";
         AzureOpenAI: Codeunit "Azure OpenAI";
     begin
@@ -41,7 +41,7 @@ codeunit 324 "No. Series Copilot Impl."
         if not AzureOpenAI.IsEnabled(Enum::"Copilot Capability"::"No. Series Copilot") then
             exit;
 
-        FeatureTelemetry.LogUptake('0000LF4', FeatureName(), Enum::"Feature Uptake Status"::Discovered);
+        NoSeriesCopilotTelemetry.LogFeatureDiscovery();
 
         Page.Run(Page::"No. Series Generation");
     end;
@@ -62,7 +62,7 @@ codeunit 324 "No. Series Copilot Impl."
                 SaveGenerationHistory(NoSeriesGeneration, InputText);
                 CreateNoSeries(NoSeriesGeneration, GeneratedNoSeries, Completion);
             end else
-                Error(InvalidPromptTxt);
+                Error(InvalidPromptTxt, GetLastErrorText());
         end else
             SendNotification(GetChatCompletionResponseErr());
     end;
@@ -150,7 +150,7 @@ codeunit 324 "No. Series Copilot Impl."
         Telemetry: Codeunit Telemetry;
         ToolsSelectionPrompt: Text;
     begin
-        if not AzureKeyVault.GetAzureKeyVaultSecret('NoSeriesCopilotToolsSelectionPrompt', ToolsSelectionPrompt) then begin
+        if not AzureKeyVault.GetAzureKeyVaultSecret('NoSeriesCopilotToolsSelectionPromptV2', ToolsSelectionPrompt) then begin
             Telemetry.LogMessage('0000NDY', TelemetryToolsSelectionPromptRetrievalErr, Verbosity::Error, DataClassification::SystemMetadata);
             Error(ToolLoadingErr);
         end;
@@ -184,14 +184,19 @@ codeunit 324 "No. Series Copilot Impl."
         AOAIChatMessages.AddTool(ChangeNoSeriesIntent);
         AOAIChatMessages.AddTool(NextYearNoSeriesIntent);
 
+        NoSeriesCopilotTelemetry.ResetDurationTracking();
+        NoSeriesCopilotTelemetry.StartDurationTracking();
         AzureOpenAI.GenerateChatCompletion(AOAIChatMessages, AOAIChatCompletionParams, AOAIOperationResponse);
+        NoSeriesCopilotTelemetry.StopDurationTracking();
         if not AOAIOperationResponse.IsSuccess() then
             Error(AOAIOperationResponse.GetError());
 
         CompletionAnswerTxt := AOAIChatMessages.GetLastMessage(); // the model can answer to rephrase the question, if the user input is not clear
 
         if AOAIOperationResponse.IsFunctionCall() then
-            CompletionAnswerTxt := GenerateNoSeriesUsingToolResult(AzureOpenAI, InputText, AOAIOperationResponse, AddNoSeriesIntent.GetExistingNoSeries());
+            CompletionAnswerTxt := GenerateNoSeriesUsingToolResult(AzureOpenAI, InputText, AOAIOperationResponse, AddNoSeriesIntent.GetExistingNoSeries())
+        else
+            NoSeriesCopilotTelemetry.LogToolNotInvoked(AOAIOperationResponse);
 
         exit(CompletionAnswerTxt);
     end;
@@ -260,7 +265,10 @@ codeunit 324 "No. Series Copilot Impl."
     begin
         MaxAttempts := 3;
         for Attempt := 1 to MaxAttempts do begin
+            NoSeriesCopilotTelemetry.ResetDurationTracking();
+            NoSeriesCopilotTelemetry.StartDurationTracking();
             AzureOpenAI.GenerateChatCompletion(AOAIChatMessages, AOAIChatCompletionParams, AOAIOperationResponse);
+            NoSeriesCopilotTelemetry.StopDurationTracking();
             if not AOAIOperationResponse.IsSuccess() then
                 Error(AOAIOperationResponse.GetError());
 
@@ -272,8 +280,10 @@ codeunit 324 "No. Series Copilot Impl."
                 Error(AOAIFunctionResponse.GetError());
 
             GeneratedNoSeriesArrayText := AOAIFunctionResponse.GetResult();
-            if CheckIfValidResult(GeneratedNoSeriesArrayText, AOAIFunctionResponse.GetFunctionName(), ExpectedNoSeriesCount) then
+            if CheckIfValidResult(GeneratedNoSeriesArrayText, AOAIFunctionResponse.GetFunctionName(), ExpectedNoSeriesCount) then begin
+                NoSeriesCopilotTelemetry.LogGenerationCompletion(ReadGeneratedNumberSeriesJArray(GeneratedNoSeriesArrayText).Count, ExpectedNoSeriesCount, Attempt);
                 exit(true);
+            end;
 
             AOAIChatMessages.DeleteMessage(AOAIChatMessages.GetHistory().Count); // remove the last message with wrong assistant response, as we need to regenerate the completion
             Sleep(500);
@@ -346,19 +356,35 @@ codeunit 324 "No. Series Copilot Impl."
         for i := 0 to Json.GetCollectionCount() - 1 do begin
             Json.GetObjectFromCollectionByIndex(i, NoSeriesObj);
             Json.InitializeObject(NoSeriesObj);
-            CheckTextPropertyExistAndCheckIfNotEmpty('seriesCode', Json);
-            CheckMaximumLengthOfPropertyValue('seriesCode', Json, 20);
-            CheckTextPropertyExistAndCheckIfNotEmpty('description', Json);
-            CheckTextPropertyExistAndCheckIfNotEmpty('startingNo', Json);
-            CheckMaximumLengthOfPropertyValue('startingNo', Json, 20);
-            CheckTextPropertyExistAndCheckIfNotEmpty('endingNo', Json);
-            CheckMaximumLengthOfPropertyValue('endingNo', Json, 20);
-            CheckTextPropertyExistAndCheckIfNotEmpty('warningNo', Json);
-            CheckMaximumLengthOfPropertyValue('warningNo', Json, 20);
-            CheckIntegerPropertyExistAndCheckIfNotEmpty('incrementByNo', Json);
-            CheckIntegerPropertyExistAndCheckIfNotEmpty('tableId', Json);
-            CheckIntegerPropertyExistAndCheckIfNotEmpty('fieldId', Json);
+            CheckMandatoryProperties(Json);
         end;
+    end;
+
+    local procedure CheckMandatoryProperties(var Json: Codeunit Json)
+    begin
+        if not CheckIfNumberSeriesIsGenerated(Json) then
+            exit;
+
+        CheckJsonTextProperty('seriesCode', Json, true);
+        CheckMaximumLengthOfPropertyValue('seriesCode', Json, 20);
+        CheckJsonTextProperty('description', Json, true);
+        CheckJsonTextProperty('startingNo', Json, true);
+        CheckMaximumLengthOfPropertyValue('startingNo', Json, 20);
+        CheckJsonTextProperty('endingNo', Json, false);
+        CheckMaximumLengthOfPropertyValue('endingNo', Json, 20);
+        CheckJsonTextProperty('warningNo', Json, false);
+        CheckMaximumLengthOfPropertyValue('warningNo', Json, 20);
+        CheckJsonIntegerProperty('incrementByNo', Json, false);
+        CheckJsonIntegerProperty('tableId', Json, true);
+        CheckJsonIntegerProperty('fieldId', Json, true);
+    end;
+
+    local procedure CheckIfNumberSeriesIsGenerated(var Json: Codeunit Json): Boolean
+    var
+        IsExists: Boolean;
+    begin
+        Json.GetBoolPropertyValueFromJObjectByName('exists', IsExists);
+        exit(not IsExists);
     end;
 
     local procedure CheckIfArrayIsNotEmpty(NumberOfGeneratedNoSeries: Integer)
@@ -367,22 +393,32 @@ codeunit 324 "No. Series Copilot Impl."
             Error(EmptyCompletionErr);
     end;
 
-    local procedure CheckTextPropertyExistAndCheckIfNotEmpty(propertyName: Text; var Json: Codeunit Json)
+    local procedure CheckJsonTextProperty(propertyName: Text; var Json: Codeunit Json; IsRequired: Boolean)
     var
         value: Text;
     begin
         Json.GetStringPropertyValueByName(propertyName, value);
-        if value = '' then
-            Error(IncorrectCompletionErr, propertyName);
+        if not IsRequired then
+            exit;
+
+        if value <> '' then
+            exit;
+
+        Error(IncorrectCompletionErr, propertyName);
     end;
 
-    local procedure CheckIntegerPropertyExistAndCheckIfNotEmpty(propertyName: Text; var Json: Codeunit Json)
+    local procedure CheckJsonIntegerProperty(propertyName: Text; var Json: Codeunit Json; IsRequired: Boolean)
     var
         PropertyValue: Integer;
     begin
         Json.GetIntegerPropertyValueFromJObjectByName(propertyName, PropertyValue);
-        if PropertyValue = 0 then
-            Error(IncorrectCompletionErr, propertyName);
+        if not IsRequired then
+            exit;
+
+        if PropertyValue <> 0 then
+            exit;
+
+        Error(IncorrectCompletionErr, propertyName);
     end;
 
     local procedure CheckMaximumLengthOfPropertyValue(propertyName: Text; var Json: Codeunit Json; maxLength: Integer)
@@ -390,8 +426,10 @@ codeunit 324 "No. Series Copilot Impl."
         value: Text;
     begin
         Json.GetStringPropertyValueByName(propertyName, value);
-        if StrLen(value) > maxLength then
-            Error(TextLengthIsOverMaxLimitErr, propertyName, maxLength);
+        if StrLen(value) <= maxLength then
+            exit;
+
+        Error(TextLengthIsOverMaxLimitErr, propertyName, maxLength);
     end;
 
     local procedure ReadGeneratedNumberSeriesJArray(Completion: Text) NoSeriesJArray: JsonArray
@@ -445,14 +483,12 @@ codeunit 324 "No. Series Copilot Impl."
     var
         NoSeriesCode: Text;
         NoSeriesObj: Text;
-        IsExists: Boolean;
     begin
         Json.GetObjectFromCollectionByIndex(i, NoSeriesObj);
         Json.InitializeObject(NoSeriesObj);
-        Json.GetBoolPropertyValueFromJObjectByName('exists', IsExists);
         Json.GetStringPropertyValueByName('seriesCode', NoSeriesCode);
 
-        if NoSeriesCodes.Contains(NoSeriesCode) and (not IsExists) then begin
+        if NoSeriesCodes.Contains(NoSeriesCode) and (CheckIfNumberSeriesIsGenerated(Json)) then begin
             Json.RemoveJObjectFromCollection(i);
             exit;
         end;

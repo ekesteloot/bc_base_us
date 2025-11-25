@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Inventory.Item;
 
 using Microsoft.Finance.Dimension;
@@ -391,6 +395,10 @@ page 1384 "Item Templ. Card"
                         ApplicationArea = Manufacturing;
                         ToolTip = 'Specifies the default number of units of the item that are processed in one production operation. This affects standard cost calculations and capacity planning. If the item routing includes fixed costs such as setup time, the value in this field is used to calculate the standard cost and distribute the setup costs. During demand planning, this value is used together with the value in the Default Dampener % field to ignore negligible changes in demand and avoid re-planning. Note that if you leave the field blank, it will be threated as 1.';
                         Visible = false;
+                    }
+                    field("Production Blocked"; Rec."Production Blocked")
+                    {
+                        ApplicationArea = Manufacturing;
                     }
                 }
                 group(Replenishment_Assembly)

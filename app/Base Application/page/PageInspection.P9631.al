@@ -43,8 +43,6 @@ page 9631 "Page Inspection"
                     ToolTip = 'Specifies the URL that opens this page in Visual Studio Code and attaches debugger to current session.';
 
                     trigger OnDrillDown()
-                    var
-                        PageInspectionVSCodeHelper: Codeunit "Page Inspection VS Code Helper";
                     begin
                         PageInspectionVSCodeHelper.NavigateToPageDefinitionInVSCode(Rec, UpdateExploreInVsCodeRequestURL);
                         UpdateExploreInVsCodeRequestURL := false;
@@ -252,7 +250,6 @@ page 9631 "Page Inspection"
                 AccessByPermission = System "Tools, Zoom" = X;
                 ApplicationArea = All;
                 Editable = false;
-                Enabled = false;
                 Visible = ShowExtensions and not ShowNoPermissionForExtensions;
             }
             part(Filters; "Page Inspection Filters")
@@ -302,6 +299,7 @@ page 9631 "Page Inspection"
     end;
 
     var
+        PageInspectionVSCodeHelper: Codeunit "Page Inspection VS Code Helper";
         PageInfo: Text;
         TableInfo: Text;
         QueryInfo: Text;

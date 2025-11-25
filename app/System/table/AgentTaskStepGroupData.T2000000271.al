@@ -99,6 +99,13 @@ table 2000000271 "Agent Task Step Group Data"
                                                                          "Group ID" = field(ID),
                                                                          Type = const("Agent Task Step Type"::"User Intervention Request")));
         }
+        field(18; "Last User Intervention Step"; Integer)
+        {
+            FieldClass = FlowField;
+            CalcFormula = max("Agent Task Step Data"."Step Number" where("Task ID" = field("Task ID"),
+                                                                         "Group ID" = field(ID),
+                                                                         Type = filter("Agent Task Step Type"::"User Intervention Request" | "Agent Task Step Type"::"User Intervention")));
+        }
     }
 
     keys

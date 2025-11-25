@@ -171,6 +171,8 @@ page 5855 "Posted Purchase Document Lines"
     trigger OnOpenPage()
     begin
         CurrentMenuType := 1;
+        OnOpenPageOnAfterSetCurrentMenuType(Rec, CurrentMenuType);
+
         ChangeSubMenu(CurrentMenuType);
 
         Rec.SetRange("No.", Rec."No.");
@@ -181,7 +183,6 @@ page 5855 "Posted Purchase Document Lines"
     var
         CopyDocMgt: Codeunit "Copy Document Mgt.";
         OldMenuType: Integer;
-        CurrentMenuType: Integer;
         LinesNotCopied: Integer;
         MissingExCostRevLink: Boolean;
 #pragma warning disable AA0074
@@ -201,6 +202,7 @@ page 5855 "Posted Purchase Document Lines"
         ToPurchHeader: Record "Purchase Header";
         ShowRevLineEnable: Boolean;
         ShowRevLinesOnly: Boolean;
+        CurrentMenuType: Integer;
 
     [Scope('OnPrem')]
     procedure CopyLineToDoc()
@@ -255,7 +257,7 @@ page 5855 "Posted Purchase Document Lines"
         ShowLinesNotCopiedMessage();
     end;
 
-    local procedure ChangeSubMenu(NewMenuType: Integer)
+    procedure ChangeSubMenu(NewMenuType: Integer)
     begin
         if OldMenuType <> NewMenuType then
             SetSubMenu(OldMenuType, false);
@@ -350,6 +352,11 @@ page 5855 "Posted Purchase Document Lines"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeShowLinesNotCopiedMessage(var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnOpenPageOnAfterSetCurrentMenuType(var Vendor: Record Vendor; var CurrentMenuType: Integer)
     begin
     end;
 }

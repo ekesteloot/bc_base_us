@@ -696,7 +696,6 @@ codeunit 1012 "Job Jnl.-Post Line"
     local procedure PostATO(JobJournalLine: Record "Job Journal Line")
     var
         AsmHeader: Record "Assembly Header";
-        ATOLink: Record "Assemble-to-Order Link";
         JobPlanningLine: Record "Job Planning Line";
         Window: Dialog;
     begin
@@ -728,12 +727,6 @@ codeunit 1012 "Job Jnl.-Post Line"
             AsmPost.InitPostATO(AsmHeader);
             CreatePosterATOLink(AsmHeader, JobPlanningLine);
             AsmPost.PostATO(AsmHeader, ItemJnlPostLine, ResJnlPostLine, WhseJnlPostLine);
-            if AsmHeader."Remaining Quantity (Base)" = 0 then begin
-                AsmPost.FinalizePostATO(AsmHeader);
-                ATOLink.Get(AsmHeader."Document Type", AsmHeader."No.");
-                ATOLink.Delete();
-            end;
-
             Window.Close();
         end;
     end;

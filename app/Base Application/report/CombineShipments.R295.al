@@ -12,7 +12,7 @@ using System.Globalization;
 report 295 "Combine Shipments"
 {
     ApplicationArea = Basic, Suite;
-    Caption = 'Combine Shipments';
+    Caption = 'Combine Sales Shipments';
     ProcessingOnly = true;
     UsageCategory = Tasks;
 
@@ -73,10 +73,7 @@ report 295 "Combine Shipments"
                                     SalesLine."Document Type" := SalesHeader."Document Type";
                                     SalesLine."Document No." := SalesHeader."No.";
                                 end;
-                                SalesShptLine := "Sales Shipment Line";
-                                HasAmount := HasAmount or ("Qty. Shipped Not Invoiced" <> 0);
-                                OnSalesShipmentLineOnAfterGetRecordOnBeforeInsertInvLineFromShptLine(SalesLine, SalesShptLine);
-                                SalesShptLine.InsertInvLineFromShptLine(SalesLine);
+                                InsertInventoryLineFromShipmentLine("Sales Shipment Line");
                             end else
                                 NoOfSalesInvErrors := NoOfSalesInvErrors + 1;
                         end;
@@ -300,20 +297,14 @@ report 295 "Combine Shipments"
 
     var
         SalesSetup: Record "Sales & Receivables Setup";
-        Cust: Record Customer;
         GLSetup: Record "General Ledger Setup";
         PmtTerms: Record "Payment Terms";
-        LanguageMgt: Codeunit Language;
         SalesCalcDisc: Codeunit "Sales-Calc. Discount";
         SalesPost: Codeunit "Sales-Post";
         Window: Dialog;
-        HasAmount: Boolean;
         HideDialog: Boolean;
-        NoOfSalesInvErrors: Integer;
         NoOfSalesInv: Integer;
         NoOfskippedShiment: Integer;
-        ReportLanguage: Integer;
-        ReportFormatRegion: Text[80];
 #pragma warning disable AA0074
         Text000: Label 'Enter the posting date.';
         Text001: Label 'Enter the document date.';
@@ -339,14 +330,20 @@ report 295 "Combine Shipments"
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         SalesShptLine: Record "Sales Shipment Line";
+        Cust: Record Customer;
+        LanguageMgt: Codeunit Language;
         PostingDateReq: Date;
         DocDateReq: Date;
         VATDateReq: Date;
         CalcInvDisc: Boolean;
+        HasAmount: Boolean;
         PostInv: Boolean;
         OnlyStdPmtTerms: Boolean;
         CopyTextLines: Boolean;
         VATDateEnabled: Boolean;
+        NoOfSalesInvErrors: Integer;
+        ReportLanguage: Integer;
+        ReportFormatRegion: Text[80];
 
     local procedure FinalizeSalesInvHeader()
     var
@@ -413,6 +410,21 @@ report 295 "Combine Shipments"
             HasAmount := false;
         end;
         OnAfterInsertSalesInvHeader(SalesHeader, "Sales Shipment Header");
+    end;
+
+    local procedure InsertInventoryLineFromShipmentLine(var SalesShipmentLine: Record "Sales Shipment Line")
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeInsertInventoryLineFromShipmentLine(SalesShipmentLine, IsHandled);
+        if IsHandled then
+            exit;
+
+        SalesShptLine := SalesShipmentLine;
+        HasAmount := HasAmount or (SalesShipmentLine."Qty. Shipped Not Invoiced" <> 0);
+        OnSalesShipmentLineOnAfterGetRecordOnBeforeInsertInvLineFromShptLine(SalesLine, SalesShptLine);
+        SalesShptLine.InsertInvLineFromShptLine(SalesLine);
     end;
 
     procedure InitializeRequest(NewPostingDate: Date; NewDocDate: Date; NewCalcInvDisc: Boolean; NewPostInv: Boolean; NewOnlyStdPmtTerms: Boolean; NewCopyTextLines: Boolean)
@@ -594,6 +606,11 @@ report 295 "Combine Shipments"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCustIsBlockedOnAfterGetRecord(OrderSalesHeader: Record "Sales Header"; SalesHeader: Record "Sales Header"; SalesShipmentLine: Record "Sales Shipment Line"; Customer: Record Customer; var CustIsBlocked: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeInsertInventoryLineFromShipmentLine(SalesShipmentLine: Record "Sales Shipment Line"; var IsHandled: Boolean)
     begin
     end;
 }

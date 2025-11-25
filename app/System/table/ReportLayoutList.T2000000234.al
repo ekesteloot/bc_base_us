@@ -94,6 +94,15 @@ table 2000000234 "Report Layout List"
         {
             Caption = 'Report Is Installed';
         }
+
+        field(16; IsObsolete; Boolean)
+        {
+            Caption = 'Is Obsolete';
+        }
+        field(17; ExcelLayoutMultipleDataSheets; enum "Excel Sheet Configuration")
+        {
+            Caption = 'Excel Layout Multiple Data Sheets';
+        }
     }
 
     keys

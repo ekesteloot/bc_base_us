@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Inventory.Analysis;
 
 using Microsoft.Finance.Dimension;
@@ -63,6 +67,9 @@ codeunit 7151 ItemAViewEntryToValueEntries
         ValueEntry.SetRange("Item No.", ItemAnalysisViewEntry."Item No.");
         ValueEntry.SetRange("Posting Date", StartDate, EndDate);
         ValueEntry.SetRange("Entry No.", 0, ItemAnalysisView."Last Entry No.");
+
+        if ItemAnalysisViewEntry.GetFilter("Location Code") <> '' then
+            ItemAnalysisViewEntry.CopyFilter("Location Code", ValueEntry."Location Code");
 
         if GetGlobalDimValue(GLSetup."Global Dimension 1 Code", ItemAnalysisViewEntry, GlobalDimValue) then
             ValueEntry.SetRange("Global Dimension 1 Code", GlobalDimValue)

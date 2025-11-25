@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Service.Document;
 
 using Microsoft.Foundation.NoSeries;
@@ -258,10 +262,8 @@ codeunit 5923 "Service-Quote to Order"
 
         SkipDelete := false;
         OnBeforeServLineDeleteAll(ServiceHeader, ServOrderHeader, SkipDelete);
-        if not SkipDelete then begin
+        if not SkipDelete then
             ApprovalsMgmt.DeleteApprovalEntries(ServiceHeader.RecordId);
-            ServOrderLine.DeleteAll(true);
-        end;
     end;
 
     local procedure TransferQuoteToOrderLines(var ServiceQuoteLine: Record "Service Line"; var ServiceQuoteHeader: Record "Service Header"; var ServiceOrderLine: Record "Service Line"; var ServiceOrderHeader: Record "Service Header")

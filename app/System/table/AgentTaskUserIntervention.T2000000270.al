@@ -48,5 +48,8 @@ table 2000000270 "Agent Task User Intervention"
         {
             Clustered = true;
         }
+        key(TaskID; "Task ID")
+        {
+        }
     }
 }

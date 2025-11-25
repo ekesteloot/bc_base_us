@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.FixedAssets.Ledger;
 
 using Microsoft.Finance.GeneralLedger.Journal;
@@ -96,10 +100,12 @@ codeunit 5624 "Cancel FA Ledger Entries"
         end;
     end;
 
-    local procedure InsertFAJnlLine(var FALedgEntry: Record "FA Ledger Entry")
+    procedure InsertFAJnlLine(var FALedgEntry: Record "FA Ledger Entry")
     begin
         if not FAJnlUsedOnce then begin
             FAJnlLine.LockTable();
+            if DeprBook.Code = '' then
+                DeprBook.Get(FALedgEntry."Depreciation Book Code");
             FAJnlSetup.FAJnlName(DeprBook, FAJnlLine, FAJnlNextLineNo);
             FAJnlUsedOnce := true;
             FAJnlDocumentNo :=
@@ -124,12 +130,14 @@ codeunit 5624 "Cancel FA Ledger Entries"
         OnAfterInsertFAJnlLine(FAJnlLine, FALedgEntry);
     end;
 
-    local procedure InsertGenJnlLine(var FALedgEntry: Record "FA Ledger Entry"; BalAccount: Boolean)
+    procedure InsertGenJnlLine(var FALedgEntry: Record "FA Ledger Entry"; BalAccount: Boolean)
     var
         FAInsertGLAcc: Codeunit "FA Insert G/L Account";
     begin
         if not GenJnlUsedOnce then begin
             GenJnlLine.LockTable();
+            if DeprBook.Code = '' then
+                DeprBook.Get(FALedgEntry."Depreciation Book Code");
             FAJnlSetup.GenJnlName(DeprBook, GenJnlLine, GenJnlNextLineNo);
             GenJnlUsedOnce := true;
             GenJnlDocumentNo :=

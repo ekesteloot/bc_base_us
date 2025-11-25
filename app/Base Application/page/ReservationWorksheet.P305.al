@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Inventory.Tracking;
 
 using Microsoft.Inventory.Availability;
@@ -456,6 +460,12 @@ page 305 "Reservation Worksheet"
         DateFilter: Text;
         NeedsAttention: Boolean;
         EmptyBatchQst: Label 'Are you sure you want to empty the batch? This action will delele all lines, automatic allocations, and any manual edits that you have made.';
+
+    procedure SetCurrentWkshBatchName(Name: Code[10])
+    begin
+        CurrentWkshBatchName := Name;
+        ReservationWorksheetMgt.SetName(CurrentWkshBatchName, Rec);
+    end;
 
     local procedure CurrentWkshBatchNameOnAfterValidate()
     begin

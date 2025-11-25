@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Inventory.Availability;
 
 using Microsoft.Assembly.Document;
@@ -197,6 +201,7 @@ codeunit 5790 "Available to Promise"
         Item.SetRange("Date Filter", 0D, GetForwardPeriodEndDate(LookaheadDateFormula, PeriodType, StartDate));
         CalculateAvailability(Item, TempAvailabilityAtDate);
         UpdateScheduledReceipt(TempAvailabilityAtDate, ExcludeOnDate, ExcludeQty);
+        OnCalcEarliestAvailabilityDateOnAfterUpdateScheduledReceipt(TempAvailabilityAtDate);
         CalculateAvailabilityByPeriod(TempAvailabilityAtDate, PeriodType);
 
         IsHandled := false;
@@ -562,9 +567,9 @@ codeunit 5790 "Available to Promise"
 
         if TransferLine.FindLinesWithItemToPlan(Item, true, false) then
             repeat
-                TransferLine.CalcFields("Reserved Qty. Inbnd. (Base)");
+                TransferLine.CalcFields("Reserved Qty. Inbnd. (Base)", "Reserved Qty. Shipped (Base)");
                 UpdateScheduledReceipt(AvailabilityAtDate, TransferLine."Receipt Date",
-                  TransferLine."Outstanding Qty. (Base)" + TransferLine."Qty. Shipped (Base)" - TransferLine."Qty. Received (Base)" - TransferLine."Reserved Qty. Inbnd. (Base)");
+                  TransferLine."Outstanding Qty. (Base)" + TransferLine."Qty. Shipped (Base)" - TransferLine."Qty. Received (Base)" - TransferLine."Reserved Qty. Inbnd. (Base)" - TransferLine."Reserved Qty. Shipped (Base)");
             until TransferLine.Next() = 0;
     end;
 
@@ -885,6 +890,11 @@ codeunit 5790 "Available to Promise"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdateAsmCompAvail(var AvailabilityAtDate: Record "Availability at Date"; var Item: Record Item; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnCalcEarliestAvailabilityDateOnAfterUpdateScheduledReceipt(var TempAvailabilityAtDate: Record "Availability at Date" temporary)
     begin
     end;
 }

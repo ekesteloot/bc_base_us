@@ -25,7 +25,6 @@ page 785 "Customer Picture"
             {
                 ApplicationArea = All;
                 ShowCaption = false;
-                ToolTip = 'Specifies the picture of the customer, for example, a logo.';
             }
         }
     }
@@ -74,6 +73,7 @@ page 785 "Customer Picture"
 
                     Clear(Rec.Image);
                     Rec.Image.ImportFile(FileName, ClientFileName);
+                    Rec.SetForceUpdateContact(true);
                     if not Rec.Modify(true) then
                         Rec.Insert(true);
 

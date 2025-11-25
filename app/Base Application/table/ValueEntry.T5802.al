@@ -1,4 +1,8 @@
-﻿namespace Microsoft.Inventory.Ledger;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Ledger;
 
 using Microsoft.CRM.Team;
 using Microsoft.Finance.Currency;
@@ -7,14 +11,12 @@ using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.Period;
 using Microsoft.Foundation.UOM;
 using Microsoft.Inventory.Costing;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Location;
-using Microsoft.Manufacturing.Capacity;
-using Microsoft.Manufacturing.MachineCenter;
-using Microsoft.Manufacturing.WorkCenter;
 using Microsoft.Projects.Project.Job;
 using Microsoft.Projects.Project.Ledger;
 using Microsoft.Projects.Resources.Resource;
@@ -32,6 +34,7 @@ table 5802 "Value Entry"
     Caption = 'Value Entry';
     DrillDownPageID = "Value Entries";
     LookupPageID = "Value Entries";
+    Permissions = TableData "Value Entry" = ri;
     DataClassification = CustomerContent;
 
     fields
@@ -118,6 +121,18 @@ table 5802 "Value Entry"
         {
             AutoFormatType = 1;
             Caption = 'Sales Amount (Actual)';
+        }
+        field(20; "Item Register No."; Integer)
+        {
+            Caption = 'Item Register No.';
+            Editable = false;
+            TableRelation = "Item Register";
+        }
+        field(21; "SIFT Bucket No."; Integer)
+        {
+            Caption = 'SIFT Bucket No.';
+            ToolTip = 'Specifies an automatically generated number that is used by the system to enable better concurrency.';
+            Editable = false;
         }
         field(22; "Salespers./Purch. Code"; Code[20])
         {
@@ -433,20 +448,16 @@ table 5802 "Value Entry"
         field(5831; "Capacity Ledger Entry No."; Integer)
         {
             Caption = 'Capacity Ledger Entry No.';
-            TableRelation = "Capacity Ledger Entry";
+            TableRelation = Microsoft.Manufacturing.Capacity."Capacity Ledger Entry";
         }
-        field(5832; Type; Enum "Capacity Type Journal")
+        field(5832; Type; Enum Microsoft.Manufacturing.Capacity."Capacity Type Journal")
         {
             Caption = 'Type';
         }
         field(5834; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = if (Type = const("Machine Center")) "Machine Center"
-            else
-            if (Type = const("Work Center")) "Work Center"
-            else
-            if (Type = const(Resource)) Resource;
+            TableRelation = if (Type = const(Resource)) Resource;
         }
         field(6602; "Return Reason Code"; Code[10])
         {
@@ -469,18 +480,19 @@ table 5802 "Value Entry"
         {
             IncludedFields = "Invoiced Quantity", "Cost Amount (Expected)", "Cost Amount (Actual)", "Cost Amount (Expected) (ACY)", "Cost Amount (Actual) (ACY)", "Entry Type", "Expected Cost", "Item Charge No.";
         }
-        key(Key5; "Item No.", "Posting Date", "Item Ledger Entry Type", "Entry Type", "Variance Type", "Item Charge No.", "Location Code", "Variant Code", "Global Dimension 1 Code", "Global Dimension 2 Code", "Source Type", "Source No.")
+        key(Key5; "Item No.", "Posting Date", "Item Ledger Entry Type", "Entry Type", "Variance Type", "Item Charge No.", "Location Code", "Variant Code", "Global Dimension 1 Code", "Global Dimension 2 Code", "Source Type", "Source No.", "SIFT Bucket No.")
         {
             SumIndexFields = "Invoiced Quantity", "Sales Amount (Expected)", "Sales Amount (Actual)", "Cost Amount (Expected)", "Cost Amount (Actual)", "Cost Amount (Non-Invtbl.)", "Purchase Amount (Actual)", "Expected Cost Posted to G/L", "Cost Posted to G/L", "Item Ledger Entry Quantity";
         }
         key(Key6; "Document No.")
         {
         }
-        key(Key7; "Item No.", "Valuation Date", "Location Code", "Variant Code")
+        key(Key7; "Item No.", "Valuation Date", "Location Code", "Variant Code", "SIFT Bucket No.")
         {
+            IncludedFields = "Item Ledger Entry Type";
             SumIndexFields = "Cost Amount (Expected)", "Cost Amount (Actual)", "Cost Amount (Expected) (ACY)", "Cost Amount (Actual) (ACY)", "Item Ledger Entry Quantity", "Invoiced Quantity";
         }
-        key(Key8; "Source Type", "Source No.", "Item No.", "Posting Date", "Entry Type", Adjustment, "Item Ledger Entry Type")
+        key(Key8; "Source Type", "Source No.", "Item No.", "Posting Date", "Entry Type", Adjustment, "Item Ledger Entry Type", "SIFT Bucket No.")
         {
             SumIndexFields = "Discount Amount", "Cost Amount (Non-Invtbl.)", "Cost Amount (Actual)", "Cost Amount (Expected)", "Sales Amount (Actual)", "Sales Amount (Expected)", "Invoiced Quantity";
         }
@@ -493,11 +505,12 @@ table 5802 "Value Entry"
         }
         key(Key11; "Order Type", "Order No.", "Order Line No.")
         {
+            IncludedFields = "Item No.", "Valuation Date", "Item Ledger Entry Type", "Variant Code", "Location Code";
         }
         key(Key13; "Job No.", "Job Task No.", "Document No.")
         {
         }
-        key(Key14; "Item Ledger Entry Type", "Posting Date", "Item No.", "Inventory Posting Group", "Dimension Set ID")
+        key(Key14; "Item Ledger Entry Type", "Posting Date", "Item No.", "Inventory Posting Group", "Dimension Set ID", "SIFT Bucket No.")
         {
             SumIndexFields = "Invoiced Quantity", "Sales Amount (Actual)", "Purchase Amount (Actual)";
         }
@@ -532,13 +545,17 @@ table 5802 "Value Entry"
         UOMMgt: Codeunit "Unit of Measure Management";
         GLSetupRead: Boolean;
 
-    local procedure GetCurrencyCode(): Code[10]
+    trigger OnInsert()
     begin
-        if not GLSetupRead then begin
-            GLSetup.Get();
-            GLSetupRead := true;
-        end;
-        exit(GLSetup."Additional Reporting Currency");
+        Rec."SIFT Bucket No." := Rec."Item Register No." mod 5;
+    end;
+
+    [InherentPermissions(PermissionObjectType::TableData, Database::"Value Entry", 'r')]
+    procedure GetNextEntryNo(): Integer
+    var
+        SequenceNoMgt: Codeunit "Sequence No. Mgt.";
+    begin
+        exit(SequenceNoMgt.GetNextSeqNo(DATABASE::"Value Entry"));
     end;
 
     procedure GetLastEntryNo(): Integer;
@@ -546,6 +563,15 @@ table 5802 "Value Entry"
         FindRecordManagement: Codeunit "Find Record Management";
     begin
         exit(FindRecordManagement.GetLastEntryIntFieldValue(Rec, FieldNo("Entry No.")))
+    end;
+
+    local procedure GetCurrencyCode(): Code[10]
+    begin
+        if not GLSetupRead then begin
+            GLSetup.Get();
+            GLSetupRead := true;
+        end;
+        exit(GLSetup."Additional Reporting Currency");
     end;
 
     procedure GetValuationDate(): Date
@@ -760,7 +786,7 @@ table 5802 "Value Entry"
     var
         DimMgt: Codeunit DimensionManagement;
     begin
-        DimMgt.ShowDimensionSet("Dimension Set ID", StrSubstNo('%1 %2', TableCaption(), "Entry No."));
+        DimMgt.ShowDimensionSet("Dimension Set ID", CopyStr(StrSubstNo('%1 %2', TableCaption(), "Entry No."), 1, 250));
     end;
 
     procedure GetAvgToDate(ToDate: Date): Date
@@ -814,7 +840,7 @@ table 5802 "Value Entry"
     procedure FindFirstValueEntryByItemLedgerEntryNo(ItemLedgerEntryNo: Integer)
     begin
         Reset();
-        SetCurrentKey("Item Ledger Entry No.");
+        SetCurrentKey("Item Ledger Entry No.", "Entry No.");
         SetRange("Item Ledger Entry No.", ItemLedgerEntryNo);
         FindFirst();
     end;

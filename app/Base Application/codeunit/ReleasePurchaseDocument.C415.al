@@ -112,7 +112,7 @@ codeunit 415 "Release Purchase Document"
         OnCodeOnBeforeCalcAndUpdateVATOnLines(PurchaseHeader);
         LinesWereModified := LinesWereModified or CalcAndUpdateVATOnLines(PurchaseHeader, PurchLine);
 
-        OnCodeOnBeforeModifyHeader(PurchaseHeader, PurchLine, PreviewMode, LinesWereModified);
+        OnCodeOnBeforeModifyHeader(PurchaseHeader, PurchLine, PreviewMode, LinesWereModified, NotOnlyDropShipment);
 
         PurchaseHeader.Modify(true);
 
@@ -168,6 +168,8 @@ codeunit 415 "Release Purchase Document"
                             PurchaseLine.TestField("Location Code");
                     end;
                     PurchaseLine.TestField("Unit of Measure Code");
+                    if PurchaseLine."Document Type" in [PurchaseLine."Document Type"::Order] then
+                        PurchaseLine.TestPurchaseJobFields();
                 end;
                 if Item.Get(PurchaseLine."No.") then
                     if Item.IsVariantMandatory() then
@@ -382,7 +384,7 @@ codeunit 415 "Release Purchase Document"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCodeOnBeforeModifyHeader(var PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; PreviewMode: Boolean; var LinesWereModified: Boolean)
+    local procedure OnCodeOnBeforeModifyHeader(var PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; PreviewMode: Boolean; var LinesWereModified: Boolean; var NotOnlyDropShipment: Boolean)
     begin
     end;
 

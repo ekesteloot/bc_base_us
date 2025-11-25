@@ -1,4 +1,8 @@
-﻿namespace Microsoft.Bank.Payment;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Bank.Payment;
 
 using Microsoft.Bank.BankAccount;
 using System.IO;
@@ -112,12 +116,10 @@ table 1205 "Credit Transfer Register"
         Modify();
     end;
 
-    [Scope('OnPrem')]
     procedure Reexport()
     var
         CreditTransReExportHistory: Record "Credit Trans Re-export History";
         TempBlob: Codeunit "Temp Blob";
-        FileMgt: Codeunit "File Management";
     begin
         TempBlob.FromRecord(Rec, FieldNo("Exported File"));
 
@@ -128,10 +130,24 @@ table 1205 "Credit Transfer Register"
         CreditTransReExportHistory."Credit Transfer Register No." := "No.";
         CreditTransReExportHistory.Insert(true);
 
-        if FileMgt.BLOBExport(TempBlob, StrSubstNo('%1.XML', Identifier), not ExportToServerFile) <> '' then begin
+        if ExportFile(TempBlob) then begin
             Status := Status::"File Re-exported";
             Modify();
         end;
+    end;
+
+    local procedure ExportFile(var TempBlob: Codeunit "Temp Blob") Result: Boolean
+    var
+        FileManagement: Codeunit "File Management";
+        FileNamePatternTok: Label '%1.XML', Locked = true;
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeExportFile(TempBlob, Rec, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
+        Result := FileManagement.BLOBExport(TempBlob, StrSubstNo(FileNamePatternTok, Identifier), not ExportToServerFile) <> '';
     end;
 
     procedure SetFileContent(var DataExch: Record "Data Exch.")
@@ -146,6 +162,11 @@ table 1205 "Credit Transfer Register"
     procedure EnableExportToServerFile()
     begin
         ExportToServerFile := true;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeExportFile(var TempBlob: Codeunit "Temp Blob"; var CreditTransferRegister: Record "Credit Transfer Register"; var Result: Boolean; var IsHandled: Boolean)
+    begin
     end;
 }
 

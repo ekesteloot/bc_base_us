@@ -76,5 +76,11 @@ table 2000000269 "Agent Task Step Data"
         key(GroupID; "Task ID", "Group ID", "Step Number")
         {
         }
+
+        key(TaskIdType; "Task ID", "Type", "Step Number")
+        {
+            Unique = false;
+            SqlIndex = "Task ID", "Type", "Step Number";
+        }
     }
 }

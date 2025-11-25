@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.FixedAssets.Journal;
 
 using Microsoft.Finance.Dimension;
@@ -557,11 +561,11 @@ page 5629 "Fixed Asset Journal"
         FAJnlManagement: Codeunit FAJnlManagement;
         ReportPrint: Codeunit "Test Report-Print";
         ClientTypeManagement: Codeunit "Client Type Management";
-        CurrentJnlBatchName: Code[10];
-        FADescription: Text[100];
         IsSaaSExcelAddinEnabled: Boolean;
 
     protected var
+        CurrentJnlBatchName: Code[10];
+        FADescription: Text[100];
         ShortcutDimCode: array[8] of Code[20];
         DimVisible1: Boolean;
         DimVisible2: Boolean;

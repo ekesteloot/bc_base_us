@@ -1,15 +1,21 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Assembly.Document;
 
 using Microsoft.Inventory.Item;
 
 page 903 "Assembly Lines"
 {
-    AutoSplitKey = true;
+    ApplicationArea = Basic, Suite;
+	AutoSplitKey = true;
     Caption = 'Assembly Lines';
     Editable = false;
     PageType = List;
     PopulateAllFields = true;
     SourceTable = "Assembly Line";
+    UsageCategory = Lists;
 
     layout
     {

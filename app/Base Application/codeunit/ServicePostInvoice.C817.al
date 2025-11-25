@@ -1,4 +1,8 @@
-﻿namespace Microsoft.Service.Posting;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Service.Posting;
 
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.GeneralLedger.Journal;
@@ -100,6 +104,7 @@ codeunit 817 "Service Post Invoice" implements "Invoice Posting"
                 ServicePostInvoiceEvents.RunOnPrepareLineAfterGetGenPostingSetup(GenPostingSetup, ServiceHeader, ServiceLine, ServiceLineACY);
             end;
 
+        SalesSetup.Get();
         if not GLSetup."VAT in Use" then
             if (ServiceLine.Type.AsInteger() >= ServiceLine.Type::Item.AsInteger()) and
                ((ServiceLine."Qty. to Invoice" <> 0) or (ServiceLine."Qty. to Ship" <> 0))
@@ -260,7 +265,7 @@ codeunit 817 "Service Post Invoice" implements "Invoice Posting"
               ServiceHeader."Prices Including VAT", -ServiceLine."Line Discount Amount", -ServiceLineACY."Line Discount Amount");
     end;
 
-    internal procedure PrepareInvoicePostingBuffer(var ServiceLine: Record "Service Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer")
+    procedure PrepareInvoicePostingBuffer(var ServiceLine: Record "Service Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer")
     begin
         ServicePostInvoiceEvents.RunOnBeforePrepareInvoicePostingBuffer(ServiceLine, InvoicePostingBuffer);
 
@@ -410,7 +415,7 @@ codeunit 817 "Service Post Invoice" implements "Invoice Posting"
             ServiceHeader."Posting Date", ServiceHeader."Currency Code", -TotalServiceLine."Pmt. Discount Amount", ServiceHeader."Currency Factor");
 
         ServicePostInvoiceEvents.RunOnPostLedgerEntryOnBeforeGenJnlPostLine(
-            GenJnlLine, ServiceHeader, TotalServiceLine, TotalServiceLineLCY, PreviewMode, SuppressCommit, GenJnlPostLine);
+            GenJnlLine, ServiceHeader, TotalServiceLine, TotalServiceLineLCY, PreviewMode, SuppressCommit, GenJnlPostLine, InvoicePostingParameters);
         GenJnlPostLine.RunWithCheck(GenJnlLine);
         ServicePostInvoiceEvents.RunOnPostLedgerEntryOnAfterGenJnlPostLine(
             GenJnlLine, ServiceHeader, TotalServiceLine, TotalServiceLineLCY, PreviewMode, SuppressCommit, GenJnlPostLine);

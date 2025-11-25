@@ -660,6 +660,16 @@ page 88 "Job Card"
                             Editable = ShipToOptions = ShipToOptions::"Custom Address";
                             ToolTip = 'Specifies the name that products on the sales document will be shipped to.';
                         }
+                        field("Ship-to Name 2"; Rec."Ship-to Name 2")
+                        {
+                            ApplicationArea = Jobs;
+                            Caption = 'Name 2';
+                            Editable = ShipToOptions = ShipToOptions::"Custom Address";
+                            Importance = Additional;
+                            ToolTip = 'Specifies an additional part of the name that products on the sales document will be shipped to.';
+                            QuickEntry = false;
+                            Visible = false;
+                        }
                         field("Ship-to Address"; Rec."Ship-to Address")
                         {
                             ApplicationArea = Jobs;
@@ -1167,7 +1177,7 @@ page 88 "Job Card"
                         PurchaseLine: Record "Purchase Line";
                     begin
                         Rec.SetPurchLineFilters(PurchaseLine);
-                        PurchaseLine.SetFilter("Outstanding Amount (LCY)", '<> 0');
+                        PurchaseLine.SetFilter(Quantity, '<> 0');
                         Page.RunModal(Page::"Purchase Lines", PurchaseLine);
                     end;
                 }

@@ -1,15 +1,15 @@
-﻿namespace Microsoft.Manufacturing.Capacity;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Manufacturing.Capacity;
 
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Ledger;
-using Microsoft.Manufacturing.Document;
-using Microsoft.Manufacturing.MachineCenter;
-using Microsoft.Manufacturing.Routing;
-using Microsoft.Manufacturing.Setup;
-using Microsoft.Manufacturing.WorkCenter;
 using Microsoft.Projects.Resources.Resource;
 using Microsoft.Utilities;
 
@@ -18,6 +18,7 @@ table 5832 "Capacity Ledger Entry"
     Caption = 'Capacity Ledger Entry';
     DrillDownPageID = "Capacity Ledger Entries";
     LookupPageID = "Capacity Ledger Entries";
+    Permissions = TableData "Capacity Ledger Entry" = ri;
     DataClassification = CustomerContent;
 
     fields
@@ -29,11 +30,7 @@ table 5832 "Capacity Ledger Entry"
         field(2; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = if (Type = const("Machine Center")) "Machine Center"
-            else
-            if (Type = const("Work Center")) "Work Center"
-            else
-            if (Type = const(Resource)) Resource;
+            TableRelation = if (Type = const(Resource)) Resource;
         }
         field(3; "Posting Date"; Date)
         {
@@ -51,33 +48,9 @@ table 5832 "Capacity Ledger Entry"
         {
             Caption = 'Description';
         }
-        field(8; "Operation No."; Code[10])
-        {
-            Caption = 'Operation No.';
-        }
-        field(9; "Work Center No."; Code[20])
-        {
-            Caption = 'Work Center No.';
-            TableRelation = "Work Center";
-        }
         field(10; Quantity; Decimal)
         {
             Caption = 'Quantity';
-            DecimalPlaces = 0 : 5;
-        }
-        field(11; "Setup Time"; Decimal)
-        {
-            Caption = 'Setup Time';
-            DecimalPlaces = 0 : 5;
-        }
-        field(12; "Run Time"; Decimal)
-        {
-            Caption = 'Run Time';
-            DecimalPlaces = 0 : 5;
-        }
-        field(13; "Stop Time"; Decimal)
-        {
-            Caption = 'Stop Time';
             DecimalPlaces = 0 : 5;
         }
         field(15; "Invoiced Quantity"; Decimal)
@@ -85,19 +58,17 @@ table 5832 "Capacity Ledger Entry"
             Caption = 'Invoiced Quantity';
             DecimalPlaces = 0 : 5;
         }
-        field(16; "Output Quantity"; Decimal)
+        field(20; "Item Register No."; Integer)
         {
-            Caption = 'Output Quantity';
-            DecimalPlaces = 0 : 5;
+            Caption = 'Item Register No.';
+            Editable = false;
+            TableRelation = "Item Register";
         }
-        field(17; "Scrap Quantity"; Decimal)
+        field(21; "SIFT Bucket No."; Integer)
         {
-            Caption = 'Scrap Quantity';
-            DecimalPlaces = 0 : 5;
-        }
-        field(19; "Concurrent Capacity"; Decimal)
-        {
-            Caption = 'Concurrent Capacity';
+            Caption = 'SIFT Bucket No.';
+            ToolTip = 'Specifies an automatically generated number that is used by the system to enable better concurrency.';
+            Editable = false;
         }
         field(28; "Cap. Unit of Measure Code"; Code[10])
         {
@@ -121,30 +92,9 @@ table 5832 "Capacity Ledger Entry"
             Caption = 'Global Dimension 2 Code';
             TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
-        field(39; "Last Output Line"; Boolean)
-        {
-            Caption = 'Last Output Line';
-        }
         field(42; "Completely Invoiced"; Boolean)
         {
             Caption = 'Completely Invoiced';
-        }
-        field(43; "Starting Time"; Time)
-        {
-            Caption = 'Starting Time';
-        }
-        field(44; "Ending Time"; Time)
-        {
-            Caption = 'Ending Time';
-        }
-        field(52; "Routing No."; Code[20])
-        {
-            Caption = 'Routing No.';
-            TableRelation = "Routing Header";
-        }
-        field(53; "Routing Reference No."; Integer)
-        {
-            Caption = 'Routing Reference No.';
         }
         field(56; "Item No."; Code[20])
         {
@@ -173,26 +123,6 @@ table 5832 "Capacity Ledger Entry"
         field(61; "External Document No."; Code[35])
         {
             Caption = 'External Document No.';
-        }
-        field(65; "Stop Code"; Code[10])
-        {
-            Caption = 'Stop Code';
-            TableRelation = Stop;
-        }
-        field(66; "Scrap Code"; Code[10])
-        {
-            Caption = 'Scrap Code';
-            TableRelation = Scrap;
-        }
-        field(68; "Work Center Group Code"; Code[10])
-        {
-            Caption = 'Work Center Group Code';
-            TableRelation = "Work Center Group";
-        }
-        field(69; "Work Shift Code"; Code[10])
-        {
-            Caption = 'Work Shift Code';
-            TableRelation = "Work Shift";
         }
         field(71; "Direct Cost"; Decimal)
         {
@@ -245,14 +175,11 @@ table 5832 "Capacity Ledger Entry"
         {
             Caption = 'Order No.';
             Editable = false;
-            TableRelation = if ("Order Type" = const(Production)) "Production Order"."No." where(Status = filter(Released ..));
         }
         field(92; "Order Line No."; Integer)
         {
             Caption = 'Order Line No.';
             Editable = false;
-            TableRelation = if ("Order Type" = const(Production)) "Prod. Order Line"."Line No." where(Status = filter(Released ..),
-                                                                                                     "Prod. Order No." = field("Order No."));
         }
         field(480; "Dimension Set ID"; Integer)
         {
@@ -330,15 +257,10 @@ table 5832 "Capacity Ledger Entry"
         key(Key2; "Document No.", "Posting Date")
         {
         }
-        key(Key3; "Order Type", "Order No.", "Order Line No.", "Routing No.", "Routing Reference No.", "Operation No.", "Last Output Line")
-        {
-            MaintainSIFTIndex = false;
-            SumIndexFields = Quantity, "Output Quantity";
-        }
-        key(Key4; "Work Center No.", "Work Shift Code", "Posting Date")
+        key(Key3; "Order Type", "Order No.", "Order Line No.")
         {
         }
-        key(Key5; Type, "No.", "Work Shift Code", "Item No.", "Posting Date")
+        key(Key5; Type, "No.", "Item No.", "Posting Date")
         {
         }
     }
@@ -354,6 +276,27 @@ table 5832 "Capacity Ledger Entry"
         GLSetup: Record "General Ledger Setup";
         GLSetupRead: Boolean;
 
+    trigger OnInsert()
+    begin
+        Rec."SIFT Bucket No." := Rec."Item Register No." mod 5;
+    end;
+
+    [InherentPermissions(PermissionObjectType::TableData, Database::"Capacity Ledger Entry", 'r')]
+    procedure GetNextEntryNo(): Integer
+    var
+        SequenceNoMgt: Codeunit "Sequence No. Mgt.";
+    begin
+        exit(SequenceNoMgt.GetNextSeqNo(DATABASE::"Capacity Ledger Entry"));
+    end;
+
+    [InherentPermissions(PermissionObjectType::TableData, Database::"Capacity Ledger Entry", 'r')]
+    procedure GetLastEntryNo(): Integer;
+    var
+        FindRecordManagement: Codeunit "Find Record Management";
+    begin
+        exit(FindRecordManagement.GetLastEntryIntFieldValue(Rec, FieldNo("Entry No.")))
+    end;
+
     local procedure GetCurrencyCode(): Code[10]
     begin
         if not GLSetupRead then begin
@@ -363,27 +306,11 @@ table 5832 "Capacity Ledger Entry"
         exit(GLSetup."Additional Reporting Currency");
     end;
 
-    procedure GetLastEntryNo(): Integer;
-    var
-        FindRecordManagement: Codeunit "Find Record Management";
-    begin
-        exit(FindRecordManagement.GetLastEntryIntFieldValue(Rec, FieldNo("Entry No.")))
-    end;
-
     procedure ShowDimensions()
     var
         DimMgt: Codeunit DimensionManagement;
     begin
         DimMgt.ShowDimensionSet("Dimension Set ID", StrSubstNo('%1 %2', TableCaption(), "Entry No."));
-    end;
-
-    procedure SetFilterByProdOrderRoutingLine(ProdOrderNo: Code[20]; ProdOrderLineNo: Integer; ProdOrderRoutingNo: Code[20]; ProdOrderRoutingLineNo: Integer)
-    begin
-        SetRange("Order Type", "Order Type"::Production);
-        SetRange("Order No.", ProdOrderNo);
-        SetRange("Order Line No.", ProdOrderLineNo);
-        SetRange("Routing No.", ProdOrderRoutingNo);
-        SetRange("Routing Reference No.", ProdOrderRoutingLineNo);
     end;
 }
 

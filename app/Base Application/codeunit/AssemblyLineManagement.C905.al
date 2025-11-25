@@ -1,4 +1,8 @@
-﻿namespace Microsoft.Assembly.Document;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Assembly.Document;
 
 using Microsoft.Assembly.Setup;
 using Microsoft.Inventory;
@@ -99,6 +103,7 @@ codeunit 905 "Assembly Line Management"
     var
         DueDateBeforeWorkDateMsgShown: Boolean;
         SkipVerificationsThatChangeDatabase: Boolean;
+        IsHandled: Boolean;
     begin
         SkipVerificationsThatChangeDatabase := AsmLineRecordIsTemporary;
         AssemblyLine.SetSkipVerificationsThatChangeDatabase(SkipVerificationsThatChangeDatabase);
@@ -119,15 +124,18 @@ codeunit 905 "Assembly Line Management"
                 "Quantity per",
                 AssemblyLine.CalcBOMQuantity(
                 BOMComponent.Type, BOMComponent."Quantity per", 1, QtyPerUoM, AssemblyLine."Resource Usage Type"));
-        OnAddBOMLineOnBeforeValidateQuantity(AssemblyHeader, AssemblyLine, BOMComponent);
-        AssemblyLine.Validate(
-            Quantity,
-            AssemblyLine.CalcBOMQuantity(
-                BOMComponent.Type, BOMComponent."Quantity per", AssemblyHeader.Quantity, QtyPerUoM, AssemblyLine."Resource Usage Type"));
-        AssemblyLine.Validate(
-            "Quantity to Consume",
-            AssemblyLine.CalcBOMQuantity(
-                BOMComponent.Type, BOMComponent."Quantity per", AssemblyHeader."Quantity to Assemble", QtyPerUoM, AssemblyLine."Resource Usage Type"));
+        IsHandled := false;
+        OnAddBOMLineOnBeforeValidateQuantity(AssemblyHeader, AssemblyLine, BOMComponent, IsHandled);
+        if not IsHandled then begin
+            AssemblyLine.Validate(
+                Quantity,
+                AssemblyLine.CalcBOMQuantity(
+                    BOMComponent.Type, BOMComponent."Quantity per", AssemblyHeader.Quantity, QtyPerUoM, AssemblyLine."Resource Usage Type"));
+            AssemblyLine.Validate(
+                "Quantity to Consume",
+                AssemblyLine.CalcBOMQuantity(
+                    BOMComponent.Type, BOMComponent."Quantity per", AssemblyHeader."Quantity to Assemble", QtyPerUoM, AssemblyLine."Resource Usage Type"));
+        end;
         AssemblyLine.ValidateDueDate(AssemblyHeader, AssemblyHeader."Starting Date", ShowDueDateBeforeWorkDateMessage);
         DueDateBeforeWorkDateMsgShown := (AssemblyLine."Due Date" < WorkDate()) and ShowDueDateBeforeWorkDateMessage;
         AssemblyLine.ValidateLeadTimeOffset(
@@ -386,6 +394,8 @@ codeunit 905 "Assembly Line Management"
         if ReplaceLinesFromBOM or UpdateDueDate then
             if DueDateBeforeWorkDate then
                 ShowDueDateBeforeWorkDateMsg(NewLineDueDate);
+
+        OnAfterUpdateAssemblyLines(AsmHeader, OldAsmHeader, FieldNum, ReplaceLinesFromBOM, CurrFieldNo, CurrentFieldNum);
     end;
 
     local procedure PreCheckAndConfirmUpdate(AsmHeader: Record "Assembly Header"; OldAsmHeader: Record "Assembly Header"; FieldNum: Integer; var ReplaceLinesFromBOM: Boolean; var TempAssemblyLine: Record "Assembly Line" temporary; var UpdateDueDate: Boolean; var UpdateLocation: Boolean; var UpdateQuantity: Boolean; var UpdateUOM: Boolean; var UpdateQtyToConsume: Boolean; var UpdateDimension: Boolean): Boolean
@@ -568,7 +578,7 @@ codeunit 905 "Assembly Line Management"
             repeat
                 ToAssemblyLine := AssemblyLine;
                 ToAssemblyLine.Insert();
-                OnCopyAssemblyDataOnAfterToAssemblyLineInsert(AssemblyLine, ToAssemblyLine);
+                OnCopyAssemblyDataOnAfterToAssemblyLineInsert(AssemblyLine, ToAssemblyLine, ToAssemblyHeader);
                 NoOfLinesInserted += 1;
             until AssemblyLine.Next() = 0;
     end;
@@ -942,7 +952,7 @@ codeunit 905 "Assembly Line Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAddBOMLineOnBeforeValidateQuantity(AssemblyHeader: Record "Assembly Header"; var AssemblyLine: Record "Assembly Line"; BOMComponent: Record "BOM Component")
+    local procedure OnAddBOMLineOnBeforeValidateQuantity(AssemblyHeader: Record "Assembly Header"; var AssemblyLine: Record "Assembly Line"; BOMComponent: Record "BOM Component"; var IsHandled: Boolean)
     begin
     end;
 
@@ -973,6 +983,11 @@ codeunit 905 "Assembly Line Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdateAssemblyLines(var AsmHeader: Record "Assembly Header"; OldAsmHeader: Record "Assembly Header"; FieldNum: Integer; ReplaceLinesFromBOM: Boolean; CurrFieldNo: Integer; CurrentFieldNum: Integer; var IsHandled: Boolean; HideValidationDialog: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterUpdateAssemblyLines(var AsmHeader: Record "Assembly Header"; OldAsmHeader: Record "Assembly Header"; FieldNum: Integer; ReplaceLinesFromBOM: Boolean; CurrFieldNo: Integer; CurrentFieldNum: Integer)
     begin
     end;
 
@@ -1012,7 +1027,7 @@ codeunit 905 "Assembly Line Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCopyAssemblyDataOnAfterToAssemblyLineInsert(var AssemblyLine: Record "Assembly Line"; var ToAssemblyLine: Record "Assembly Line")
+    local procedure OnCopyAssemblyDataOnAfterToAssemblyLineInsert(var AssemblyLine: Record "Assembly Line"; var ToAssemblyLine: Record "Assembly Line"; var ToAssemblyHeader: Record "Assembly Header")
     begin
     end;
 

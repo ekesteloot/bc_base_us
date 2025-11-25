@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Service.Contract;
 
 using Microsoft.Finance.GeneralLedger.Account;
@@ -19,8 +23,11 @@ codeunit 5958 "Serv. Calc. G/L Acc.Where-Used"
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Calc. G/L Acc. Where-Used", 'OnAfterFillTableBuffer', '', false, false)]
     local procedure OnAfterFillTableBuffer(var TableBuffer: Record "Integer")
+    var
+        ServiceContractAccountGroup: Record "Service Contract Account Group";
     begin
-        AddTable(TableBuffer, Database::"Service Contract Account Group");
+        if ServiceContractAccountGroup.ReadPermission() and ServiceContractAccountGroup.WritePermission() then
+            AddTable(TableBuffer, Database::"Service Contract Account Group");
     end;
 
     local procedure AddTable(var TableBuffer: Record "Integer"; TableID: Integer)

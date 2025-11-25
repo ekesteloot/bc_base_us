@@ -127,19 +127,19 @@ report 7304 "Get Outbound Source Documents"
 
                     trigger OnAfterGetRecord()
                     var
+                        ProdOrderWarehouseMgt: Codeunit "Prod. Order Warehouse Mgt.";
                         ToBinCode: Code[20];
                     begin
                         if ("Flushing Method" = "Flushing Method"::"Pick + Forward") and ("Routing Link Code" = '') then
                             CurrReport.Skip();
 
-                        GetLocation("Location Code");
+                        this.GetLocation("Location Code");
                         ToBinCode := "Bin Code";
 
                         CalcFields("Pick Qty.");
                         if "Expected Quantity" > "Qty. Picked" + "Pick Qty." then
-                            if WhsePickWkshCreate.FromProdOrderCompLine(
-                                 PickWkshTemplate, PickWkshName, Location.Code,
-                                 ToBinCode, "Prod. Order Component")
+                            if ProdOrderWarehouseMgt.FromProdOrderCompLine(
+                                 PickWkshTemplate, PickWkshName, Location.Code, ToBinCode, "Prod. Order Component")
                             then
                                 LineCreated := true;
                     end;

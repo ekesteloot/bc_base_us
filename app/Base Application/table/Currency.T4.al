@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Finance.Currency;
+namespace Microsoft.Finance.Currency;
 
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Account;
@@ -480,32 +480,22 @@ table 4 Currency
             Caption = 'Last Modified Date Time';
             Editable = false;
         }
+#if not CLEANSCHEMA26
         field(720; "Coupled to CRM"; Boolean)
         {
             Caption = 'Coupled to Dataverse';
             Editable = false;
             ObsoleteReason = 'Replaced by flow field Coupled to Dataverse';
-#if not CLEAN23
-            ObsoleteState = Pending;
-            ObsoleteTag = '23.0';
-#else
             ObsoleteState = Removed;
             ObsoleteTag = '26.0';
-#endif
         }
+#endif
         field(721; "Coupled to Dataverse"; Boolean)
         {
             FieldClass = FlowField;
             Caption = 'Coupled to Dataverse';
             Editable = false;
             CalcFormula = exist("CRM Integration Record" where("Integration ID" = field(SystemId), "Table ID" = const(Database::Currency)));
-        }
-        field(8000; Id; Guid)
-        {
-            Caption = 'Id';
-            ObsoleteState = Removed;
-            ObsoleteReason = 'This functionality will be replaced by the systemID field';
-            ObsoleteTag = '22.0';
         }
     }
 
@@ -518,14 +508,6 @@ table 4 Currency
         key(Key2; SystemModifiedAt)
         {
         }
-#if not CLEAN23
-        key(Key3; "Coupled to CRM")
-        {
-            ObsoleteState = Pending;
-            ObsoleteReason = 'Replaced by flow field Coupled to Dataverse';
-            ObsoleteTag = '23.0';
-        }
-#endif
     }
 
     fieldgroups
@@ -665,6 +647,9 @@ table 4 Currency
     end;
 
     procedure GetGainLossAccount(DtldCVLedgEntryBuf: Record "Detailed CV Ledg. Entry Buffer"): Code[20]
+    var
+        ReturnValue: Code[20];
+        IsHandled: Boolean;
     begin
         OnBeforeGetGainLossAccount(Rec, DtldCVLedgEntryBuf);
 
@@ -677,8 +662,14 @@ table 4 Currency
                 exit(GetRealizedLossesAccount());
             DtldCVLedgEntryBuf."Entry Type"::"Realized Gain":
                 exit(GetRealizedGainsAccount());
-            else
-                Error(IncorrectEntryTypeErr, DtldCVLedgEntryBuf."Entry Type");
+            else begin
+                IsHandled := false;
+                OnGetGainLossAccountOnOtherEntryType(Rec, DtldCVLedgEntryBuf, IsHandled, ReturnValue);
+                if IsHandled then
+                    exit(ReturnValue)
+                else
+                    Error(IncorrectEntryTypeErr, DtldCVLedgEntryBuf."Entry Type");
+            end;
         end;
     end;
 
@@ -910,5 +901,9 @@ table 4 Currency
     local procedure OnBeforeResolveCurrencySymbol(var Currency: Record Currency; var CurrencyCode: Code[10])
     begin
     end;
-}
 
+    [IntegrationEvent(false, false)]
+    local procedure OnGetGainLossAccountOnOtherEntryType(var Currency: Record Currency; DtldCVLedgEntryBuffer: Record "Detailed CV Ledg. Entry Buffer"; var IsHandled: Boolean; var ReturnValue: Code[20])
+    begin
+    end;
+}

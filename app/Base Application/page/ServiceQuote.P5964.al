@@ -104,7 +104,7 @@ page 5964 "Service Quote"
                         {
                             ApplicationArea = Service;
                             QuickEntry = false;
-                            ToolTip = 'Specifies the county in the customer''s address.';
+                            ToolTip = 'Specifies the state, province or county of the address.';
                         }
                     }
                     field("Post Code"; Rec."Post Code")
@@ -279,7 +279,7 @@ page 5964 "Service Quote"
                             ApplicationArea = Service;
                             Caption = 'County';
                             QuickEntry = false;
-                            ToolTip = 'Specifies the county in the customer''s address.';
+                            ToolTip = 'Specifies the state, province or county of the address.';
                         }
                     }
                     field("Bill-to Post Code"; Rec."Bill-to Post Code")
@@ -423,6 +423,14 @@ page 5964 "Service Quote"
                         Caption = 'Name';
                         ToolTip = 'Specifies the name of the customer at the address that the items are shipped to.';
                     }
+                    field("Ship-to Name 2"; Rec."Ship-to Name 2")
+                    {
+                        ApplicationArea = Service;
+                        Caption = 'Name 2';
+                        Importance = Additional;
+                        ToolTip = 'Specifies an additional part of thethe name of the customer at the address that the items are shipped to.';
+                        Visible = false;
+                    }
                     field("Ship-to Address"; Rec."Ship-to Address")
                     {
                         ApplicationArea = Service;
@@ -446,7 +454,7 @@ page 5964 "Service Quote"
                             ApplicationArea = Service;
                             Caption = 'County';
                             QuickEntry = false;
-                            ToolTip = 'Specifies the county in the customer''s address.';
+                            ToolTip = 'Specifies the state, province or county of the address.';
                         }
                     }
                     field("Ship-to Post Code"; Rec."Ship-to Post Code")
@@ -772,7 +780,6 @@ page 5964 "Service Quote"
 
                     trigger OnAction()
                     begin
-                        OnBeforeCalculateSalesTaxStatistics(Rec, true);
                         Rec.OpenStatistics();
                     end;
                 }
@@ -866,8 +873,7 @@ page 5964 "Service Quote"
                 trigger OnAction()
                 begin
                     CurrPage.Update();
-                    CODEUNIT.Run(CODEUNIT::"Serv-Quote to Order (Yes/No)", Rec);
-                    CurrPage.Update();
+                    Codeunit.Run(Codeunit::"Serv-Quote to Order (Yes/No)", Rec);
                 end;
             }
             action("&Print")
@@ -966,6 +972,11 @@ page 5964 "Service Quote"
         }
     }
 
+    trigger OnAfterGetCurrRecord()
+    begin
+        ActivateFields();
+    end;
+
     trigger OnDeleteRecord(): Boolean
     begin
         CurrPage.SaveRecord();
@@ -991,8 +1002,6 @@ page 5964 "Service Quote"
     trigger OnOpenPage()
     begin
         Rec.SetSecurityFilterOnRespCenter();
-
-        ActivateFields();
         SetDocNoVisible();
     end;
 
@@ -1061,11 +1070,6 @@ page 5964 "Service Quote"
     local procedure FinishingTimeOnAfterValidate()
     begin
         CurrPage.Update(true);
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalculateSalesTaxStatistics(var ServiceHeader: Record "Service Header"; ShowDialog: Boolean)
-    begin
     end;
 }
 

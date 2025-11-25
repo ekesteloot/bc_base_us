@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Service.History;
 
 using Microsoft.Bank.BankAccount;
@@ -36,10 +40,7 @@ using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
 using System.Security.AccessControl;
-using System.Utilities;
 using System.Security.User;
-using System.IO;
-using Microsoft.eServices.EDocument;
 
 table 5992 "Service Invoice Header"
 {
@@ -61,6 +62,7 @@ table 5992 "Service Invoice Header"
         field(3; "No."; Code[20])
         {
             Caption = 'No.';
+            OptimizeForTextSearch = true;
         }
         field(4; "Bill-to Customer No."; Code[20])
         {
@@ -71,32 +73,39 @@ table 5992 "Service Invoice Header"
         field(5; "Bill-to Name"; Text[100])
         {
             Caption = 'Bill-to Name';
+            OptimizeForTextSearch = true;
         }
         field(6; "Bill-to Name 2"; Text[50])
         {
             Caption = 'Bill-to Name 2';
+            OptimizeForTextSearch = true;
         }
         field(7; "Bill-to Address"; Text[100])
         {
             Caption = 'Bill-to Address';
+            OptimizeForTextSearch = true;
         }
         field(8; "Bill-to Address 2"; Text[50])
         {
             Caption = 'Bill-to Address 2';
+            OptimizeForTextSearch = true;
         }
         field(9; "Bill-to City"; Text[30])
         {
             Caption = 'Bill-to City';
+            OptimizeForTextSearch = true;
             TableRelation = "Post Code".City;
             ValidateTableRelation = false;
         }
         field(10; "Bill-to Contact"; Text[100])
         {
             Caption = 'Bill-to Contact';
+            OptimizeForTextSearch = true;
         }
         field(11; "Your Reference"; Text[35])
         {
             Caption = 'Your Reference';
+            OptimizeForTextSearch = true;
         }
         field(12; "Ship-to Code"; Code[10])
         {
@@ -106,28 +115,34 @@ table 5992 "Service Invoice Header"
         field(13; "Ship-to Name"; Text[100])
         {
             Caption = 'Ship-to Name';
+            OptimizeForTextSearch = true;
         }
         field(14; "Ship-to Name 2"; Text[50])
         {
             Caption = 'Ship-to Name 2';
+            OptimizeForTextSearch = true;
         }
         field(15; "Ship-to Address"; Text[100])
         {
             Caption = 'Ship-to Address';
+            OptimizeForTextSearch = true;
         }
         field(16; "Ship-to Address 2"; Text[50])
         {
             Caption = 'Ship-to Address 2';
+            OptimizeForTextSearch = true;
         }
         field(17; "Ship-to City"; Text[30])
         {
             Caption = 'Ship-to City';
+            OptimizeForTextSearch = true;
             TableRelation = "Post Code".City;
             ValidateTableRelation = false;
         }
         field(18; "Ship-to Contact"; Text[100])
         {
             Caption = 'Ship-to Contact';
+            OptimizeForTextSearch = true;
         }
         field(19; "Order Date"; Date)
         {
@@ -141,6 +156,7 @@ table 5992 "Service Invoice Header"
         field(22; "Posting Description"; Text[100])
         {
             Caption = 'Posting Description';
+            OptimizeForTextSearch = true;
         }
         field(23; "Payment Terms Code"; Code[10])
         {
@@ -228,6 +244,7 @@ table 5992 "Service Invoice Header"
         field(42; "Format Region"; Text[80])
         {
             Caption = 'Format Region';
+            OptimizeForTextSearch = true;
             TableRelation = "Language Selection"."Language Tag";
         }
         field(43; "Salesperson Code"; Code[20])
@@ -317,6 +334,7 @@ table 5992 "Service Invoice Header"
         field(70; "VAT Registration No."; Text[20])
         {
             Caption = 'VAT Registration No.';
+            OptimizeForTextSearch = true;
         }
         field(73; "Reason Code"; Code[10])
         {
@@ -350,28 +368,34 @@ table 5992 "Service Invoice Header"
         field(79; Name; Text[100])
         {
             Caption = 'Name';
+            OptimizeForTextSearch = true;
         }
         field(80; "Name 2"; Text[50])
         {
             Caption = 'Name 2';
+            OptimizeForTextSearch = true;
         }
         field(81; Address; Text[100])
         {
             Caption = 'Address';
+            OptimizeForTextSearch = true;
         }
         field(82; "Address 2"; Text[50])
         {
             Caption = 'Address 2';
+            OptimizeForTextSearch = true;
         }
         field(83; City; Text[30])
         {
             Caption = 'City';
+            OptimizeForTextSearch = true;
             TableRelation = "Post Code".City;
             ValidateTableRelation = false;
         }
         field(84; "Contact Name"; Text[100])
         {
             Caption = 'Contact Name';
+            OptimizeForTextSearch = true;
         }
         field(85; "Bill-to Post Code"; Code[20])
         {
@@ -383,6 +407,7 @@ table 5992 "Service Invoice Header"
         {
             CaptionClass = '5,3,' + "Bill-to Country/Region Code";
             Caption = 'Bill-to County';
+            OptimizeForTextSearch = true;
         }
         field(87; "Bill-to Country/Region Code"; Code[10])
         {
@@ -399,6 +424,7 @@ table 5992 "Service Invoice Header"
         {
             CaptionClass = '5,1,' + "Country/Region Code";
             Caption = 'County';
+            OptimizeForTextSearch = true;
         }
         field(90; "Country/Region Code"; Code[10])
         {
@@ -415,6 +441,7 @@ table 5992 "Service Invoice Header"
         {
             CaptionClass = '5,4,' + "Ship-to Country/Region Code";
             Caption = 'Ship-to County';
+            OptimizeForTextSearch = true;
         }
         field(93; "Ship-to Country/Region Code"; Code[10])
         {
@@ -441,6 +468,7 @@ table 5992 "Service Invoice Header"
         field(100; "External Document No."; Code[35])
         {
             Caption = 'External Document No.';
+            OptimizeForTextSearch = true;
         }
         field(101; "Area"; Code[10])
         {
@@ -547,6 +575,7 @@ table 5992 "Service Invoice Header"
         field(710; "Document Exchange Identifier"; Text[50])
         {
             Caption = 'Document Exchange Identifier';
+            OptimizeForTextSearch = true;
         }
         field(711; "Document Exchange Status"; Enum "Service Document Exchange Status")
         {
@@ -555,6 +584,7 @@ table 5992 "Service Invoice Header"
         field(712; "Doc. Exch. Original Identifier"; Text[50])
         {
             Caption = 'Doc. Exch. Original Identifier';
+            OptimizeForTextSearch = true;
         }
         field(1200; "Direct Debit Mandate ID"; Code[35])
         {
@@ -585,6 +615,7 @@ table 5992 "Service Invoice Header"
         field(5902; Description; Text[100])
         {
             Caption = 'Description';
+            OptimizeForTextSearch = true;
         }
         field(5904; "Service Order Type"; Code[10])
         {
@@ -617,11 +648,13 @@ table 5992 "Service Invoice Header"
         field(5915; "Phone No."; Text[30])
         {
             Caption = 'Phone No.';
+            OptimizeForTextSearch = true;
             ExtendedDatatype = PhoneNo;
         }
         field(5916; "E-Mail"; Text[80])
         {
             Caption = 'Email';
+            OptimizeForTextSearch = true;
             ExtendedDatatype = EMail;
 
             trigger OnValidate()
@@ -634,11 +667,13 @@ table 5992 "Service Invoice Header"
         field(5917; "Phone No. 2"; Text[30])
         {
             Caption = 'Phone No. 2';
+            OptimizeForTextSearch = true;
             ExtendedDatatype = PhoneNo;
         }
         field(5918; "Fax No."; Text[30])
         {
             Caption = 'Fax No.';
+            OptimizeForTextSearch = true;
         }
         field(5921; "No. of Unallocated Items"; Integer)
         {
@@ -783,10 +818,12 @@ table 5992 "Service Invoice Header"
         field(5955; "Ship-to Fax No."; Text[30])
         {
             Caption = 'Ship-to Fax No.';
+            OptimizeForTextSearch = true;
         }
         field(5956; "Ship-to E-Mail"; Text[80])
         {
             Caption = 'Ship-to Email';
+            OptimizeForTextSearch = true;
             ExtendedDatatype = EMail;
 
             trigger OnValidate()
@@ -805,11 +842,13 @@ table 5992 "Service Invoice Header"
         field(5958; "Ship-to Phone"; Text[30])
         {
             Caption = 'Ship-to Phone';
+            OptimizeForTextSearch = true;
             ExtendedDatatype = PhoneNo;
         }
         field(5959; "Ship-to Phone 2"; Text[30])
         {
             Caption = 'Ship-to Phone 2';
+            OptimizeForTextSearch = true;
             ExtendedDatatype = PhoneNo;
         }
         field(5966; "Service Zone Filter"; Code[10])
@@ -839,173 +878,6 @@ table 5992 "Service Invoice Header"
         field(9001; "Quote No."; Code[20])
         {
             Caption = 'Quote No.';
-        }	
-        field(10018; "STE Transaction ID"; Text[20])
-        {
-            Caption = 'STE Transaction ID';
-            Editable = false;
-        }
-        field(10019; "Electronic Document Sent"; Boolean)
-        {
-            Caption = 'Electronic Document Sent';
-            Editable = false;
-        }
-        field(10020; "Original Document XML"; BLOB)
-        {
-            Caption = 'Original Document XML';
-        }
-        field(10021; "No. of E-Documents Sent"; Integer)
-        {
-            Caption = 'No. of E-Documents Sent';
-            Editable = false;
-        }
-        field(10022; "Original String"; BLOB)
-        {
-            Caption = 'Original String';
-        }
-        field(10023; "Digital Stamp SAT"; BLOB)
-        {
-            Caption = 'Digital Stamp SAT';
-        }
-        field(10024; "Certificate Serial No."; Text[250])
-        {
-            Caption = 'Certificate Serial No.';
-            Editable = false;
-        }
-        field(10025; "Signed Document XML"; BLOB)
-        {
-            Caption = 'Signed Document XML';
-        }
-        field(10026; "Digital Stamp PAC"; BLOB)
-        {
-            Caption = 'Digital Stamp PAC';
-        }
-        field(10030; "Electronic Document Status"; Option)
-        {
-            Caption = 'Electronic Document Status';
-            Editable = false;
-            OptionCaption = ' ,Stamp Received,Sent,Canceled,Stamp Request Error,Cancel Error,Cancel In Progress';
-            OptionMembers = " ","Stamp Received",Sent,Canceled,"Stamp Request Error","Cancel Error","Cancel In Progress";
-        }
-        field(10031; "Date/Time Stamped"; Text[50])
-        {
-            Caption = 'Date/Time Stamped';
-            Editable = false;
-        }
-        field(10032; "Date/Time Sent"; Text[50])
-        {
-            Caption = 'Date/Time Sent';
-            Editable = false;
-        }
-        field(10033; "Date/Time Canceled"; Text[50])
-        {
-            Caption = 'Date/Time Canceled';
-            Editable = false;
-        }
-        field(10035; "Error Code"; Code[10])
-        {
-            Caption = 'Error Code';
-            Editable = false;
-        }
-        field(10036; "Error Description"; Text[250])
-        {
-            Caption = 'Error Description';
-            Editable = false;
-        }
-        field(10037; "Date/Time Stamp Received"; DateTime)
-        {
-            Caption = 'Date/Time Stamp Received';
-            Editable = false;
-        }
-        field(10038; "Date/Time Cancel Sent"; DateTime)
-        {
-            Caption = 'Date/Time Cancel Sent';
-            Editable = false;
-        }
-        field(10040; "PAC Web Service Name"; Text[50])
-        {
-            Caption = 'PAC Web Service Name';
-            Editable = false;
-        }
-        field(10041; "QR Code"; BLOB)
-        {
-            Caption = 'QR Code';
-        }
-        field(10042; "Fiscal Invoice Number PAC"; Text[50])
-        {
-            Caption = 'Fiscal Invoice Number PAC';
-            Editable = false;
-        }
-        field(10043; "Date/Time First Req. Sent"; Text[50])
-        {
-            Caption = 'Date/Time First Req. Sent';
-            Editable = false;
-        }
-        field(10050; "Foreign Trade"; Boolean)
-        {
-            Caption = 'Foreign Trade';
-        }
-        field(10059; "SAT International Trade Term"; Code[10])
-        {
-            Caption = 'SAT International Trade Term';
-            TableRelation = "SAT International Trade Term";
-        }
-        field(10060; "Exchange Rate USD"; Decimal)
-        {
-            Caption = 'Exchange Rate USD';
-            DecimalPlaces = 0 : 6;
-        }
-        field(27000; "CFDI Purpose"; Code[10])
-        {
-            Caption = 'CFDI Purpose';
-            TableRelation = "SAT Use Code";
-        }
-        field(27001; "CFDI Relation"; Code[10])
-        {
-            Caption = 'CFDI Relation';
-            TableRelation = "SAT Relationship Type";
-        }
-        field(27002; "CFDI Cancellation Reason Code"; Code[10])
-        {
-            Caption = 'CFDI Cancellation Reason';
-            TableRelation = "CFDI Cancellation Reason";
-        }
-        field(27003; "Substitution Document No."; Code[20])
-        {
-            Caption = 'Substitution Document No.';
-            TableRelation = "Service Invoice Header" where("Electronic Document Status" = filter("Stamp Received"));
-        }
-        field(27004; "CFDI Export Code"; Code[10])
-        {
-            Caption = 'CFDI Export Code';
-            TableRelation = "CFDI Export Code";
-        }
-        field(27005; "CFDI Period"; Option)
-        {
-            Caption = 'CFDI Period';
-            OptionCaption = 'Diario,Semanal,Quincenal,Mensual';
-            OptionMembers = "Diario","Semanal","Quincenal","Mensual";
-        }
-        field(27007; "CFDI Cancellation ID"; Text[50])
-        {
-            Caption = 'CFDI Cancellation ID';
-        }
-        field(27008; "Marked as Canceled"; Boolean)
-        {
-            Caption = 'Marked as Canceled';
-        }
-        field(27009; "SAT Address ID"; Integer)
-        {
-            Caption = 'SAT Address ID';
-            TableRelation = "SAT Address";
-
-            trigger OnLookup()
-            var
-                SATAddress: Record "SAT Address";
-            begin
-                if SATAddress.LookupSATAddress(SATAddress, Rec."Ship-to Country/Region Code", Rec."Bill-to Country/Region Code") then
-                    Rec."SAT Address ID" := SATAddress.Id;
-            end;
         }
     }
 
@@ -1044,6 +916,8 @@ table 5992 "Service Invoice Header"
 
     trigger OnDelete()
     begin
+        OnBeforeOnDelete(Rec);
+
         TestField("No. Printed");
         LockTable();
 
@@ -1063,7 +937,6 @@ table 5992 "Service Invoice Header"
         ServInvLine: Record "Service Invoice Line";
         DimMgt: Codeunit DimensionManagement;
         UserSetupMgt: Codeunit "User Setup Management";
-        Text10000: Label 'There is no electronic Document sent yet for Document no. %1.';
 
     procedure Navigate()
     var
@@ -1115,7 +988,6 @@ table 5992 "Service Invoice Header"
     var
         DocumentSendingProfile: Record "Document Sending Profile";
         DummyReportSelections: Record "Report Selections";
-        EInvoiceMgt: Codeunit "E-Invoice Mgt.";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -1123,7 +995,6 @@ table 5992 "Service Invoice Header"
         if IsHandled then
             exit;
 
-        EInvoiceMgt.EDocPrintValidation("Electronic Document Status", "No.");
         DocumentSendingProfile.TrySendToPrinter(
           DummyReportSelections.Usage::"SM.Invoice".AsInteger(), Rec, FieldNo("Bill-to Customer No."), ShowRequestPage);
     end;
@@ -1167,53 +1038,6 @@ table 5992 "Service Invoice Header"
         StatPageID := Page::"Service Invoice Statistics";
         OnOpenStatisticsOnAfterSetStatPageID(Rec, StatPageID);
         Page.RunModal(StatPageID, Rec);
-    end;
-
-    procedure ExportEDocument()
-    var
-        TempBlob: Codeunit "Temp Blob";
-        RBMgt: Codeunit "File Management";
-    begin
-        CalcFields("Signed Document XML");
-        if "Signed Document XML".HasValue() then begin
-            TempBlob.FromRecord(Rec, FieldNo("Signed Document XML"));
-            RBMgt.BLOBExport(TempBlob, "No." + '.xml', true);
-        end else
-            Error(Text10000, "No.");
-    end;
-
-    procedure ExportEDocumentPDF()
-    var
-        ServiceInvoiceHeader: Record "Service Invoice Header";
-        FileManagement: Codeunit "File Management";
-        FilePath: Text;
-    begin
-        if "Electronic Document Status" in ["Electronic Document Status"::Sent, "Electronic Document Status"::"Stamp Received"] then begin
-            ServiceInvoiceHeader := Rec;
-            ServiceInvoiceHeader.SetRecFilter();
-            FilePath := FileManagement.ServerTempFileName('pdf');
-            REPORT.SaveAsPdf(REPORT::"Elec. Service Invoice MX", FilePath, ServiceInvoiceHeader);
-            FileManagement.DownloadHandler(FilePath, '', '', '', "No." + '.pdf');
-        end else
-            Error(Text10000, "No.");
-    end;
-
-    procedure RequestStampEDocument()
-    var
-        EInvoiceMgt: Codeunit "E-Invoice Mgt.";
-        LoCRecRef: RecordRef;
-    begin
-        LoCRecRef.GetTable(Rec);
-        EInvoiceMgt.RequestStampDocument(LoCRecRef, false);
-    end;
-
-    procedure CancelEDocument()
-    var
-        EInvoiceMgt: Codeunit "E-Invoice Mgt.";
-        LoCRecRef: RecordRef;
-    begin
-        LoCRecRef.GetTable(Rec);
-        EInvoiceMgt.CancelDocument(LoCRecRef);
     end;
 
     procedure ShowActivityLog()
@@ -1280,6 +1104,11 @@ table 5992 "Service Invoice Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnOpenStatisticsOnAfterSetStatPageID(var ServiceInvoiceHeader: Record "Service Invoice Header"; var StatPageID: Integer);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOnDelete(var ServiceInvoiceHeader: Record "Service Invoice Header")
     begin
     end;
 }

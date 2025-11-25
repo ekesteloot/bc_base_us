@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Inventory.Item;
 
 using System.Utilities;
@@ -41,7 +45,13 @@ codeunit 5722 "Item Category Management"
         PresentationOrder: Integer;
         Indentation: Integer;
         HasChildren: Boolean;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeUpdatePresentationOrderIterative(TempItemCategory, IsHandled);
+        if IsHandled then
+            exit;
+
         PresentationOrder := 0;
 
         TempCurItemCategory.Copy(TempItemCategory, true);
@@ -212,6 +222,11 @@ codeunit 5722 "Item Category Management"
                     TempStack.Push(ItemCategory.RecordId());
                 until ItemCategory.Next() = 0;
         end;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdatePresentationOrderIterative(var TempItemCategory: Record "Item Category" temporary; var IsHandled: Boolean)
+    begin
     end;
 }
 

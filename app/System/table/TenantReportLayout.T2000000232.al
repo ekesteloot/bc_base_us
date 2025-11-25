@@ -3,6 +3,7 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 namespace System.Environment.Configuration;
+using System.Reflection;
 
 table 2000000232 "Tenant Report Layout"
 {
@@ -74,6 +75,14 @@ table 2000000232 "Tenant Report Layout"
         field(11; Description; Text[250])
         {
             Caption = 'Description';
+        }
+        field(12; IsObsolete; Boolean)
+        {
+            Caption = 'Is Obsolete';
+        }
+        field(13; ExcelLayoutMultipleDataSheets; enum "Excel Sheet Configuration")
+        {
+            Caption = 'Excel Layout Multiple Data Sheets';
         }
     }
 

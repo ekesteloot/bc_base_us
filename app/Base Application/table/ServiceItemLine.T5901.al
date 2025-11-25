@@ -1,4 +1,8 @@
-﻿namespace Microsoft.Service.Document;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Service.Document;
 
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Segment;
@@ -1893,6 +1897,8 @@ table 5901 "Service Item Line"
                 end;
                 ServLine.Modify();
             until ServLine.Next() = 0;
+
+        OnAfterCheckWarranty(Rec, xRec, Date);
     end;
 
     local procedure CheckIfLoanerOnServOrder()
@@ -3221,6 +3227,11 @@ table 5901 "Service Item Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCreateDim(var ServiceItemLine: Record "Service Item Line"; CallingFieldNo: Integer; xServiceItemLine: Record "Service Item Line"; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCheckWarranty(var ServiceItemLine: Record "Service Item Line"; var xServiceItemLine: Record "Service Item Line"; Date: Date)
     begin
     end;
 }

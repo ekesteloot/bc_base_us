@@ -487,7 +487,7 @@ page 49 "Purchase Quote"
                                 {
                                     ApplicationArea = Location;
                                     Importance = Promoted;
-                                    ToolTip = 'Specifies a code for the location where you want the items to be placed when they are received.';
+                                    ToolTip = 'Specifies the location where the items are to be placed when they are received. This field acts as the default location for new lines. You can update the location code for individual lines as needed.';
                                 }
                             }
                             field("Ship-to Name"; Rec."Ship-to Name")
@@ -497,6 +497,16 @@ page 49 "Purchase Quote"
                                 Editable = ShipToOptions = ShipToOptions::"Custom Address";
                                 Importance = Additional;
                                 ToolTip = 'Specifies the name of the customer that items on the purchase order were shipped to, as a drop shipment.';
+                            }
+                            field("Ship-to Name 2"; Rec."Ship-to Name 2")
+                            {
+                                ApplicationArea = Basic, Suite;
+                                Caption = 'Name 2';
+                                Editable = ShipToOptions = ShipToOptions::"Custom Address";
+                                Importance = Additional;
+                                ToolTip = 'Specifies an additional part of the name of the customer that items on the purchase order were shipped to, as a drop shipment.';
+                                QuickEntry = false;
+                                Visible = false;
                             }
                             field("Ship-to Address"; Rec."Ship-to Address")
                             {
@@ -1040,6 +1050,21 @@ page 49 "Purchase Quote"
                         DocPrint.PrintPurchHeader(Rec);
                     end;
                 }
+                action(Email)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Send by Email';
+                    Ellipsis = true;
+                    Image = Email;
+                    ToolTip = 'Finalize and prepare to email the document. The Send Email window opens prefilled with the vendor''s email address so you can add or edit information.';
+
+                    trigger OnAction()
+                    var
+                        DocPrint: Codeunit "Document-Print";
+                    begin
+                        DocPrint.EmailPurchHeader(Rec);
+                    end;
+                }
                 action(Send)
                 {
                     ApplicationArea = Basic, Suite;
@@ -1426,6 +1451,9 @@ page 49 "Purchase Quote"
             {
                 Caption = 'Print/Send', Comment = 'Generated from the PromotedActionCategories property index 5.';
 
+                actionref(Email_Promoted; Email)
+                {
+                }
                 actionref(Print_Promoted; Print)
                 {
                 }

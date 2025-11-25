@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Manufacturing.Document;
 
 codeunit 99000772 "Prod. Order Route Management"
@@ -329,6 +333,7 @@ codeunit 99000772 "Prod. Order Route Management"
         ProdOrderRtngLine2.ModifyAll("Sequence No. (Actual)", 0);
 
         MaxSeq := ProdOrderRtngLine2.Count();
+        ProdOrderRtngLine.Get(ProdOrderRtngLine.Status, ProdOrderRtngLine."Prod. Order No.", ProdOrderRtngLine."Routing Reference No.", ProdOrderRtngLine."Routing No.", ProdOrderRtngLine."Operation No.");
 
         case Direction of
             Direction::Forward:

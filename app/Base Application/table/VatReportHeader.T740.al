@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -230,6 +230,7 @@ table 740 "VAT Report Header"
         {
             Caption = 'Return Period No.';
         }
+#if not CLEANSCHEMA25
         field(20; "Date Type"; Enum "VAT Date Type")
         {
             Caption = 'Date Type';
@@ -237,6 +238,7 @@ table 740 "VAT Report Header"
             ObsoleteState = Removed;
             ObsoleteTag = '25.0';
         }
+#endif
         field(30; "Additional Information"; Code[50])
         {
             Caption = 'Additional Information';
@@ -255,24 +257,6 @@ table 740 "VAT Report Header"
         {
             Caption = 'Amounts in Add. Rep. Currency';
             Editable = false;
-        }
-        field(4800; "VATGroup Return"; Boolean)
-        {
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Moved to VAT Group Management extension field 4700 VAT Group Return';
-            ObsoleteTag = '18.0';
-        }
-        field(4801; "VATGroup Status"; Text[20])
-        {
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Moved to VAT Group Management extension field 4701 VAT Group Status';
-            ObsoleteTag = '18.0';
-        }
-        field(4802; "VATGroup Settlement Posted"; Boolean)
-        {
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Moved to VAT Group Management extension field 4702 VAT Group Settlement Posted';
-            ObsoleteTag = '18.0';
         }
     }
 
@@ -450,10 +434,21 @@ table 740 "VAT Report Header"
     procedure CheckIfCanBeReleased(VATReportHeader: Record "VAT Report Header")
     begin
         VATReportHeader.TestField(Status, VATReportHeader.Status::Open);
+        VATReportHeader.TestOriginalReportNo();
+    end;
 
-        if VATReportHeader."VAT Report Type" in ["VAT Report Type"::Corrective, "VAT Report Type"::Supplementary] then
-            if VATReportHeader."Original Report No." = '' then
-                Error(Text008, Format(VATReportHeader."VAT Report Type"));
+    internal procedure TestOriginalReportNo()
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeTestOriginalReportNo(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
+        if "VAT Report Type" in ["VAT Report Type"::Corrective, "VAT Report Type"::Supplementary] then
+            if "Original Report No." = '' then
+                Error(Text008, Format("VAT Report Type"));
     end;
 
     procedure PeriodToDate()
@@ -605,5 +600,9 @@ table 740 "VAT Report Header"
     local procedure OnBeforeGetNoSeriesCode(var VATReportHeader: Record "VAT Report Header"; var Result: Code[20]; var IsHandled: Boolean)
     begin
     end;
-}
 
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeTestOriginalReportNo(VATReportHeader: Record "VAT Report Header"; var IsHandled: Boolean)
+    begin
+    end;
+}

@@ -138,7 +138,7 @@ page 45 "Sales List"
                 field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = Location;
-                    ToolTip = 'Specifies the location from where inventory items to the customer on the sales document are to be shipped by default.';
+                    ToolTip = 'Specifies the location from where items are to be shipped. This field acts as the default location for new lines. You can update the location code for individual lines as needed.';
                 }
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
@@ -198,24 +198,6 @@ page 45 "Sales List"
             {
                 Caption = '&Line';
                 Image = Line;
-                action(Card)
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Card';
-                    Image = EditLines;
-                    ShortCutKey = 'Shift+F7';
-                    ToolTip = 'View or change detailed information about the customer.';
-                    ObsoleteReason = 'Replaced by "Show Document" action';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '22.0';
-
-                    trigger OnAction()
-                    var
-                        PageManagement: Codeunit "Page Management";
-                    begin
-                        PageManagement.PageRun(Rec);
-                    end;
-                }
                 action(ShowDocument)
                 {
                     ApplicationArea = Basic, Suite;

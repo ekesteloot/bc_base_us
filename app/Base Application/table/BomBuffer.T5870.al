@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Inventory.BOM;
 
 using Microsoft.Assembly.Document;
@@ -524,8 +528,8 @@ table 5870 "BOM Buffer"
     procedure TransferFromProdComp(var EntryNo: Integer; ProdBOMLine: Record "Production BOM Line"; NewIndentation: Integer; ParentQtyPer: Decimal; ParentScrapQtyPer: Decimal; ParentScrapPct: Decimal; NeedByDate: Date; ParentLocationCode: Code[10]; ParentItem: Record Item; BOMQtyPerUOM: Decimal)
     var
         BOMItem: Record Item;
+        MfgCostCalcMgt: Codeunit "Mfg. Cost Calculation Mgt.";
         UOMMgt: Codeunit "Unit of Measure Management";
-        CostCalculationMgt: Codeunit "Cost Calculation Management";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -544,9 +548,9 @@ table 5870 "BOM Buffer"
 
             Description := ProdBOMLine.Description;
             "Qty. per Parent" :=
-              CostCalculationMgt.CalcCompItemQtyBase(
+              MfgCostCalcMgt.CalcCompItemQtyBase(
                 ProdBOMLine, WorkDate(),
-                CostCalculationMgt.CalcQtyAdjdForBOMScrap(ParentItem."Lot Size", ParentScrapPct), ParentItem."Routing No.", true) /
+                MfgCostCalcMgt.CalcQtyAdjdForBOMScrap(ParentItem."Lot Size", ParentScrapPct), ParentItem."Routing No.", true) /
               UOMMgt.GetQtyPerUnitOfMeasure(BOMItem, ProdBOMLine."Unit of Measure Code") /
               BOMQtyPerUOM / ParentItem."Lot Size";
             "Qty. per Top Item" := Round(ParentQtyPer * "Qty. per Parent", UOMMgt.QtyRndPrecision());
@@ -885,7 +889,7 @@ table 5870 "BOM Buffer"
 
         "Unit Cost" := Item."Unit Cost";
         "Single-Level Material Cost" :=
-          RoundUnitAmt(Item."Unit Cost", UOMMgt.GetQtyPerUnitOfMeasure(Item, "Unit of Measure Code") * "Qty. per Top Item");
+          RoundUnitAmt(Item."Single-Level Material Cost", UOMMgt.GetQtyPerUnitOfMeasure(Item, "Unit of Measure Code") * "Qty. per Top Item");
         "Rolled-up Material Cost" :=
           RoundUnitAmt(Item."Unit Cost", UOMMgt.GetQtyPerUnitOfMeasure(Item, "Unit of Measure Code") * "Qty. per Top Item");
     end;

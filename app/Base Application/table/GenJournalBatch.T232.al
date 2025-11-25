@@ -9,6 +9,7 @@ using Microsoft.Foundation.NoSeries;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using System.Automation;
+using Microsoft.Intercompany.Partner;
 
 table 232 "Gen. Journal Batch"
 {
@@ -70,7 +71,9 @@ table 232 "Gen. Journal Batch"
             else
             if ("Bal. Account Type" = const("Bank Account")) "Bank Account"
             else
-            if ("Bal. Account Type" = const("Fixed Asset")) "Fixed Asset";
+            if ("Bal. Account Type" = const("Fixed Asset")) "Fixed Asset"
+            else
+            if ("Bal. Account Type" = const("IC Partner")) "IC Partner";
 
             trigger OnValidate()
             begin
@@ -187,13 +190,6 @@ table 232 "Gen. Journal Batch"
                 end;
             end;
         }
-        field(8000; Id; Guid)
-        {
-            Caption = 'Id';
-            ObsoleteState = Removed;
-            ObsoleteReason = 'This functionality will be replaced by the systemID field';
-            ObsoleteTag = '22.0';
-        }
         field(8001; "Last Modified DateTime"; DateTime)
         {
             Caption = 'Last Modified DateTime';
@@ -217,13 +213,6 @@ table 232 "Gen. Journal Batch"
                 Validate("Bal. Account Type", "Bal. Account Type"::"G/L Account");
                 Validate("Bal. Account No.", GLAccount."No.");
             end;
-        }
-        field(9000; "Background Error Check"; Boolean)
-        {
-            Caption = 'Background Error Check';
-            ObsoleteReason = 'Replaced with GLSetup.Enable Data Check';
-            ObsoleteState = Removed;
-            ObsoleteTag = '23.0';
         }
     }
 
@@ -471,4 +460,3 @@ table 232 "Gen. Journal Batch"
     end;
 
 }
-

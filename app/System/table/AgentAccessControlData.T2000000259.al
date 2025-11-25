@@ -26,11 +26,9 @@ table 2000000259 "Agent Access Control Data"
             Caption = 'User Security ID';
             TableRelation = "User"."User Security ID";
         }
-        field(3; Access; Option)
+        field(3; "Can Configure Agent"; Boolean)
         {
-            Caption = 'Access';
-            OptionCaption = 'User,Owner,UserAndOwner';
-            OptionMembers = User,Owner,UserAndOwner;
+            Caption = 'Can Configure Agent';
         }
     }
 

@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.CRM.Interaction;
 
 page 5073 "Contact Int. Entries Subform"
@@ -8,7 +12,8 @@ page 5073 "Contact Int. Entries Subform"
     PageType = ListPart;
     SourceTable = "Interaction Log Entry";
     SourceTableView = sorting("Entry No.")
-                      order(descending);
+                      order(descending)
+                      where("Contact No." = filter(<> ''));
 
     layout
     {

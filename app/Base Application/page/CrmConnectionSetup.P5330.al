@@ -82,7 +82,7 @@ page 5330 "CRM Connection Setup"
                     var
                         FeatureTelemetry: Codeunit "Feature Telemetry";
                         CDSIntegrationImpl: Codeunit "CDS Integration Impl.";
-                        Dynamics365SalesEnabledLbl: Label 'User %1 enabled integration to Dynamics 365 Sales.', Locked = true;
+                        Dynamics365SalesEnabledLbl: Label 'Integration to Dynamics 365 Sales has been enabled by UserSecurityId %1.', Locked = true;
                     begin
                         CurrPage.Update(true);
                         if Rec."Is Enabled" then begin
@@ -444,9 +444,9 @@ page 5330 "CRM Connection Setup"
             action(CoupleUsers)
             {
                 ApplicationArea = Suite;
-                Caption = 'Couple Salespersons';
+                Caption = 'Couple Salespeople';
                 Image = CoupledUsers;
-                ToolTip = 'Open the list of users in Dynamics 365 Sales for manual coupling to salespersons in Business Central.';
+                ToolTip = 'Open the list of users in Dynamics 365 Sales to manually couple them to salespeople in Business Central.';
 
                 trigger OnAction()
                 var

@@ -44,5 +44,6 @@ permissionset 2000000024 D365BCEssentialAttach
                   tabledata "Table Mappings" = RIMD,
                   tabledata "User Default Style Sheet" = RIMD,
                   tabledata "User Page Metadata" = RIMD,
-                  tabledata "Webhook Notification" = RIMD;
+                  tabledata "Webhook Notification" = RIMD,
+                  system "Manage Agent Tasks" = X;
 }

@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Manufacturing.MachineCenter;
 
 using Microsoft.Manufacturing.Capacity;
@@ -15,16 +19,13 @@ report 99001045 "Calc. Machine Center Calendar"
             RequestFilterFields = "No.";
 
             trigger OnAfterGetRecord()
-            var
-                CapacityType: Enum "Capacity Type";
             begin
                 Window.Update(1, "No.");
                 TestField("Work Center No.");
                 TestField(Capacity);
                 TestField(Efficiency);
 
-                CalendarMgt.CalculateSchedule(
-                    CapacityType::"Machine Center", "No.", "Work Center No.", StartingDate, EndingDate)
+                CalculateMachineCenterSchedule("Machine Center");
             end;
 
             trigger OnPreDataItem()
@@ -89,10 +90,8 @@ report 99001045 "Calc. Machine Center Calendar"
     end;
 
     var
-        CalendarMgt: Codeunit "Shop Calendar Management";
+        ShopCalendarManagement: Codeunit "Shop Calendar Management";
         Window: Dialog;
-        StartingDate: Date;
-        EndingDate: Date;
 
 #pragma warning disable AA0074
         Text000: Label 'Calculating Machine Center...\\';
@@ -103,10 +102,33 @@ report 99001045 "Calc. Machine Center Calendar"
         Text005: Label 'You must enter the Ending Date.';
 #pragma warning restore AA0074
 
+    protected var
+        StartingDate: Date;
+        EndingDate: Date;
+
     procedure InitializeRequest(NewStartingDate: Date; NewEndingDate: Date)
     begin
         StartingDate := NewStartingDate;
         EndingDate := NewEndingDate;
+    end;
+
+    local procedure CalculateMachineCenterSchedule(MachineCenter: Record "Machine Center")
+    var
+        CapacityType: Enum "Capacity Type";
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeCalculateMachineCenterSchedule(MachineCenter, StartingDate, EndingDate, IsHandled);
+        if IsHandled then
+            exit;
+
+        ShopCalendarManagement.CalculateSchedule(
+            CapacityType::"Machine Center", MachineCenter."No.", MachineCenter."Work Center No.", StartingDate, EndingDate);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCalculateMachineCenterSchedule(MachineCenter: Record "Machine Center"; StartingDate: Date; EndingDate: Date; var IsHandled: Boolean);
+    begin
     end;
 }
 

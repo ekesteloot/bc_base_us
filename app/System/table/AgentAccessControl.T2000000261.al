@@ -27,12 +27,10 @@ table 2000000261 "Agent Access Control"
             TableRelation = "User"."User Security ID";
             Tooltip = 'Specifies the User Security ID of the user associated with this agent.';
         }
-        field(3; Access; Option)
+        field(3; "Can Configure Agent"; Boolean)
         {
-            Caption = 'Access';
-            OptionCaption = 'User,Owner,UserAndOwner';
-            OptionMembers = User,Owner,UserAndOwner;
-            Tooltip = 'Specifies the access level for the user for this agent.';
+            Caption = 'Can Configure Agent';
+            Tooltip = 'Specifies whether the user can configure this agent.';
         }
     }
 

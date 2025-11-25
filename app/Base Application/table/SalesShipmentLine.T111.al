@@ -17,6 +17,7 @@ using Microsoft.Foundation.ExtendedText;
 using Microsoft.Foundation.Shipping;
 using Microsoft.Foundation.UOM;
 using Microsoft.Intercompany.Partner;
+using Microsoft.Inventory.Costing;
 using Microsoft.Inventory.Intrastat;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Item.Catalog;
@@ -56,6 +57,7 @@ table 111 "Sales Shipment Line"
         field(3; "Document No."; Code[20])
         {
             Caption = 'Document No.';
+            OptimizeForTextSearch = true;
             TableRelation = "Sales Shipment Header";
 
             trigger OnValidate()
@@ -105,14 +107,17 @@ table 111 "Sales Shipment Line"
         field(11; Description; Text[100])
         {
             Caption = 'Description';
+            OptimizeForTextSearch = true;
         }
         field(12; "Description 2"; Text[50])
         {
             Caption = 'Description 2';
+            OptimizeForTextSearch = true;
         }
         field(13; "Unit of Measure"; Text[50])
         {
             Caption = 'Unit of Measure';
+            OptimizeForTextSearch = true;
         }
         field(15; Quantity; Decimal)
         {
@@ -452,36 +457,6 @@ table 111 "Sales Shipment Line"
             Caption = 'Responsibility Center';
             TableRelation = "Responsibility Center";
         }
-        field(5705; "Cross-Reference No."; Code[20])
-        {
-            Caption = 'Cross-Reference No.';
-            ObsoleteReason = 'Cross-Reference replaced by Item Reference feature.';
-            ObsoleteState = Removed;
-            ObsoleteTag = '22.0';
-        }
-        field(5706; "Unit of Measure (Cross Ref.)"; Code[10])
-        {
-            Caption = 'Unit of Measure (Cross Ref.)';
-            ObsoleteReason = 'Cross-Reference replaced by Item Reference feature.';
-            ObsoleteState = Removed;
-            ObsoleteTag = '22.0';
-        }
-        field(5707; "Cross-Reference Type"; Option)
-        {
-            Caption = 'Cross-Reference Type';
-            OptionCaption = ' ,Customer,Vendor,Bar Code';
-            OptionMembers = " ",Customer,Vendor,"Bar Code";
-            ObsoleteReason = 'Cross-Reference replaced by Item Reference feature.';
-            ObsoleteState = Removed;
-            ObsoleteTag = '22.0';
-        }
-        field(5708; "Cross-Reference Type No."; Code[30])
-        {
-            Caption = 'Cross-Reference Type No.';
-            ObsoleteReason = 'Cross-Reference replaced by Item Reference feature.';
-            ObsoleteState = Removed;
-            ObsoleteTag = '22.0';
-        }
         field(5709; "Item Category Code"; Code[20])
         {
             Caption = 'Item Category Code';
@@ -495,13 +470,6 @@ table 111 "Sales Shipment Line"
         {
             Caption = 'Purchasing Code';
             TableRelation = Purchasing;
-        }
-        field(5712; "Product Group Code"; Code[10])
-        {
-            Caption = 'Product Group Code';
-            ObsoleteReason = 'Product Groups became first level children of Item Categories.';
-            ObsoleteState = Removed;
-            ObsoleteTag = '15.0';
         }
         field(5725; "Item Reference No."; Code[50])
         {
@@ -598,10 +566,12 @@ table 111 "Sales Shipment Line"
         field(10000; "Package Tracking No."; Text[30])
         {
             Caption = 'Package Tracking No.';
+            OptimizeForTextSearch = true;
         }
         field(10003; "Custom Transit Number"; Text[30])
         {
             Caption = 'Custom Transit Number';
+            OptimizeForTextSearch = true;
         }
         field(10004; "SAT Customs Document Type"; Code[10])
         {
@@ -696,7 +666,13 @@ table 111 "Sales Shipment Line"
     procedure ShowItemTrackingLines()
     var
         ItemTrackingDocMgt: Codeunit "Item Tracking Doc. Management";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeShowItemTrackingLines(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
         ItemTrackingDocMgt.ShowItemTrackingForShptRcptLine(DATABASE::"Sales Shipment Line", 0, "Document No.", '', 0, "Line No.");
     end;
 
@@ -896,36 +872,32 @@ table 111 "Sales Shipment Line"
                 end;
     end;
 
-    procedure GetSalesInvLines(var TempSalesInvLine: Record "Sales Invoice Line" temporary)
+    procedure GetSalesInvLines(var TempSalesInvoiceLine: Record "Sales Invoice Line" temporary)
     var
-        SalesInvLine: Record "Sales Invoice Line";
-        ItemLedgEntry: Record "Item Ledger Entry";
-        ValueEntry: Record "Value Entry";
+        SalesInvoiceLine: Record "Sales Invoice Line";
+        ValueItemLedgerEntries: Query "Value Item Ledger Entries";
     begin
-        TempSalesInvLine.Reset();
-        TempSalesInvLine.DeleteAll();
+        TempSalesInvoiceLine.Reset();
+        TempSalesInvoiceLine.DeleteAll();
 
         if Type <> Type::Item then
             exit;
 
-        FilterPstdDocLnItemLedgEntries(ItemLedgEntry);
-        ItemLedgEntry.SetFilter("Invoiced Quantity", '<>0');
-        if ItemLedgEntry.FindSet() then begin
-            ValueEntry.SetCurrentKey("Item Ledger Entry No.", "Entry Type");
-            ValueEntry.SetRange("Entry Type", ValueEntry."Entry Type"::"Direct Cost");
-            ValueEntry.SetFilter("Invoiced Quantity", '<>0');
-            repeat
-                ValueEntry.SetRange("Item Ledger Entry No.", ItemLedgEntry."Entry No.");
-                if ValueEntry.FindSet() then
-                    repeat
-                        if ValueEntry."Document Type" = ValueEntry."Document Type"::"Sales Invoice" then
-                            if SalesInvLine.Get(ValueEntry."Document No.", ValueEntry."Document Line No.") then begin
-                                TempSalesInvLine.Init();
-                                TempSalesInvLine := SalesInvLine;
-                                if TempSalesInvLine.Insert() then;
-                            end;
-                    until ValueEntry.Next() = 0;
-            until ItemLedgEntry.Next() = 0;
+        ValueItemLedgerEntries.SetRange(Item_Ledg_Document_No, "Document No.");
+        ValueItemLedgerEntries.SetRange(Item_Ledg_Document_Type, Enum::"Item Ledger Document Type"::"Sales Shipment");
+        ValueItemLedgerEntries.SetRange(Item_Ledg_Document_Line_No, "Line No.");
+        ValueItemLedgerEntries.SetFilter(Item_Ledg_Invoice_Quantity, '<>0');
+        ValueItemLedgerEntries.SetRange(Value_Entry_Type, Enum::"Cost Entry Type"::"Direct Cost");
+        ValueItemLedgerEntries.SetFilter(Value_Entry_Invoiced_Qty, '<>0');
+        ValueItemLedgerEntries.SetRange(Value_Entry_Doc_Type, Enum::"Item Ledger Document Type"::"Sales Invoice");
+        ValueItemLedgerEntries.Open();
+        while ValueItemLedgerEntries.Read() do begin
+            OnGetSalesInvLinesOnBeforeGetSalesInvoiceLine(SalesInvoiceLine);
+            if SalesInvoiceLine.Get(ValueItemLedgerEntries.Value_Entry_Doc_No, ValueItemLedgerEntries.Value_Entry_Doc_Line_No) then begin
+                TempSalesInvoiceLine.Init();
+                TempSalesInvoiceLine := SalesInvoiceLine;
+                if TempSalesInvoiceLine.Insert() then;
+            end;
         end;
     end;
 
@@ -1153,6 +1125,7 @@ table 111 "Sales Shipment Line"
             exit;
         end;
 
+        SalesShipmentHeader.SetLoadFields("No.", SystemId);
         if not SalesShipmentHeader.Get("Document No.") then
             exit;
 
@@ -1169,6 +1142,7 @@ table 111 "Sales Shipment Line"
             exit;
         end;
 
+        SalesShipmentHeader.SetLoadFields("No.", SystemId);
         if not SalesShipmentHeader.GetBySystemId(Rec."Document Id") then
             exit;
 
@@ -1192,7 +1166,7 @@ table 111 "Sales Shipment Line"
 
         if UserSetupMgt.GetSalesFilter() <> '' then begin
             FilterGroup(2);
-            SetRange("Responsibility Center", UserSetupMgt.GetPurchasesFilter());
+            SetRange("Responsibility Center", UserSetupMgt.GetSalesFilter());
             FilterGroup(0);
         end;
     end;
@@ -1291,5 +1265,14 @@ table 111 "Sales Shipment Line"
     local procedure OnInsertInvLineFromShptLineOnBeforeSalesHeaderGet(var SalesHeader: Record "Sales Header"; SalesShipmentLine: Record "Sales Shipment Line"; var TempSalesLine: Record "Sales Line" temporary; var IsHandled: Boolean)
     begin
     end;
-}
 
+    [IntegrationEvent(false, false)]
+    local procedure OnGetSalesInvLinesOnBeforeGetSalesInvoiceLine(var SalesInvoiceLine: Record "Sales Invoice Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeShowItemTrackingLines(var SalesShipmentLine: Record "Sales Shipment Line"; var IsHandled: Boolean)
+    begin
+    end;
+}

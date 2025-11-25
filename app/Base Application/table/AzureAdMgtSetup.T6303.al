@@ -1,4 +1,4 @@
-﻿namespace System.Azure.Identity;
+namespace System.Azure.Identity;
 
 using System.Reflection;
 
@@ -11,6 +11,7 @@ table 6303 "Azure AD Mgt. Setup"
     {
         field(1; "Primary Key"; Code[10])
         {
+            AllowInCustomizations = Never;
             Caption = 'Primary Key';
         }
         field(2; "Auth Flow Codeunit ID"; Integer)
@@ -22,14 +23,6 @@ table 6303 "Azure AD Mgt. Setup"
         {
             Caption = 'Azure AD User Mgt. Codeunit ID';
             TableRelation = "CodeUnit Metadata".ID;
-        }
-        field(4; "PBI Service Mgt. Codeunit ID"; Integer)
-        {
-            Caption = 'PBI Service Mgt. Codeunit ID';
-            TableRelation = "CodeUnit Metadata".ID;
-            ObsoleteReason = 'Disabling the Power BI integration through AzureADMgtSetup has been discontinued.';
-            ObsoleteState = Removed;
-            ObsoleteTag = '24.0';
         }
     }
 
@@ -57,4 +50,3 @@ table 6303 "Azure AD Mgt. Setup"
              ("Azure AD User Mgt. Codeunit ID" <> CODEUNIT::"Azure AD User Management"));
     end;
 }
-

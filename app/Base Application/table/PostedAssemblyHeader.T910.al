@@ -1,4 +1,8 @@
-﻿namespace Microsoft.Assembly.History;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Assembly.History;
 
 using Microsoft.Assembly.Comment;
 using Microsoft.Finance.Dimension;
@@ -277,7 +281,13 @@ table 910 "Posted Assembly Header"
     procedure ShowItemTrackingLines()
     var
         ItemTrackingDocMgt: Codeunit "Item Tracking Doc. Management";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeShowItemTrackingLines(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
         ItemTrackingDocMgt.ShowItemTrackingForShptRcptLine(DATABASE::"Posted Assembly Header", 0, "No.", '', 0, 0);
     end;
 
@@ -342,6 +352,11 @@ table 910 "Posted Assembly Header"
             until PostedAssemblyLine.Next() = 0;
 
         exit(ExpCost[RowIdx::MatCost] + ExpCost[RowIdx::ResCost] + ExpCost[RowIdx::ResOvhd]);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeShowItemTrackingLines(var PostedAssemblyHeader: Record "Posted Assembly Header"; var IsHandled: Boolean)
+    begin
     end;
 }
 

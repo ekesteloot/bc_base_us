@@ -19,4 +19,20 @@ interface IAgentMetadata
     /// </summary>
     /// <returns>The summary page ID.</returns>
     procedure GetSummaryPageId(): Integer;
+
+    /// <summary>
+    /// Returns all agent task user intervention suggestions applicable to the specified agent task, page, and record.
+    /// </summary>
+    /// <param name="AgentUserId">The agent user id.</param>
+    /// <param name="AgentTaskId">The agent task id.</param>
+    /// <param name="PageId">The id of the page the suggestions are intended for.</param>
+    /// <param name="RecordId">The record id for the page's underlying record.</param>
+    /// <returns>The agent task user intervention suggestions.</returns>
+    procedure GetAgentTaskUserInterventionSuggestions(AgentUserId: Guid; AgentTaskId: BigInteger; PageId: Integer; RecordId: RecordId; var AgentTaskUserInterventionSuggestion: Record "Agent Task User Int Suggestion");
+
+    /// <summary>
+    /// Returns the ID of the page that is used to display agent task messages for this agent.
+    /// </summary>
+    /// <remarks>The default generic Agent Task Message page is Page::"Agent Task Message Card".</remarks>
+    procedure GetAgentTaskMessagePageId(): Integer;
 }

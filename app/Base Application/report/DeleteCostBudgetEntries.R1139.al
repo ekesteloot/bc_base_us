@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.CostAccounting.Budget;
 
 using Microsoft.CostAccounting.Setup;
@@ -26,6 +30,7 @@ report 1139 "Delete Cost Budget Entries"
                     CostBudgetEntry.SetRange("Allocated with Journal No.", "No.");
                     CostBudgetEntry.ModifyAll(Allocated, false);
                     CostBudgetEntry.ModifyAll("Allocated with Journal No.", 0);
+                    CostBudgetEntry.SetRange("Allocated with Journal No.");
                 end;
 
                 CostBudgetEntry.SetRange("Entry No.", "From Cost Budget Entry No.", "To Cost Budget Entry No.");

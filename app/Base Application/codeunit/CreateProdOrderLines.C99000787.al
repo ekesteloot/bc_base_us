@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Manufacturing.Document;
 
 using Microsoft.Inventory;
@@ -312,6 +316,7 @@ codeunit 99000787 "Create Prod. Order Lines"
         ProdOrderLine3.SetRange(Status, ProdOrderLine.Status);
         ProdOrderLine3.SetRange("Prod. Order No.", ProdOrderLine."Prod. Order No.");
         ProdOrderLine3.SetRange("Item No.", ProdOrderLine."Item No.");
+        ProdOrderLine3.SetRange("Unit of Measure Code", ProdOrderLine."Unit of Measure Code");
         ProdOrderLine3.SetRange("Variant Code", ProdOrderLine."Variant Code");
         ProdOrderLine3.SetRange("Location Code", ProdOrderLine."Location Code");
         ProdOrderLine3.SetRange("Planning Level Code", ProdOrderLine."Planning Level Code");
@@ -409,7 +414,7 @@ codeunit 99000787 "Create Prod. Order Lines"
         OnAfterShouldIncreasePlanningLevel(ProdOrderComp, StockkeepingUnit, IncreasePlanningLevel);
     end;
 
-    local procedure CheckMakeOrderLine(var ProdOrderComp: Record "Prod. Order Component"; var ProdOrderLine: Record "Prod. Order Line"; Direction: Option Forward,Backward; MultiLevel: Boolean; LetDueDateDecrease: Boolean): Boolean
+    procedure CheckMakeOrderLine(var ProdOrderComp: Record "Prod. Order Component"; var ProdOrderLine: Record "Prod. Order Line"; Direction: Option Forward,Backward; MultiLevel: Boolean; LetDueDateDecrease: Boolean): Boolean
     var
         Item: Record Item;
         ParentItem: Record Item;
@@ -484,7 +489,7 @@ codeunit 99000787 "Create Prod. Order Lines"
         exit(true);
     end;
 
-    local procedure ReserveMultiLevelStructure(var ProdOrderComp2: Record "Prod. Order Component")
+    procedure ReserveMultiLevelStructure(var ProdOrderComp2: Record "Prod. Order Component")
     var
         ProdOrderComp3: Record "Prod. Order Component";
         ProdOrderLine3: Record "Prod. Order Line";
@@ -611,20 +616,40 @@ codeunit 99000787 "Create Prod. Order Lines"
 
     local procedure IsReplSystemProdOrder(ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10]): Boolean
     var
-        SKU: Record "Stockkeeping Unit";
-        Item: Record Item;
         IsHandled: Boolean;
         ReplanSystemProdOrder: Boolean;
     begin
+        IsHandled := false;
         OnBeforeIsReplSystemProdOrder(SalesLine, ReplanSystemProdOrder, IsHandled);
         if IsHandled then
             exit(ReplanSystemProdOrder);
 
-        if SKU.Get(LocationCode, ItemNo, VariantCode) then
-            exit(SKU."Replenishment System" = SKU."Replenishment System"::"Prod. Order");
+        exit(CheckReplenishmentSystemProdOrderAndNotProductionBlocked(ItemNo, VariantCode, LocationCode));
+    end;
 
+    internal procedure CheckReplenishmentSystemProdOrderAndNotProductionBlocked(ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10]) ReplenishmentSystemProdOrderAndNotProductionBlocked: Boolean
+    var
+        StockkeepingUnit: Record "Stockkeeping Unit";
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
+    begin
+        StockkeepingUnit.SetLoadFields("Replenishment System");
+        if StockkeepingUnit.Get(LocationCode, ItemNo, VariantCode) then
+            ReplenishmentSystemProdOrderAndNotProductionBlocked := StockkeepingUnit."Replenishment System" = StockkeepingUnit."Replenishment System"::"Prod. Order";
+
+        Item.SetLoadFields("Replenishment System", Blocked, "Production Blocked");
         Item.Get(ItemNo);
-        exit(Item."Replenishment System" = Item."Replenishment System"::"Prod. Order");
+        if not ReplenishmentSystemProdOrderAndNotProductionBlocked then
+            ReplenishmentSystemProdOrderAndNotProductionBlocked := Item."Replenishment System" = Item."Replenishment System"::"Prod. Order";
+
+        if ReplenishmentSystemProdOrderAndNotProductionBlocked then
+            ReplenishmentSystemProdOrderAndNotProductionBlocked := (not Item.Blocked) and (Item."Production Blocked" <> Item."Production Blocked"::Output);
+
+        if ReplenishmentSystemProdOrderAndNotProductionBlocked and (VariantCode <> '') then begin
+            ItemVariant.SetLoadFields(Blocked, "Production Blocked");
+            ItemVariant.Get(ItemNo, VariantCode);
+            ReplenishmentSystemProdOrderAndNotProductionBlocked := (not ItemVariant.Blocked) and (ItemVariant."Production Blocked" <> ItemVariant."Production Blocked"::Output);
+        end;
     end;
 
     [IntegrationEvent(false, false)]

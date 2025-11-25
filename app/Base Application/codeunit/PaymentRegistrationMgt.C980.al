@@ -1,4 +1,8 @@
-﻿namespace Microsoft.Bank.Payment;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Bank.Payment;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.Finance.GeneralLedger.Account;
@@ -421,6 +425,7 @@ codeunit 980 "Payment Registration Mgt."
         CustLedgerEntry."Applies-to ID" :=
           NoSeries.PeekNextNo(GenJnlBatch."No. Series", TempPaymentRegistrationBuffer."Date Received");
         CustLedgerEntry.CalcFields("Remaining Amount");
+        OnUpdateApplicationFieldsOnCustLedgerEntryOnAfterCalcRemainingAmount(CustLedgerEntry);
         if (TempPaymentRegistrationBuffer."Amount Received" > CustLedgerEntry."Remaining Amount") then
             CustLedgerEntry."Amount to Apply" := CustLedgerEntry."Remaining Amount"
         else
@@ -647,6 +652,11 @@ codeunit 980 "Payment Registration Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnShowRecords(var TempDocumentSearchResult: Record "Document Search Result" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateApplicationFieldsOnCustLedgerEntryOnAfterCalcRemainingAmount(var CustLedgerEntry: Record "Cust. Ledger Entry")
     begin
     end;
 }

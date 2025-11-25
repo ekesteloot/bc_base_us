@@ -1,4 +1,8 @@
-﻿namespace Microsoft.Service.Posting;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Service.Posting;
 
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.VAT.Calculation;
@@ -58,10 +62,14 @@ codeunit 5912 "ServLedgEntries-Post"
         SrcCode := SrcCodeSetup."Service Management";
         ServiceRegister."Source Code" := SrcCode;
         ServiceRegister."User ID" := CopyStr(UserId(), 1, MaxStrLen(ServiceRegister."User ID"));
+
+        OnAfterInitServiceRegister(ServiceRegister);
     end;
 
     procedure FinishServiceRegister(var PassedServEntryNo: Integer; var PassedWarrantyEntryNo: Integer)
     begin
+        OnBeforeFinishServiceRegister(ServiceRegister);
+
         PassedServEntryNo := NextServLedgerEntryNo;
         PassedWarrantyEntryNo := NextWarrantyLedgerEntryNo;
 
@@ -775,7 +783,6 @@ codeunit 5912 "ServLedgEntries-Post"
         if ServLine.Type = ServLine.Type::" " then
             exit;
 
-        ServHeader.Get(ServLine."Document Type", ServLine."Document No.");
         if ServHeader."Document Type" <> ServHeader."Document Type"::"Credit Memo" then
             exit;
 
@@ -1222,6 +1229,16 @@ codeunit 5912 "ServLedgEntries-Post"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertServLedgEntryCrMemo(var PassedNextEntryNo: Integer; var ServiceHeader: Record "Service Header"; var ServiceLine: Record "Service Line"; GenJnlLineDocNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInitServiceRegister(var ServiceRegister: Record "Service Register")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeFinishServiceRegister(var ServiceRegister: Record "Service Register")
     begin
     end;
 }

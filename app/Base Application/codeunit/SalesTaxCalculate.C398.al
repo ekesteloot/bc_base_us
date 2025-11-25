@@ -66,18 +66,30 @@ codeunit 398 "Sales Tax Calculate"
         Text004: Label 'The calculated sales tax amount is %5, but was supposed to be %6.';
         Text1020000: Label 'Tax country/region %1 is being used.  You must use %2.';
         Text1020001: Label 'Note to Programmers: The function "CopyTaxDifferences" must not be called unless the function "EndSalesTaxCalculation", or the function "PutSalesTaxAmountLineTable", is called first.';
-        Text1020003: Label 'Invalid function call. Function reserved for external tax engines only.';
 #pragma warning restore AA0470
 #pragma warning restore AA0074
+        ExternalTaxEngine: Interface "External Tax Engine";
+        ExternalTaxEngineInitialized: Boolean;
+
+    procedure InitializeExternalTaxEngine()
+    begin
+        ExternalTaxEngine := "External Tax Engine"::Default;
+        ExternalTaxEngineInitialized := true;
+        OnAfterInitializeExternalTaxEngine(ExternalTaxEngine);
+    end;
 
     procedure CallExternalTaxEngineForDoc(DocTable: Integer; DocType: Option Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order"; DocNo: Code[20]) STETransactionID: Text[20]
     begin
-        Error(Text1020003);
+        if not ExternalTaxEngineInitialized then
+            InitializeExternalTaxEngine();
+        STETransactionID := ExternalTaxEngine.CallExternalTaxEngineForDoc(DocTable, DocType, DocNo);
     end;
 
     procedure CallExternalTaxEngineForJnl(var GenJnlLine: Record "Gen. Journal Line"; CalculationType: Option Normal,Reverse,Expense): Decimal
     begin
-        Error(Text1020003);
+        if not ExternalTaxEngineInitialized then
+            InitializeExternalTaxEngine();
+        exit(ExternalTaxEngine.CallExternalTaxEngineForJnl(GenJnlLine, CalculationType));
     end;
 
     procedure CallExternalTaxEngineForSales(var SalesHeader: Record "Sales Header"; UpdateRecIfChanged: Boolean) STETransactionIDChanged: Boolean
@@ -115,12 +127,16 @@ codeunit 398 "Sales Tax Calculate"
 
     procedure FinalizeExternalTaxCalcForDoc(DocTable: Integer; DocNo: Code[20])
     begin
-        Error(Text1020003);
+        if not ExternalTaxEngineInitialized then
+            InitializeExternalTaxEngine();
+        ExternalTaxEngine.FinalizeExternalTaxCalcForDoc(DocTable, DocNo);
     end;
 
     procedure FinalizeExternalTaxCalcForJnl(var GLEntry: Record "G/L Entry")
     begin
-        Error(Text1020003);
+        if not ExternalTaxEngineInitialized then
+            InitializeExternalTaxEngine();
+        ExternalTaxEngine.FinalizeExternalTaxCalcForJnl(GLEntry);
     end;
 
     procedure CalculateTax(TaxAreaCode: Code[20]; TaxGroupCode: Code[20]; TaxLiable: Boolean; Date: Date; Amount: Decimal; Quantity: Decimal; ExchangeRate: Decimal) TaxAmount: Decimal
@@ -727,6 +743,7 @@ codeunit 398 "Sales Tax Calculate"
                             TempSalesTaxAmountLine.Positive := TotalPositive;
                         end;
 
+                OnAddSalesLineOnAfterSetSalesTaxAmountLineFilter(TempSalesTaxAmountLine, SalesLine, TaxAreaLine);
                 if not TempSalesTaxAmountLine.FindFirst() then begin
                     TempSalesTaxAmountLine.Init();
                     TempSalesTaxAmountLine."Tax Group Code" := SalesLine."Tax Group Code";
@@ -754,6 +771,7 @@ codeunit 398 "Sales Tax Calculate"
                     TempSalesTaxAmountLine."Tax Amount" := 0;
                     TempSalesTaxAmountLine.Quantity := TempSalesTaxAmountLine.Quantity + SalesLine."Quantity (Base)";
                     TempSalesTaxAmountLine."Invoice Discount Amount" := TempSalesTaxAmountLine."Invoice Discount Amount" + SalesLine."Inv. Discount Amount";
+                    OnAddSalesLineOnBeforeModifySalesTaxAmountLine(TempSalesTaxAmountLine, SalesLine);
                     TempSalesTaxAmountLine.Modify();
                 end;
             until TaxAreaLine.Next() = 0;
@@ -1262,6 +1280,7 @@ codeunit 398 "Sales Tax Calculate"
                       Text000,
                       TempSalesTaxAmountLine.FieldCaption("Calculation Order"), TaxArea.TableCaption(), TempSalesTaxAmountLine."Tax Area Code",
                       TaxDetail.FieldCaption("Calculate Tax on Tax"), CalculationOrderViolation);
+                OnEndSalesTaxCalculationOnBeforeSalesTaxAmountLine2Copy(TempSalesTaxAmountLine, TaxBaseAmt, AddedTaxAmount, TotalTaxAmount);
                 SalesTaxAmountLine2.Copy(TempSalesTaxAmountLine);
                 if (TempSalesTaxAmountLine."Tax Type" = TempSalesTaxAmountLine."Tax Type"::"Excise Tax") and not TaxDetail."Calculate Tax on Tax" then
                     SalesTaxAmountLine2."Tax %" := 0
@@ -1469,6 +1488,7 @@ codeunit 398 "Sales Tax Calculate"
                     SalesLine.SetRange("Tax Area Code", TempSalesTaxAmountLine."Tax Area Code");
                 SalesLine.SetRange("Tax Group Code", TempSalesTaxAmountLine."Tax Group Code");
                 SalesLine.SetCurrentKey(Amount);
+                OnDistTaxOverSalesLinesOnAfterSetSalesLineFilters(SalesLine, TempSalesTaxAmountLine);
                 SalesLine.FindSet(true);
                 repeat
                     if ((TaxCountry = TaxCountry::US) or
@@ -2327,5 +2347,31 @@ codeunit 398 "Sales Tax Calculate"
     local procedure OnAfterEndSalesTaxCalulation(var TempSalesTaxAmountLine: Record "Sales Tax Amount Line" temporary; SalesHeaderRead: Boolean; PurchHeaderRead: Boolean; ServHeaderRead: Boolean; ProcessDate: Date)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAddSalesLineOnAfterSetSalesTaxAmountLineFilter(var TempSalesTaxAmountLine: Record "Sales Tax Amount Line" temporary; SalesLine: Record "Sales Line"; TaxAreaLine: Record "Tax Area Line");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAddSalesLineOnBeforeModifySalesTaxAmountLine(var TempSalesTaxAmountLine: Record "Sales Tax Amount Line" temporary; SalesLine: Record "Sales Line");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnEndSalesTaxCalculationOnBeforeSalesTaxAmountLine2Copy(var TempSalesTaxAmountLine: Record "Sales Tax Amount Line" temporary; var TaxBaseAmt: Decimal; var AddedTaxAmount: Decimal; var TotalTaxAmount: Decimal);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnDistTaxOverSalesLinesOnAfterSetSalesLineFilters(var SalesLine: Record "Sales Line"; var TempSalesTaxAmountLine: Record "Sales Tax Amount Line" temporary);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInitializeExternalTaxEngine(var ExternalTaxEngineImplementation: Interface "External Tax Engine")
+    begin
+    end;
+
 }
 

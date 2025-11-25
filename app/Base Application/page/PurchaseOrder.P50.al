@@ -625,7 +625,7 @@ page 50 "Purchase Order"
                                     ApplicationArea = Location;
                                     Importance = Promoted;
                                     Editable = ShipToOptions = ShipToOptions::Location;
-                                    ToolTip = 'Specifies a code for the location where you want the items to be placed when they are received.';
+                                    ToolTip = 'Specifies the location where the items are to be placed when they are received. This field acts as the default location for new lines. You can update the location code for individual lines as needed.';
                                 }
                             }
                             field("Ship-to Name"; Rec."Ship-to Name")
@@ -635,6 +635,16 @@ page 50 "Purchase Order"
                                 Editable = ShipToOptions = ShipToOptions::"Custom Address";
                                 Importance = Additional;
                                 ToolTip = 'Specifies the name of the company at the address that you want the items on the purchase document to be shipped to.';
+                            }
+                            field("Ship-to Name 2"; Rec."Ship-to Name 2")
+                            {
+                                ApplicationArea = Basic, Suite;
+                                Caption = 'Name 2';
+                                Editable = ShipToOptions = ShipToOptions::"Custom Address";
+                                Importance = Additional;
+                                ToolTip = 'Specifies an additional part of the name of the customer that items on the purchase order were shipped to, as a drop shipment.';
+                                QuickEntry = false;
+                                Visible = false;
                             }
                             field("Ship-to Address"; Rec."Ship-to Address")
                             {
@@ -2092,6 +2102,21 @@ page 50 "Purchase Order"
                         PurchaseHeader.PrintRecords(true);
                     end;
                 }
+                action(Email)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Send by Email';
+                    Ellipsis = true;
+                    Image = Email;
+                    ToolTip = 'Finalize and prepare to email the document. The Send Email window opens prefilled with the vendor''s email address so you can add or edit information.';
+
+                    trigger OnAction()
+                    var
+                        DocPrint: Codeunit "Document-Print";
+                    begin
+                        DocPrint.EmailPurchHeader(Rec);
+                    end;
+                }
                 action(SendCustom)
                 {
                     ApplicationArea = Basic, Suite;
@@ -2256,6 +2281,9 @@ page 50 "Purchase Order"
             {
                 Caption = 'Print/Send', Comment = 'Generated from the PromotedActionCategories property index 9.';
 
+                actionref(Email_Promoted; Email)
+                {
+                }
                 actionref("&Print_Promoted"; "&Print")
                 {
                 }
@@ -2524,17 +2552,24 @@ page 50 "Purchase Order"
         PurchaseHeader: Record "Purchase Header";
         InstructionMgt: Codeunit "Instruction Mgt.";
         LinesInstructionMgt: Codeunit "Lines Instruction Mgt.";
-        IsScheduledPosting: Boolean;
+        DocumentIsScheduledForPosting: Boolean;
         IsHandled: Boolean;
     begin
         LinesInstructionMgt.PurchaseCheckAllLinesHaveQuantityAssigned(Rec);
 
         Rec.SendToPosting(PostingCodeunitID);
 
-        IsScheduledPosting := Rec."Job Queue Status" = Rec."Job Queue Status"::"Scheduled for Posting";
-        DocumentIsPosted := (not PurchaseHeader.Get(Rec."Document Type", Rec."No.")) or IsScheduledPosting;
+        DocumentIsScheduledForPosting := Rec."Job Queue Status" = Rec."Job Queue Status"::"Scheduled for Posting";
+        if DocumentIsScheduledForPosting then
+            DocumentIsPosted := true
+        else begin
+            PurchaseHeader.SetRange("Document Type", Rec."Document Type");
+            PurchaseHeader.SetRange("No.", Rec."No.");
+            DocumentIsPosted := PurchaseHeader.IsEmpty();
+        end;
 
-        if IsScheduledPosting then
+        OnPostDocumentOnAfterCalcDocumentIsScheduledForPosting(Rec, DocumentIsScheduledForPosting, DocumentIsPosted);
+        if DocumentIsScheduledForPosting then
             CurrPage.Close();
         CurrPage.Update(false);
 
@@ -2552,7 +2587,7 @@ page 50 "Purchase Order"
                     if InstructionMgt.IsEnabled(InstructionMgt.ShowPostedConfirmationMessageCode()) then
                         ShowPostedConfirmationMessage();
 
-                    if IsScheduledPosting or DocumentIsPosted then
+                    if DocumentIsScheduledForPosting or DocumentIsPosted then
                         CurrPage.Close();
                 end;
             Enum::"Navigate After Posting"::"New Document":
@@ -2830,7 +2865,7 @@ page 50 "Purchase Order"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnPostDocumentBeforeNavigateAfterPosting(var PurchaseHeader: Record "Purchase Header"; var PostingCodeunitID: Integer; var Navigate: Enum "Navigate After Posting"; DocumentIsPosted: Boolean; var IsHandled: Boolean)
+    local procedure OnPostDocumentBeforeNavigateAfterPosting(var PurchaseHeader: Record "Purchase Header"; var PostingCodeunitID: Integer; var Navigate: Enum "Navigate After Posting"; var DocumentIsPosted: Boolean; var IsHandled: Boolean)
     begin
     end;
 
@@ -2861,6 +2896,11 @@ page 50 "Purchase Order"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCurrencyCodeOnAssistEdit(var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPostDocumentOnAfterCalcDocumentIsScheduledForPosting(var PurchaseHeader: Record "Purchase Header"; var DocumentIsScheduledForPosting: Boolean; var DocumentIsPosted: Boolean)
     begin
     end;
 }

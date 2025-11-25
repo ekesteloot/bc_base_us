@@ -40,6 +40,7 @@ table 25 "Vendor Ledger Entry"
         field(3; "Vendor No."; Code[20])
         {
             Caption = 'Vendor No.';
+            OptimizeForTextSearch = true;
             TableRelation = Vendor;
         }
         field(4; "Posting Date"; Date)
@@ -53,6 +54,7 @@ table 25 "Vendor Ledger Entry"
         field(6; "Document No."; Code[20])
         {
             Caption = 'Document No.';
+            OptimizeForTextSearch = true;
 
             trigger OnLookup()
             var
@@ -64,10 +66,12 @@ table 25 "Vendor Ledger Entry"
         field(7; Description; Text[100])
         {
             Caption = 'Description';
+            OptimizeForTextSearch = true;
         }
         field(8; "Vendor Name"; Text[100])
         {
             Caption = 'Vendor Name';
+            OptimizeForTextSearch = true;
         }
         field(11; "Currency Code"; Code[10])
         {
@@ -366,6 +370,7 @@ table 25 "Vendor Ledger Entry"
         field(63; "External Document No."; Code[35])
         {
             Caption = 'External Document No.';
+            OptimizeForTextSearch = true;
         }
         field(64; "No. Series"; Code[20])
         {
@@ -447,6 +452,7 @@ table 25 "Vendor Ledger Entry"
             begin
                 TestField(Open, true);
                 CalcFields(Amount, "Remaining Amount");
+                OnValidateMaxPaymentToleranceBeforeError(Rec);
 
                 if "Max. Payment Tolerance" * Amount < 0 then
                     FieldError("Max. Payment Tolerance", StrSubstNo(MustHaveSameSignErr, FieldCaption(Amount)));
@@ -551,6 +557,7 @@ table 25 "Vendor Ledger Entry"
         field(289; "Message to Recipient"; Text[140])
         {
             Caption = 'Message to Recipient';
+            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             var
@@ -639,6 +646,7 @@ table 25 "Vendor Ledger Entry"
             Caption = 'Remit-to Code';
             TableRelation = "Remit Address".Code where("Vendor No." = field("Vendor No."));
         }
+#if not CLEANSCHEMA28
         field(10020; "IRS 1099 Code"; Code[10])
         {
             Caption = 'IRS 1099 Code';
@@ -652,6 +660,8 @@ table 25 "Vendor Ledger Entry"
             ObsoleteTag = '28.0';
 #endif
         }
+#endif
+#if not CLEANSCHEMA28
         field(10021; "IRS 1099 Amount"; Decimal)
         {
             Caption = 'IRS 1099 Amount';
@@ -664,6 +674,7 @@ table 25 "Vendor Ledger Entry"
             ObsoleteTag = '28.0';
 #endif
         }
+#endif
     }
 
     keys
@@ -1131,6 +1142,11 @@ table 25 "Vendor Ledger Entry"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterRecalculateAmounts(var VendorLedgerEntry: Record "Vendor Ledger Entry"; FromCurrencyCode: Code[10]; ToCurrencyCode: Code[10]; PostingDate: Date)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateMaxPaymentToleranceBeforeError(var VendorLedgerEntry: Record "Vendor Ledger Entry")
     begin
     end;
 

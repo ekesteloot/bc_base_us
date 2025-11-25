@@ -32,8 +32,8 @@ table 2000000268 "Agent Task Message Data"
         field(4; "Status"; Option)
         {
             Caption = 'Status';
-            OptionCaption = ',Draft,Sent,Reviewed,Rejected';
-            OptionMembers = " ",Draft,Sent,Reviewed,Rejected;
+            OptionCaption = ',Draft,Sent,Reviewed,Rejected,Discarded';
+            OptionMembers = " ",Draft,Sent,Reviewed,Rejected,Discarded;
         }
         field(5; Content; Blob)
         {

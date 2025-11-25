@@ -76,6 +76,14 @@ table 2000000231 "Report Layout Definition"
             ObsoleteReason = 'This field should not be used. Instead, the layout description should be obtained from the metareport';
             Caption = 'Description';
         }
+        field(11; IsObsolete; Boolean)
+        {
+            Caption = 'Is bsolete';
+        }
+        field(12; ExcelLayoutMultipleDataSheets; enum "Excel Sheet Configuration")
+        {
+            Caption = 'Excel Layout Multiple Data Sheets';
+        }
     }
 
     keys

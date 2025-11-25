@@ -62,7 +62,7 @@ codeunit 5348 "CRM Quote to Sales Quote"
         MissingWriteInProductNoErr: Label '%1 %2 %3 contains a write-in product. You must choose the default write-in product in Sales & Receivables Setup window.', Comment = '%1 - Dataverse service name,%2 - document type (order or quote), %3 - document number';
         MisingWriteInProductTelemetryMsg: Label 'The user is missing a default write-in product when creating a sales quote from a %1 quote.', Locked = true;
         CrmTelemetryCategoryTok: Label 'AL CRM Integration', Locked = true;
-        SuccessfullyCoupledSalesQuoteTelemetryMsg: Label 'The user successfully coupled quote %2 to %1 quote %3 (quote number %4).', Locked = true;
+        SuccessfullyCoupledSalesQuoteTelemetryMsg: Label 'The user successfully coupled quote %2 to %1 quote %3.', Locked = true;
         SkippingProcessQuoteConnectionDisabledMsg: Label 'Skipping creation of quote header from %1 quote %2. The %1 integration is not enabled.', Locked = true;
         SuccessfullyAppliedSalesQuoteDiscountsTelemetryMsg: Label 'Successfully applied discounts from %1 quote %3 to quote %2.', Locked = true;
         StartingToApplySalesQuoteDiscountsTelemetryMsg: Label 'Starting to appliy discounts from %1 quote %3 to quote %2.', Locked = true;
@@ -236,7 +236,7 @@ codeunit 5348 "CRM Quote to Sales Quote"
         CRMIntegrationRecord.CoupleRecordIdToCRMID(SalesHeader.RecordId, CRMQuote.QuoteId);
         OnCreateOrUpdateNAVQuoteOnAfterCoupleRecordIdToCRMID(CRMQuote, SalesHeader);
         if OpType = OpType::Create then
-            Session.LogMessage('0000839', StrSubstNo(SuccessfullyCoupledSalesQuoteTelemetryMsg, CRMProductName.CDSServiceName(), SalesHeader.SystemId, CRMQuote.QuoteId, CRMQuote.QuoteNumber), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CrmTelemetryCategoryTok);
+            Session.LogMessage('0000839', StrSubstNo(SuccessfullyCoupledSalesQuoteTelemetryMsg, CRMProductName.CDSServiceName(), SalesHeader.SystemId, CRMQuote.QuoteId), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CrmTelemetryCategoryTok);
         exit(true);
     end;
 
@@ -319,13 +319,19 @@ codeunit 5348 "CRM Quote to Sales Quote"
         SalesLine.InsertFreightLine(CRMQuote.FreightAmount);
     end;
 
-    procedure GetCoupledCustomer(CRMQuote: Record "CRM Quote"; var Customer: Record Customer): Boolean
+    procedure GetCoupledCustomer(CRMQuote: Record "CRM Quote"; var Customer: Record Customer) Result: Boolean
     var
         CRMAccount: Record "CRM Account";
         CRMIntegrationRecord: Record "CRM Integration Record";
         NAVCustomerRecordId: RecordID;
         CRMAccountId: Guid;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetCoupledCustomer(CRMQuote, Customer, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         if IsNullGuid(CRMQuote.CustomerId) then
             Error(NoCustomerErr, CannotCreateSalesQuoteInNAVTxt, CRMQuote.Description, CRMProductName.CDSServiceName());
 
@@ -519,6 +525,9 @@ codeunit 5348 "CRM Quote to Sales Quote"
         NAVItemUomRecordId: RecordID;
         NAVResourceUomRecordId: RecordID;
     begin
+        if IsNullGuid(CRMProduct.ProductId) then
+            exit;
+
         case CRMProduct.ProductTypeCode of
             CRMProduct.ProductTypeCode::SalesInventory:
                 begin
@@ -703,5 +712,9 @@ codeunit 5348 "CRM Quote to Sales Quote"
     local procedure OnBeforeFindOrderSalesHeader(var OrderSalesHeader: Record "Sales Header")
     begin
     end;
-}
 
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetCoupledCustomer(CRMQuote: Record "CRM Quote"; var Customer: Record Customer; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+}

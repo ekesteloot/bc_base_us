@@ -17,4 +17,12 @@ enum 2000000003 "Copilot Capability"
     {
         Caption = 'Analyze list';
     }
+    value(3; Summarize)
+    {
+        Caption = 'Summarize';
+    }
+    value(4; Autofill)
+    {
+        Caption = 'Autofill';
+    }
 }

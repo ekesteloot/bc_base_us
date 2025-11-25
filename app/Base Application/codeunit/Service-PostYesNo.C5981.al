@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Service.Posting;
 
 using Microsoft.Finance.GeneralLedger.Preview;
@@ -162,7 +166,7 @@ codeunit 5981 "Service-Post (Yes/No)"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforePostDocument(var ServiceHeader: Record "Service Header"; var ServiceLine: Record "Service Line");
+    local procedure OnBeforePostDocument(var ServiceHeader: Record "Service Header"; var ServiceLine: Record "Service Line" temporary);
     begin
     end;
 

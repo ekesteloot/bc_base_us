@@ -410,7 +410,7 @@ page 6640 "Purchase Return Order"
                 {
                     ApplicationArea = Location;
                     Importance = Promoted;
-                    ToolTip = 'Specifies a code for the location where you want the items to be placed when they are received.';
+                    ToolTip = 'Specifies the location where the items are to be shipped. This field acts as the default location for new lines. You can update the location code for individual lines as needed.';
                 }
                 field("Applies-to Doc. Type"; Rec."Applies-to Doc. Type")
                 {
@@ -501,6 +501,16 @@ page 6640 "Purchase Return Order"
                         Editable = ShipToOptions = ShipToOptions::"Custom Address";
                         Importance = Additional;
                         ToolTip = 'Specifies the name of the vendor sending the order.';
+                    }
+                    field("Ship-to Name 2"; Rec."Ship-to Name 2")
+                    {
+                        ApplicationArea = PurchReturnOrder;
+                        Caption = 'Name 2';
+                        Editable = ShipToOptions = ShipToOptions::"Custom Address";
+                        Importance = Additional;
+                        ToolTip = 'Specifies an additional part of the name for the order address of the vendor.';
+                        QuickEntry = false;
+                        Visible = false;
                     }
                     field("Ship-to Address"; Rec."Ship-to Address")
                     {
@@ -1072,6 +1082,38 @@ page 6640 "Purchase Return Order"
                     DocPrint.PrintPurchHeader(Rec);
                 end;
             }
+            action(Email)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Send by Email';
+                Ellipsis = true;
+                Image = Email;
+                ToolTip = 'Finalize and prepare to email the document. The Send Email window opens prefilled with the vendor''s email address so you can add or edit information.';
+
+                trigger OnAction()
+                var
+                    DocPrint: Codeunit "Document-Print";
+                begin
+                    DocPrint.EmailPurchHeader(Rec);
+                end;
+            }
+            action(Send)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Send';
+                Ellipsis = true;
+                Image = SendToMultiple;
+                ToolTip = 'Prepare to send the document according to the vendor''s sending profile, such as attached to an email. The Send document to window opens first so you can confirm or select a sending profile.';
+
+                trigger OnAction()
+                var
+                    PurchaseHeader: Record "Purchase Header";
+                begin
+                    PurchaseHeader := Rec;
+                    CurrPage.SetSelectionFilter(PurchaseHeader);
+                    PurchaseHeader.SendRecords();
+                end;
+            }
             action(AttachAsPDF)
             {
                 ApplicationArea = Basic, Suite;
@@ -1145,6 +1187,75 @@ page 6640 "Purchase Return Order"
                         CurrPage.PurchLines.Page.PurchaseDocTotalsNotUpToDate();
                         CurrPage.PurchLines.Page.Update(false);
                     end;
+                }
+                group(IncomingDocument)
+                {
+                    Caption = 'Incoming Document';
+                    Image = Documents;
+                    action(IncomingDocCard)
+                    {
+                        ApplicationArea = Suite;
+                        Caption = 'View Incoming Document';
+                        Enabled = HasIncomingDocument;
+                        Image = ViewOrder;
+                        ToolTip = 'View any incoming document records and file attachments that exist for the entry or document, for example for auditing purposes';
+
+                        trigger OnAction()
+                        var
+                            IncomingDocument: Record "Incoming Document";
+                        begin
+                            IncomingDocument.ShowCardFromEntryNo(Rec."Incoming Document Entry No.");
+                        end;
+                    }
+                    action(SelectIncomingDoc)
+                    {
+                        AccessByPermission = TableData "Incoming Document" = R;
+                        ApplicationArea = Suite;
+                        Caption = 'Select Incoming Document';
+                        Image = SelectLineToApply;
+                        ToolTip = 'Select an incoming document record and file attachment that you want to link to the entry or document.';
+
+                        trigger OnAction()
+                        var
+                            IncomingDocument: Record "Incoming Document";
+                        begin
+                            Rec.Validate("Incoming Document Entry No.", IncomingDocument.SelectIncomingDocument(Rec."Incoming Document Entry No.", Rec.RecordId));
+                        end;
+                    }
+                    action(IncomingDocAttachFile)
+                    {
+                        ApplicationArea = Suite;
+                        Caption = 'Create Incoming Document from File';
+                        Ellipsis = true;
+                        Enabled = (Rec."Incoming Document Entry No." = 0) and (Rec."No." <> '');
+                        Image = Attach;
+                        ToolTip = 'Create an incoming document from a file that you select from the disk. The file will be attached to the incoming document record.';
+
+                        trigger OnAction()
+                        var
+                            IncomingDocumentAttachment: Record "Incoming Document Attachment";
+                        begin
+                            IncomingDocumentAttachment.NewAttachmentFromPurchaseDocument(Rec);
+                        end;
+                    }
+                    action(RemoveIncomingDoc)
+                    {
+                        ApplicationArea = Suite;
+                        Caption = 'Remove Incoming Document';
+                        Enabled = HasIncomingDocument;
+                        Image = RemoveLine;
+                        ToolTip = 'Remove any incoming document records and file attachments.';
+
+                        trigger OnAction()
+                        var
+                            IncomingDocument: Record "Incoming Document";
+                        begin
+                            if IncomingDocument.Get(Rec."Incoming Document Entry No.") then
+                                IncomingDocument.RemoveLinkToRelatedRecord();
+                            Rec."Incoming Document Entry No." := 0;
+                            Rec.Modify(true);
+                        end;
+                    }
                 }
                 action("Apply Entries")
                 {
@@ -1492,6 +1603,23 @@ page 6640 "Purchase Return Order"
                 actionref(GetPostedDocumentLinesToReverse_Promoted; GetPostedDocumentLinesToReverse)
                 {
                 }
+                group("Category_Incoming Document")
+                {
+                    Caption = 'Incoming Document';
+
+                    actionref(IncomingDocAttachFile_Promoted; IncomingDocAttachFile)
+                    {
+                    }
+                    actionref(SelectIncomingDoc_Promoted; SelectIncomingDoc)
+                    {
+                    }
+                    actionref(IncomingDocCard_Promoted; IncomingDocCard)
+                    {
+                    }
+                    actionref(RemoveIncomingDoc_Promoted; RemoveIncomingDoc)
+                    {
+                    }
+                }
                 actionref(CalculateInvoiceDiscount_Promoted; CalculateInvoiceDiscount)
                 {
                 }
@@ -1520,7 +1648,13 @@ page 6640 "Purchase Return Order"
             {
                 Caption = 'Print/Send', Comment = 'Generated from the PromotedActionCategories property index 9.';
 
+                actionref(Email_Promoted; Email)
+                {
+                }
                 actionref("&Print_Promoted"; "&Print")
+                {
+                }
+                actionref(Send_Promoted; Send)
                 {
                 }
                 actionref(AttachAsPDF_Promoted; AttachAsPDF)
@@ -1681,6 +1815,7 @@ page 6640 "Purchase Return Order"
         IsPostingGroupEditable: Boolean;
         IsPurchaseLinesEditable: Boolean;
         VATDateEnabled: Boolean;
+        HasIncomingDocument: Boolean;
 
     protected var
         ShipToOptions: Option "Default (Vendor Address)","Alternate Vendor Address","Custom Address";
@@ -1706,14 +1841,19 @@ page 6640 "Purchase Return Order"
         PurchaseHeader: Record "Purchase Header";
         InstructionMgt: Codeunit "Instruction Mgt.";
         LinesInstructionMgt: Codeunit "Lines Instruction Mgt.";
+        DocumentIsScheduledForPosting: Boolean;
         IsHandled: Boolean;
     begin
         LinesInstructionMgt.PurchaseCheckAllLinesHaveQuantityAssigned(Rec);
         Rec.SendToPosting(PostingCodeunitID);
 
-        DocumentIsPosted := not PurchaseHeader.Get(Rec."Document Type", Rec."No.");
+        PurchaseHeader.SetRange("Document Type", Rec."Document Type");
+        PurchaseHeader.SetRange("No.", Rec."No.");
+        DocumentIsPosted := PurchaseHeader.IsEmpty();
 
-        if Rec."Job Queue Status" = Rec."Job Queue Status"::"Scheduled for Posting" then
+        DocumentIsScheduledForPosting := Rec."Job Queue Status" = Rec."Job Queue Status"::"Scheduled for Posting";
+        OnPostDocumentOnAfterCalcDocumentIsScheduledForPosting(Rec, DocumentIsScheduledForPosting, DocumentIsPosted);
+        if DocumentIsScheduledForPosting then
             CurrPage.Close();
         CurrPage.Update(false);
 
@@ -1778,6 +1918,7 @@ page 6640 "Purchase Return Order"
         DocumentErrorsMgt: Codeunit "Document Errors Mgt.";
     begin
         JobQueueVisible := Rec."Job Queue Status" = Rec."Job Queue Status"::"Scheduled for Posting";
+        HasIncomingDocument := Rec."Incoming Document Entry No." <> 0;
 
         OpenApprovalEntriesExistForCurrUser := ApprovalsMgmt.HasOpenApprovalEntriesForCurrentUser(Rec.RecordId());
         OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(Rec.RecordId());
@@ -1875,6 +2016,11 @@ page 6640 "Purchase Return Order"
 
     [IntegrationEvent(true, false)]
     local procedure OnQueryClosePageOnAfterCalcShowConfirmCloseUnposted(var PurchaseHeader: Record "Purchase Header"; var ShowConfirmCloseUnposted: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPostDocumentOnAfterCalcDocumentIsScheduledForPosting(var PurchaseHeader: Record "Purchase Header"; var DocumentIsScheduledForPosting: Boolean; var DocumentIsPosted: Boolean)
     begin
     end;
 }

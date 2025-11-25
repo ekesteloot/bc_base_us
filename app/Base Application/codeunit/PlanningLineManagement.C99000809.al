@@ -1,4 +1,8 @@
-﻿namespace Microsoft.Inventory.Planning;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Planning;
 
 using Microsoft.Foundation.UOM;
 using Microsoft.Inventory;
@@ -48,7 +52,7 @@ codeunit 99000809 "Planning Line Management"
         TempPlanningErrorLog: Record "Planning Error Log" temporary;
         CalcPlanningRtngLine: Codeunit "Calculate Planning Route Line";
         UOMMgt: Codeunit "Unit of Measure Management";
-        CostCalcMgt: Codeunit "Cost Calculation Management";
+        MfgCostCalcMgt: Codeunit "Mfg. Cost Calculation Mgt.";
         PlanningRoutingMgt: Codeunit PlanningRoutingManagement;
         VersionMgt: Codeunit VersionManagement;
         GetPlanningParameters: Codeunit "Planning-Get Parameters";
@@ -113,7 +117,7 @@ codeunit 99000809 "Planning Line Management"
 
         OnTransferRoutingLineOnBeforeCalcRoutingCostPerUnit(PlanningRoutingLine, ReqLine, RoutingLine);
 
-        CostCalcMgt.CalcRoutingCostPerUnit(
+        MfgCostCalcMgt.CalcRoutingCostPerUnit(
           PlanningRoutingLine.Type, PlanningRoutingLine."No.", PlanningRoutingLine."Direct Unit Cost", PlanningRoutingLine."Indirect Cost %", PlanningRoutingLine."Overhead Rate", PlanningRoutingLine."Unit Cost per", PlanningRoutingLine."Unit Cost Calculation");
 
         OnTransferRoutingLineOnBeforeValidateDirectUnitCost(ReqLine, RoutingLine, PlanningRoutingLine);
@@ -129,6 +133,7 @@ codeunit 99000809 "Planning Line Management"
         BOMHeader: Record "Production BOM Header";
         CompSKU: Record "Stockkeeping Unit";
         ProductionBOMVersion: Record "Production BOM Version";
+        Item: Record Item;
         VersionCode: Code[20];
         ReqQty: Decimal;
         IsHandled: Boolean;
@@ -187,13 +192,14 @@ codeunit 99000809 "Planning Line Management"
             if ProdBOMLine[Level].Find('-') then
                 repeat
                     IsHandled := false;
-                    OnTransferBOMOnBeforeTransferPlanningComponent(ReqLine, ProdBOMLine[Level], Blocked, IsHandled);
+                    OnTransferBOMOnBeforeTransferPlanningComponent(ReqLine, ProdBOMLine[Level], Blocked, IsHandled, Level);
                     if not IsHandled then begin
                         if ProdBOMLine[Level]."Routing Link Code" <> '' then begin
                             PlanningRtngLine2.SetRange("Worksheet Template Name", ReqLine."Worksheet Template Name");
                             PlanningRtngLine2.SetRange("Worksheet Batch Name", ReqLine."Journal Batch Name");
                             PlanningRtngLine2.SetRange("Worksheet Line No.", ReqLine."Line No.");
                             PlanningRtngLine2.SetRange("Routing Link Code", ProdBOMLine[Level]."Routing Link Code");
+                            OnTransferBOMOnBeforePlanningRtngLineFind(PlanningRtngLine2, ProdBOMLine[Level], ReqLine);
                             PlanningRtngLine2.FindFirst();
                             ReqQty :=
                               ProdBOMLine[Level].Quantity *
@@ -212,7 +218,9 @@ codeunit 99000809 "Planning Line Management"
                             ProdBOMLine[Level].Type::Item:
                                 begin
                                     IsHandled := false;
-                                    UpdateCondition := ReqQty >= 0;
+                                    Item.SetLoadFields(Blocked);
+                                    Item.Get(ProdBOMLine[Level]."No.");
+                                    UpdateCondition := (ReqQty <> 0) or ((ReqQty = 0) and not (Item.Blocked));
                                     OnTransferBOMOnBeforeUpdatePlanningComp(ProdBOMLine[Level], UpdateCondition, IsHandled);
                                     if not IsHandled then
                                         if UpdateCondition then begin
@@ -469,7 +477,7 @@ codeunit 99000809 "Planning Line Management"
             else
                 ReqLine.CalcStartingDate('');
             ReqLine.UpdateDatetime();
-            OnCalculateRoutingOnAfterUpdateReqLine(ReqLine);
+            OnCalculateRoutingOnAfterUpdateReqLine(ReqLine, Direction);
             exit;
         end;
 
@@ -1099,7 +1107,7 @@ codeunit 99000809 "Planning Line Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCalculateRoutingOnAfterUpdateReqLine(var RequisitionLine: Record "Requisition Line")
+    local procedure OnCalculateRoutingOnAfterUpdateReqLine(var RequisitionLine: Record "Requisition Line"; Direction: Option Forward,Backward)
     begin
     end;
 
@@ -1119,7 +1127,7 @@ codeunit 99000809 "Planning Line Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnTransferBOMOnBeforeTransferPlanningComponent(var RequisitionLine: Record "Requisition Line"; var ProductionBOMLine: Record "Production BOM Line"; Blocked: Boolean; var IsHandled: Boolean)
+    local procedure OnTransferBOMOnBeforeTransferPlanningComponent(var RequisitionLine: Record "Requisition Line"; var ProductionBOMLine: Record "Production BOM Line"; Blocked: Boolean; var IsHandled: Boolean; Level: Integer)
     begin
     end;
 
@@ -1170,6 +1178,11 @@ codeunit 99000809 "Planning Line Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeTransferRoutingLine(var PlanningRoutingLine: Record "Planning Routing Line"; RequisitionLine: Record "Requisition Line"; RoutingLine: Record "Routing Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnTransferBOMOnBeforePlanningRtngLineFind(var PlanningRoutingLine: Record "Planning Routing Line"; ProductionBOMLine: Record "Production BOM Line"; RequisitionLine: Record "Requisition Line")
     begin
     end;
 }

@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Inventory.Transfer;
 
 using Microsoft.Inventory.Availability;
@@ -43,7 +47,7 @@ codeunit 99000876 "Transfer Availability Mgt."
                   TransLine."Shipment Date", TransLine."Transfer-from Code", TransLine."Variant Code");
 
                 TransLine.FindLast();
-                TransLine.SetFilter("Transfer-to Code", Item.GetFilter("Location Filter"));
+                TransLine.SetFilter("Transfer-from Code", Item.GetFilter("Location Filter"));
                 TransLine.SetFilter("Variant Code", Item.GetFilter("Variant Filter"));
                 TransLine.SetFilter("Shipment Date", Item.GetFilter("Date Filter"));
             until TransLine.Next() = 0;
@@ -204,22 +208,21 @@ codeunit 99000876 "Transfer Availability Mgt."
         case AvailabilityType of
             AvailabilityType::Period:
                 if ItemAvailabilityFormsMgt.ShowItemAvailabilityByPeriod(Item, GetFieldCaption(TransLine.FieldCaption(TransLine."Shipment Date")), TransLine."Shipment Date", NewDate) then
-                    TransLine.Validate(TransLine."Shipment Date", NewDate);
+                    TransLine.Validate("Shipment Date", NewDate);
             AvailabilityType::Variant:
                 if ItemAvailabilityFormsMgt.ShowItemAvailabilityByVariant(Item, GetFieldCaption(TransLine.FieldCaption(TransLine."Variant Code")), TransLine."Variant Code", NewVariantCode) then
-                    TransLine.Validate(TransLine."Variant Code", NewVariantCode);
+                    TransLine.Validate("Variant Code", NewVariantCode);
             AvailabilityType::Location:
-                if ItemAvailabilityFormsMgt.ShowItemAvailabilityByLocation(Item, GetFieldCaption(TransLine.FieldCaption(TransLine."Transfer-from Code")), TransLine."Transfer-from Code", NewLocationCode) then
-                    TransLine.Validate(TransLine."Transfer-from Code", NewLocationCode);
+                ItemAvailabilityFormsMgt.ShowItemAvailabilityByLocation(Item, '', TransLine."Transfer-from Code", NewLocationCode);
             AvailabilityType::"Event":
                 if ItemAvailabilityFormsMgt.ShowItemAvailabilityByEvent(Item, GetFieldCaption(TransLine.FieldCaption(TransLine."Shipment Date")), TransLine."Shipment Date", NewDate, false) then
-                    TransLine.Validate(TransLine."Shipment Date", NewDate);
+                    TransLine.Validate("Shipment Date", NewDate);
             AvailabilityType::BOM:
                 if ItemAvailabilityFormsMgt.ShowItemAvailabilityByBOMLevel(Item, GetFieldCaption(TransLine.FieldCaption(TransLine."Shipment Date")), TransLine."Shipment Date", NewDate) then
-                    TransLine.Validate(TransLine."Shipment Date", NewDate);
+                    TransLine.Validate("Shipment Date", NewDate);
             AvailabilityType::UOM:
                 if ItemAvailabilityFormsMgt.ShowItemAvailabilityByUOM(Item, GetFieldCaption(TransLine.FieldCaption(TransLine."Unit of Measure Code")), TransLine."Unit of Measure Code", NewUnitOfMeasureCode) then
-                    TransLine.Validate(TransLine."Unit of Measure Code", NewUnitOfMeasureCode);
+                    TransLine.Validate("Unit of Measure Code", NewUnitOfMeasureCode);
         end;
     end;
 

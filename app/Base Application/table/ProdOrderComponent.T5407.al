@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Manufacturing.Document;
 
 using Microsoft.Finance.Dimension;
@@ -19,7 +23,6 @@ using Microsoft.Manufacturing.Routing;
 using Microsoft.Manufacturing.Setup;
 using Microsoft.Warehouse.Activity;
 using Microsoft.Warehouse.Journal;
-using Microsoft.Warehouse.Request;
 using Microsoft.Warehouse.Structure;
 using Microsoft.Warehouse.Worksheet;
 
@@ -1019,7 +1022,6 @@ table 5407 "Prod. Order Component"
         UOMMgt: Codeunit "Unit of Measure Management";
         DimMgt: Codeunit DimensionManagement;
         WhseProdRelease: Codeunit "Whse.-Production Release";
-        ItemSubstitutionMgt: Codeunit "Item Subst.";
         Reservation: Page Reservation;
         Blocked: Boolean;
         GLSetupRead: Boolean;
@@ -1091,7 +1093,7 @@ table 5407 "Prod. Order Component"
         ProdOrderLine: Record "Prod. Order Line";
         ProdOrderRtngLine: Record "Prod. Order Routing Line";
         CapLedgEntry: Record "Capacity Ledger Entry";
-        CostCalcMgt: Codeunit "Cost Calculation Management";
+        MfgCostCalcMgt: Codeunit "Mfg. Cost Calculation Mgt.";
         OutputQtyBase: Decimal;
         CompQtyBase: Decimal;
         NeededQty: Decimal;
@@ -1134,7 +1136,7 @@ table 5407 "Prod. Order Component"
                     until CapLedgEntry.Next() = 0;
             end;
 
-            CompQtyBase := CostCalcMgt.CalcActNeededQtyBase(ProdOrderLine, Rec, OutputQtyBase);
+            CompQtyBase := MfgCostCalcMgt.CalcActNeededQtyBase(ProdOrderLine, Rec, OutputQtyBase);
             OnGetNeededQtyAfterCalcCompQtyBase(Rec, CompQtyBase, OutputQtyBase);
 
             NeededQty := UOMMgt.RoundToItemRndPrecision(CompQtyBase / "Qty. per Unit of Measure", RoundingPrecision);
@@ -1243,7 +1245,6 @@ table 5407 "Prod. Order Component"
 
     procedure AdjustQtyToQtyPicked(var QtyToPost: Decimal)
     var
-        WhseValidateSourceLine: Codeunit "Whse. Validate Source Line";
         AdjustedQty: Decimal;
         IsHandled: Boolean;
     begin
@@ -1253,7 +1254,7 @@ table 5407 "Prod. Order Component"
             exit;
 
         AdjustedQty :=
-          "Qty. Picked" + WhseValidateSourceLine.CalcNextLevelProdOutput(Rec) -
+          "Qty. Picked" + ProdOrderWarehouseMgt.CalcNextLevelProdOutput(Rec) -
           ("Expected Quantity" - "Remaining Quantity");
 
         if QtyToPost > AdjustedQty then
@@ -1333,6 +1334,75 @@ table 5407 "Prod. Order Component"
     procedure ShowShortcutDimCode(var ShortcutDimCode: array[8] of Code[20])
     begin
         DimMgt.GetShortcutDimensions(Rec."Dimension Set ID", ShortcutDimCode);
+    end;
+
+    /// <summary>
+    /// Opens a page for selecting multiple items to add to the document.
+    /// Selected items are added to the document.
+    /// </summary>
+    procedure SelectMultipleItems()
+    var
+        ItemListPage: Page "Item List";
+        SelectionFilter: Text;
+    begin
+        SelectionFilter := ItemListPage.SelectActiveItems();
+
+        if SelectionFilter <> '' then
+            AddItems(SelectionFilter);
+    end;
+
+    /// <summary>
+    /// Adds items to the document based on the provided selection filter.
+    /// </summary>
+    /// <param name="SelectionFilter">The filter to use for selecting items.</param>
+    procedure AddItems(SelectionFilter: Text)
+    var
+        Item: Record Item;
+        ProdOrderComponent: Record "Prod. Order Component";
+    begin
+        InitNewLine(ProdOrderComponent);
+        Item.SetLoadFields("No.");
+        Item.SetFilter("No.", SelectionFilter);
+        if Item.FindSet() then
+            repeat
+                AddItem(ProdOrderComponent, Item."No.");
+            until Item.Next() = 0;
+    end;
+
+    /// <summary>
+    /// Adds an item to the document.
+    /// </summary>
+    /// <remarks>
+    /// After the line is added, assembly order is automatically created if required.
+    /// If the item has extended text, the text is added as a line.
+    /// </remarks>
+    /// <param name="ProdOrderComponent">Return value: The added Prod. Order Component. Prod. Order Component must have the number set.</param>
+    /// <param name="ItemNo">Return value: The number of the item to add.</param>
+    procedure AddItem(var ProdOrderComponent: Record "Prod. Order Component"; ItemNo: Code[20])
+    begin
+        ProdOrderComponent.Init();
+        ProdOrderComponent."Line No." += 10000;
+        ProdOrderComponent.Validate("Item No.", ItemNo);
+        ProdOrderComponent.Insert(true);
+    end;
+
+    /// <summary>
+    /// Initializes a new Prod. Order Component based on the current Prod. Order Component.
+    /// </summary>
+    /// <param name="NewProdOrderComponent">Return value: The new Prod. Order Component.</param>
+    procedure InitNewLine(var NewProdOrderComponent: Record "Prod. Order Component")
+    var
+        ProdOrderComponent: Record "Prod. Order Component";
+    begin
+        NewProdOrderComponent.Copy(Rec);
+        ProdOrderComponent.SetLoadFields("Line No.");
+        ProdOrderComponent.SetRange(Status, NewProdOrderComponent.Status);
+        ProdOrderComponent.SetRange("Prod. Order No.", NewProdOrderComponent."Prod. Order No.");
+        ProdOrderComponent.SetRange("Prod. Order Line No.", NewProdOrderComponent."Prod. Order Line No.");
+        if ProdOrderComponent.FindLast() then
+            NewProdOrderComponent."Line No." := ProdOrderComponent."Line No."
+        else
+            NewProdOrderComponent."Line No." := 0;
     end;
 
     local procedure GetUpdateFromSKU()
@@ -1672,6 +1742,7 @@ table 5407 "Prod. Order Component"
 
     procedure ShowItemSub()
     var
+        MfgItemSubstitution: Codeunit "Mfg. Item Substitution";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -1679,7 +1750,7 @@ table 5407 "Prod. Order Component"
         if IsHandled then
             exit;
 
-        ItemSubstitutionMgt.GetCompSubst(Rec);
+        MfgItemSubstitution.GetProdOrderCompSubst(Rec);
     end;
 
     local procedure GetSKU() Result: Boolean
@@ -1837,6 +1908,7 @@ table 5407 "Prod. Order Component"
         if Rec."Variant Code" = '' then
             Description := Item.Description
         else begin
+            ItemVariant.SetLoadFields(Description, Blocked);
             ItemVariant.Get("Item No.", "Variant Code");
             ItemVariant.TestField(Blocked, false);
             Description := ItemVariant.Description;

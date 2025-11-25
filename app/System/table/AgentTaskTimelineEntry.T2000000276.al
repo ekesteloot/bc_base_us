@@ -68,26 +68,24 @@ table 2000000276 "Agent Task Timeline Entry"
             OptionMembers = Past,Present,Future;
             Editable = false;
         }
-        field(10; Type; Option)
+        field(10; Type; Enum "Agent Task Timeline Entry Type")
         {
             Caption = 'Type';
             ToolTip = 'Specifies the timeline entry type.';
-            OptionCaption = 'Default,Message,UserInterventionRequest';
-            OptionMembers = Default,Message,UserInterventionRequest;
             Editable = false;
         }
         field(11; "User Intervention Request Type"; Option)
         {
             Caption = 'User Intervention Request Type';
-            ToolTip = 'Specifies the user intervention request type when the timeline entry is pending user intervention.';
-            OptionCaption = ',Review Message,Assistance,Review Record';
-            OptionMembers = " ",ReviewMessage,Assistance,ReviewRecord;
+            ToolTip = 'Specifies the user intervention request type when the timeline entry is a user intervention request.';
+            OptionCaption = ',Review Message,Assistance,Review Record,Resume Task,Retry';
+            OptionMembers = " ",ReviewMessage,Assistance,ReviewRecord,ResumeTask,Retry;
             Editable = false;
         }
-        field(12; Annotation; Blob)
+        field(12; Annotations; Blob)
         {
-            Caption = 'Annotation';
-            ToolTip = 'Specifies the annotation for the timeline entry, if any.';
+            Caption = 'Annotations';
+            ToolTip = 'Specifies the annotations for the timeline entry, if any.';
         }
         field(13; "Primary Page ID"; Integer)
         {
@@ -105,6 +103,17 @@ table 2000000276 "Agent Task Timeline Entry"
             ToolTip = 'Specifies the category of the timeline entry.';
             OptionCaption = 'Primary,Secondary';
             OptionMembers = Primary,Secondary;
+        }
+        field(16; "Last User Intervention Step"; Integer)
+        {
+            Caption = 'Last User Intervention Step Number';
+            ToolTip = 'Specifies the step number of the last user intervention (request) step in the timeline entry.';
+            Editable = false;
+        }
+        field(17; "Suggestions"; Blob)
+        {
+            Caption = 'Suggestions';
+            ToolTip = 'Specifies the suggestions that can be used to provide input for certain user intervention requests.';
         }
     }
 

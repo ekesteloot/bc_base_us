@@ -258,28 +258,6 @@ page 5900 "Service Order"
                     Importance = Promoted;
                     ToolTip = 'Specifies if items in the Service Lines window are ready to be handled in warehouse activities.';
                 }
-                field("CFDI Purpose"; Rec."CFDI Purpose")
-                {
-                    ApplicationArea = BasicMX;
-                    Importance = Additional;
-                    ToolTip = 'Specifies the CFDI purpose required for reporting to the Mexican tax authorities (SAT).';
-                }
-                field("CFDI Relation"; Rec."CFDI Relation")
-                {
-                    ApplicationArea = BasicMX;
-                    Importance = Additional;
-                    ToolTip = 'Specifies the relation of the CFDI document. ';
-                }
-                field("CFDI Export Code"; Rec."CFDI Export Code")
-                {
-                    ApplicationArea = BasicMX;
-                    ToolTip = 'Specifies a code to indicate if the document is used for exports to other countries.';
-                }
-                field("CFDI Period"; Rec."CFDI Period")
-                {
-                    ApplicationArea = BasicMX;
-                    ToolTip = 'Specifies the period to use when reporting for general public customers';
-                }
             }
             part(ServItemLines; "Service Order Subform")
             {
@@ -570,6 +548,14 @@ page 5900 "Service Order"
                         Caption = 'Name';
                         ToolTip = 'Specifies the name of the customer at the address that the items are shipped to.';
                     }
+                    field("Ship-to Name 2"; Rec."Ship-to Name 2")
+                    {
+                        ApplicationArea = Service;
+                        Caption = 'Name 2';
+                        Importance = Additional;
+                        ToolTip = 'Specifies an additional part of thethe name of the customer at the address that the items are shipped to.';
+                        Visible = false;
+                    }
                     field("Ship-to Address"; Rec."Ship-to Address")
                     {
                         ApplicationArea = Service;
@@ -680,6 +666,12 @@ page 5900 "Service Order"
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies how long it takes from when the items are shipped from the warehouse to when they are delivered.';
+                }
+                field("Combine Shipments"; Rec."Combine Shipments")
+                {
+                    ApplicationArea = Service;
+                    Importance = Additional;
+                    ToolTip = 'Specifies whether the order will be included when you use the Combine Shipments function.';
                 }
             }
             group(Details)
@@ -805,31 +797,6 @@ page 5900 "Service Order"
                 {
                     ApplicationArea = BasicEU;
                     ToolTip = 'Specifies the area of the customer or vendor, for the purpose of reporting to INTRASTAT.';
-                }
-            }
-            group(ElectronicDocument)
-            {
-                Caption = 'Electronic Document';
-                field("SAT Address ID"; Rec."SAT Address ID")
-                {
-                    ApplicationArea = BasicMX;
-                    ToolTip = 'Specifies the SAT address that the goods or merchandise are moved to.';
-                    BlankZero = true;
-                }
-                field(Control1310005; Rec."Foreign Trade")
-                {
-                    ApplicationArea = BasicMX;
-                    ToolTip = 'Specifies whether the goods or merchandise that are transported enter or leave the national territory.';
-                }
-                field("SAT International Trade Term"; Rec."SAT International Trade Term")
-                {
-                    ApplicationArea = BasicMX;
-                    ToolTip = 'Specifies an international commercial terms code that are used in international sale contracts according to the SAT internatoinal trade terms definition.';
-                }
-                field("Exchange Rate USD"; Rec."Exchange Rate USD")
-                {
-                    ApplicationArea = BasicMX;
-                    ToolTip = 'Specifies the USD to MXN exchange rate that is used to report foreign trade documents to Mexican SAT authorities. This rate must match the rate used by the Mexican National Bank.';
                 }
             }
         }
@@ -1046,20 +1013,6 @@ page 5900 "Service Order"
                         DocumentAttachmentDetails.RunModal();
                     end;
                 }
-                action(CFDIRelationDocuments)
-                {
-                    ApplicationArea = Service, BasicMX;
-                    Caption = 'CFDI Relation Documents';
-                    Image = Allocations;
-                    RunObject = Page "CFDI Relation Documents";
-                    RunPageLink = "Document Table ID" = const(5900),
-#pragma warning disable AL0603
-                                  "Document Type" = field("Document Type"),
-#pragma warning restore AL0603
-                                  "Document No." = field("No."),
-                                  "Customer No." = field("Bill-to Customer No.");
-                    ToolTip = 'View or add CFDI relation documents for the record.';
-                }
             }
             group("<Action36>")
             {
@@ -1075,7 +1028,6 @@ page 5900 "Service Order"
 
                     trigger OnAction()
                     begin
-                        OnBeforeCalculateSalesTaxStatistics(Rec, true);
                         Rec.OpenOrderStatistics();
                     end;
                 }
@@ -1685,11 +1637,6 @@ page 5900 "Service Order"
 
     [IntegrationEvent(true, false)]
     local procedure OnAfterOnAfterGetRecord(var ServiceHeader: Record "Service Header")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalculateSalesTaxStatistics(var ServiceHeader: Record "Service Header"; ShowDialog: Boolean)
     begin
     end;
 

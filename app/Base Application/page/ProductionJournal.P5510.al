@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Manufacturing.Journal;
 
 using Microsoft.Finance.Dimension;
@@ -90,10 +94,17 @@ page 5510 "Production Journal"
                     Editable = false;
                     ToolTip = 'Specifies the number of the item on the journal line.';
 
-                    trigger OnLookup(var Text: Text): Boolean
+                    trigger OnAssistEdit()
+                    var
+                        ItemCard: Page "Item Card";
                     begin
-                        if Item.Get(Rec."Item No.") then
-                            PAGE.RunModal(PAGE::"Item List", Item);
+                        if Rec."Item No." = '' then
+                            exit;
+
+                        if Item.Get(Rec."Item No.") then begin
+                            ItemCard.SetRecord(Item);
+                            ItemCard.RunModal();
+                        end;
                     end;
                 }
                 field("Operation No."; Rec."Operation No.")
@@ -824,7 +835,7 @@ page 5510 "Production Journal"
         Item: Record Item;
         ProdOrderComp: Record "Prod. Order Component";
         TempItemJnlLine: Record "Item Journal Line" temporary;
-        CostCalcMgt: Codeunit "Cost Calculation Management";
+        MfgCostCalcMgt: Codeunit "Mfg. Cost Calculation Mgt.";
         ReportPrint: Codeunit "Test Report-Print";
         UOMMgt: Codeunit "Unit of Measure Management";
         PostingDate: Date;
@@ -919,7 +930,7 @@ page 5510 "Production Journal"
                             if not ProdOrderLine.Get(ProdOrder.Status, ProdOrder."No.", Rec."Order Line No.") then
                                 Clear(ProdOrderLine);
                         if ProdOrderLine."Prod. Order No." <> '' then begin
-                            CostCalcMgt.CalcActTimeAndQtyBase(
+                            MfgCostCalcMgt.CalcActTimeAndQtyBase(
                               ProdOrderLine, Rec."Operation No.", ActualRunTime, ActualSetupTime, ActualOutputQty, ActualScrapQty);
                             ActualSetupTime :=
                               Round(ActualSetupTime / Rec."Qty. per Cap. Unit of Measure", UOMMgt.TimeRndPrecision());

@@ -213,8 +213,10 @@ codeunit 10 "Type Helper"
     end;
 
     procedure FormatDateWithCurrentCulture(DateToFormat: Date): Text
+    var
+        Language: Codeunit Language;
     begin
-        exit(FormatDate(DateToFormat, 'd', GetCultureName()));
+        exit(FormatDate(DateToFormat, 'd', Language.GetCurrentCultureName()));
     end;
 
     procedure GetHMSFromTime(var Hour: Integer; var Minute: Integer; var Second: Integer; TimeSource: Time)
@@ -238,6 +240,8 @@ codeunit 10 "Type Helper"
         exit(DateTime.IsLeapYear(Date2DMY(Date, 3)));
     end;
 
+#if not CLEAN26
+    [Obsolete('Use codeunit 43 Language, procedure GetCultureName instead.', '26.0')]
     procedure LanguageIDToCultureName(LanguageID: Integer): Text
     var
         CultureInfo: DotNet CultureInfo;
@@ -246,12 +250,14 @@ codeunit 10 "Type Helper"
         exit(CultureInfo.Name);
     end;
 
+    [Obsolete('Use codeunit 43 Language, procedure GetCurrentCultureName instead.', '26.0')]
     procedure GetCultureName(): Text
     var
         CultureInfo: DotNet CultureInfo;
     begin
         exit(CultureInfo.CurrentCulture.Name);
     end;
+#endif
 
     procedure GetOptionNo(Value: Text; OptionString: Text): Integer
     var
@@ -890,6 +896,11 @@ codeunit 10 "Type Helper"
     end;
 
     procedure GetAmountFormatLCYWithUserLocale(): Text
+    begin
+        exit(GetAmountFormatLCYWithUserLocale(0));
+    end;
+
+    procedure GetAmountFormatLCYWithUserLocale(DecimalPlaces: Integer): Text
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
         CurrencySymbol: Text[10];
@@ -897,47 +908,69 @@ codeunit 10 "Type Helper"
         GeneralLedgerSetup.Get();
         CurrencySymbol := GeneralLedgerSetup.GetCurrencySymbol();
 
-        exit(GetAmountFormatWithUserLocale(CurrencySymbol));
+        exit(GetAmountFormatWithUserLocale(CurrencySymbol, DecimalPlaces));
     end;
 
     procedure GetAmountFormatWithUserLocale(CurrencySymbol: Text[10]): Text
+    begin
+        exit(GetAmountFormatWithUserLocale(CurrencySymbol, 0));
+    end;
+
+    procedure GetAmountFormatWithUserLocale(CurrencySymbol: Text[10]; DecimalPlaces: Integer): Text
     var
         UserPersonalization: Record "User Personalization";
     begin
         if not UserPersonalization.Get(UserSecurityId()) then
-            exit(GetDefaultAmountFormat());
+            exit(GetDefaultAmountFormat(DecimalPlaces));
 
-        exit(GetAmountFormat(UserPersonalization."Locale ID", CurrencySymbol));
+        exit(GetAmountFormat(UserPersonalization."Locale ID", CurrencySymbol, DecimalPlaces));
     end;
 
     procedure GetAmountFormat(LocaleId: Integer; CurrencySymbol: Text[10]): Text
+    begin
+        exit(GetAmountFormatDecimalPlaces(LocaleId, CurrencySymbol, 0));
+    end;
+
+    procedure GetAmountFormat(LocaleId: Integer; CurrencySymbol: Text[10]; DecimalPlaces: Integer): Text
+    begin
+        exit(GetAmountFormatDecimalPlaces(LocaleId, CurrencySymbol, DecimalPlaces));
+    end;
+
+    procedure GetAmountFormatDecimalPlaces(LocaleId: Integer; CurrencySymbol: Text[10]; DecimalPlaces: Integer): Text
     var
         CurrencyPositivePattern: Integer;
     begin
         // set position of currency symbol based on the locale
         if LocaleId <= 0 then
-            exit(GetDefaultAmountFormat());
+            exit(GetDefaultAmountFormat(DecimalPlaces));
 
         if not GetCurrencyStyle(LocaleId, CurrencyPositivePattern) then
-            exit(GetDefaultAmountFormat());
+            exit(GetDefaultAmountFormat(DecimalPlaces));
 
         case CurrencyPositivePattern of
             0: // $n
-                exit(CurrencySymbol + GetDefaultAmountFormat());
+                exit(CurrencySymbol + GetDefaultAmountFormat(DecimalPlaces));
             1: // n$
-                exit(GetDefaultAmountFormat() + CurrencySymbol);
+                exit(GetDefaultAmountFormat(DecimalPlaces) + CurrencySymbol);
             2: // $ n
-                exit(CurrencySymbol + ' ' + GetDefaultAmountFormat());
+                exit(CurrencySymbol + ' ' + GetDefaultAmountFormat(DecimalPlaces));
             3: // n $
-                exit(GetDefaultAmountFormat() + ' ' + CurrencySymbol);
+                exit(GetDefaultAmountFormat(DecimalPlaces) + ' ' + CurrencySymbol);
             else
-                exit(GetDefaultAmountFormat());
+                exit(GetDefaultAmountFormat(DecimalPlaces));
         end
     end;
 
     internal procedure GetDefaultAmountFormat(): Text
     begin
         exit('<Precision,0:0><Standard Format,0>');
+    end;
+
+    internal procedure GetDefaultAmountFormat(DecimalPlaces: Integer): Text
+    begin
+#pragma warning disable AA0217
+        exit(StrSubstNo('<Precision,0:%1><Standard Format,0>', DecimalPlaces));
+#pragma warning restore AA0217
     end;
 
     procedure GetXMLAmountFormatWithTwoDecimalPlaces(): Text

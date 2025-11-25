@@ -1,6 +1,11 @@
-﻿namespace Microsoft.Assembly.Document;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Assembly.Document;
 
 using Microsoft.Assembly.Comment;
+using Microsoft.Assembly.Costing;
 using Microsoft.Assembly.Setup;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Setup;
@@ -15,7 +20,6 @@ using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Requisition;
 using Microsoft.Inventory.Tracking;
-using Microsoft.Manufacturing.StandardCost;
 using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.Document;
 using Microsoft.Warehouse.Activity;
@@ -1213,12 +1217,12 @@ table 900 "Assembly Header"
 
     procedure UpdateUnitCost()
     var
-        CalculateStandardCost: Codeunit "Calculate Standard Cost";
+        CalculateAssemblyCost: Codeunit "Calculate Assembly Cost";
         RolledUpAsmUnitCost: Decimal;
         OverHeadAmt: Decimal;
     begin
         RolledUpAsmUnitCost := CalcRolledUpAsmUnitCost();
-        OverHeadAmt := CalculateStandardCost.CalcOverHeadAmt(RolledUpAsmUnitCost, "Indirect Cost %", "Overhead Rate");
+        OverHeadAmt := CalculateAssemblyCost.CalcOverHeadAmt(RolledUpAsmUnitCost, "Indirect Cost %", "Overhead Rate");
         Validate("Unit Cost", RoundUnitAmount(RolledUpAsmUnitCost + OverHeadAmt));
         Modify(true);
     end;
@@ -1424,6 +1428,8 @@ table 900 "Assembly Header"
             Error(Text015, FieldCaption("Due Date"), "Due Date", FieldCaption("Ending Date"), "Ending Date");
         if "Ending Date" < "Starting Date" then
             Error(Text015, FieldCaption("Ending Date"), "Ending Date", FieldCaption("Starting Date"), "Starting Date");
+
+        OnAfterValidateDates(Rec, FieldNumToCalculateFrom, DoNotValidateButJustAssign);
     end;
 
     local procedure CalculateNewDates(FieldNumToCalculateFrom: Integer; var NewDueDate: Date; var NewEndDate: Date; var NewStartDate: Date)
@@ -2219,6 +2225,11 @@ table 900 "Assembly Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateDim(var AssemblyHeader: Record "Assembly Header"; CurrentFieldNo: Integer; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterValidateDates(var AssemblyHeader: Record "Assembly Header"; FieldNumToCalculateFrom: Integer; var DoNotValidateButJustAssign: Boolean)
     begin
     end;
 }

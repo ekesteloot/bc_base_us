@@ -1,6 +1,7 @@
 namespace System.Integration.PowerBI;
 using System.Telemetry;
 using System.Environment.Configuration;
+using System.Globalization;
 
 page 6323 "Power BI Element Card"
 {
@@ -242,13 +243,20 @@ page 6323 "Power BI Element Card"
 
     local procedure InitializeAddIn()
     var
+        Language: Codeunit Language;
         DashboardId: Guid;
         ReportId: Guid;
         TileId: Guid;
         PageName: Text[200];
         VisualName: Text[200];
     begin
-        CurrPage.PowerBIManagement.SetSettings(false, PowerBIDisplayedElement.ShowPanesInExpandedMode, PowerBIDisplayedElement.ShowPanesInExpandedMode, false, false, false, true);
+        if (PowerBIDisplayedElement.ShowPanesInExpandedMode) then begin
+            CurrPage.PowerBIManagement.SetFiltersVisible(true);
+            CurrPage.PowerBIManagement.SetPageSelectionVisible(true);
+        end;
+
+        CurrPage.PowerBIManagement.AddBottomPadding(true);
+        CurrPage.PowerBIManagement.SetLocale(Language.GetCurrentCultureName());
         PowerBiServiceMgt.InitializeAddinToken(CurrPage.PowerBIManagement);
 
         if PowerBIDisplayedElement.ElementEmbedUrl <> '' then

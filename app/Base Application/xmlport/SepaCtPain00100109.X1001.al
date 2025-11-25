@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Bank.DirectDebit;
 
 using Microsoft.Bank.Payment;
@@ -126,6 +130,17 @@ xmlport 1001 "SEPA CT pain.001.001.09"
                     {
                         fieldelement(InstrPrty; PaymentExportDataGroup."SEPA Instruction Priority Text")
                         {
+                        }
+                        textelement(SvcLvl)
+                        {
+                            textelement(Cd)
+                            {
+
+                                trigger OnBeforePassVariable()
+                                begin
+                                    Cd := 'SEPA';
+                                end;
+                            }
                         }
                     }
                     textelement(ReqdExctnDt)

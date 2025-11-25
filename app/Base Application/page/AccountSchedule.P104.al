@@ -34,6 +34,23 @@ page 104 "Account Schedule"
                 begin
                     AccSchedManagement.CheckName(CurrentSchedName);
                     CurrentSchedNameOnAfterValidate();
+                    GetInternalDescription();
+                end;
+            }
+            field(InternalDescription; InternalDescription)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Internal Description';
+                MultiLine = true;
+                ToolTip = 'Specifies the internal description of row definition. The internal description is not shown on the final report but is used to provide more context when using the definition.';
+
+                trigger OnValidate()
+                var
+                    AccScheduleName: Record "Acc. Schedule Name";
+                begin
+                    AccScheduleName.Get(CurrentSchedName);
+                    AccScheduleName."Internal Description" := InternalDescription;
+                    AccScheduleName.Modify();
                 end;
             }
             repeater(Control1)
@@ -242,6 +259,21 @@ page 104 "Account Schedule"
                     CurrPage.Update(false);
                 end;
             }
+            action(WhereUsed)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Where-Used';
+                ToolTip = 'View or edit financial reports in which the row definition is used.';
+                Image = Track;
+
+                trigger OnAction()
+                var
+                    FinancialReport: Record "Financial Report";
+                begin
+                    FinancialReport.SetRange("Financial Report Row Group", CurrentSchedName);
+                    Page.Run(0, FinancialReport);
+                end;
+            }
             group("F&unctions")
             {
                 Caption = 'F&unctions';
@@ -311,6 +343,9 @@ page 104 "Account Schedule"
                 actionref(Indent_Promoted; Indent)
                 {
                 }
+                actionref(WhereUsed_Promoted; WhereUsed)
+                {
+                }
             }
             group(Category_Category4)
             {
@@ -353,12 +388,14 @@ page 104 "Account Schedule"
         AccSchedManagement.OpenAndCheckSchedule(CurrentSchedName, Rec);
         if CurrentSchedName <> OriginalSchedName then
             CurrentSchedNameOnAfterValidate();
+        GetInternalDescription();
     end;
 
     var
         AccSchedManagement: Codeunit AccSchedManagement;
         CurrentSchedName: Code[10];
         DimCaptionsInitialized: Boolean;
+        InternalDescription: Text[250];
         TotalingDisplayed: Text[250];
 
     procedure SetAccSchedName(NewAccSchedName: Code[10])
@@ -371,6 +408,15 @@ page 104 "Account Schedule"
         CurrPage.SaveRecord();
         AccSchedManagement.SetName(CurrentSchedName, Rec);
         CurrPage.Update(false);
+    end;
+
+    local procedure GetInternalDescription()
+    var
+        AccScheduleName: Record "Acc. Schedule Name";
+    begin
+        InternalDescription := '';
+        if AccScheduleName.Get(CurrentSchedName) then
+            InternalDescription := AccScheduleName."Internal Description";
     end;
 
     local procedure FormatLines()

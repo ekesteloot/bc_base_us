@@ -1,4 +1,8 @@
-﻿namespace Microsoft.Service.History;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Service.History;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Payment;
@@ -934,6 +938,15 @@ table 5990 "Service Shipment Header"
 #endif
             CertificateOfSupply.Insert(true);
         end
+    end;
+
+    procedure IsCompletelyInvoiced(): Boolean
+    var
+        ServiceShipmentLine: Record "Service Shipment Line";
+    begin
+        ServiceShipmentLine.SetRange("Document No.", "No.");
+        ServiceShipmentLine.SetFilter("Qty. Shipped Not Invoiced", '<>0');
+        exit(ServiceShipmentLine.IsEmpty());
     end;
 
     [IntegrationEvent(false, false)]

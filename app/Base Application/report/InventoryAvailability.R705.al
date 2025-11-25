@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Inventory.Reports;
 
 using Microsoft.Inventory.Availability;
@@ -292,11 +296,18 @@ report 705 "Inventory Availability"
           Item."Res. Qty. on Req. Line";
 
         GlobalInvtReorder := GlobalProjAvailBalance < ReorderPoint;
+
+        OnAfterCalcNeed(Item, LocationFilter, VariantFilter, ReorderPoint, GlobalInvtReorder)
     end;
 
     procedure InitializeRequest(NewUseStockkeepingUnit: Boolean)
     begin
         GlobalUseStockkeepingUnit := NewUseStockkeepingUnit;
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnAfterCalcNeed(var Item: Record Item; LocationFilter: Text; VariantFilter: Text; ReorderPoint: Decimal; var GlobalInvtReorder: Boolean)
+    begin
     end;
 }
 

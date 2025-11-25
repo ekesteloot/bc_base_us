@@ -174,6 +174,17 @@ table 1173 "Document Attachment"
                     Error(NoDocumentAttachedErr);
             end;
         }
+        field(21; "Document Flow Production"; Boolean)
+        {
+            Caption = 'Flow to Production Trx';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if not HasContent() then
+                    Error(NoDocumentAttachedErr);
+            end;
+        }
     }
 
     keys
@@ -219,7 +230,7 @@ table 1173 "Document Attachment"
         IncomingFileName: Text;
         NoDocumentAttachedErr: Label 'Please attach a document first.';
         EmptyFileNameErr: Label 'Please choose a file to attach.';
-        NoContentErr: Label 'The selected file has no content. Please choose another file.';
+        NoContentErr: Label 'The selected file ''%1'' has no content. Please choose another file.', Comment = '%1=FileName';
         DuplicateErr: Label 'This file is already attached to the document. Please choose another file.';
 
     procedure ImportAttachment(DocumentInStream: InStream; FileName: Text)
@@ -279,6 +290,23 @@ table 1173 "Document Attachment"
         exit(false);
     end;
 
+    internal procedure SupportedByFileViewer(): Boolean
+    begin
+        case Rec."File Type" of
+            Rec."File Type"::PDF:
+                exit(true);
+            Rec."File Type"::" ":
+                begin
+                    if Rec."File Extension" <> '' then
+                        exit(LowerCase(Rec."File Extension") = 'pdf');
+
+                    exit(Lowercase(Rec."File Name").EndsWith('pdf'))
+                end;
+            else
+                exit(false);
+        end;
+    end;
+
     local procedure IsPostedDocument(TableID: Integer) Posted: Boolean
     begin
         if TableID in [Database::"Sales Invoice Header", Database::"Sales Cr.Memo Header"] then
@@ -306,7 +334,7 @@ table 1173 "Document Attachment"
             Error(EmptyFileNameErr);
         // Validate file/media is not empty
         if not TempBlob.HasValue() then
-            Error(NoContentErr);
+            Error(NoContentErr, FileName);
 
         TempBlob.CreateInStream(DocStream);
         InsertAttachment(DocStream, RecRef, FileName, AllowDuplicateFileName);
@@ -531,6 +559,9 @@ table 1173 "Document Attachment"
         if IsHandled then
             exit;
 
+        if AttachmentInStream.Length = 0 then
+            Error(NoContentErr, FileName);
+
         Rec."Document Reference ID".ImportStream(AttachmentInStream, '', '', FileName);
     end;
 
@@ -570,6 +601,16 @@ table 1173 "Document Attachment"
 
         TenantMedia.Get(Rec."Document Reference ID".MediaId());
         exit(TenantMedia."Mime Type");
+    end;
+
+    internal procedure ViewFile()
+    var
+        TempBlob: Codeunit "Temp Blob";
+        FileInStream: InStream;
+    begin
+        GetAsTempBlob(TempBlob);
+        TempBlob.CreateInStream(FileInStream);
+        File.ViewFromStream(FileInStream, Rec."File Name" + '.' + Rec."File Extension", true);
     end;
 
     procedure OpenInOneDrive(DocumentSharingIntent: Enum "Document Sharing Intent")

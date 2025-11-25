@@ -1,4 +1,8 @@
-﻿namespace Microsoft.Bank.BankAccount;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Bank.BankAccount;
 
 using Microsoft.Bank.Check;
 using Microsoft.Bank.Ledger;
@@ -189,6 +193,7 @@ table 270 "Bank Account"
 
                 BankAccount := Rec;
                 BankAccount.CalcFields(Balance, "Balance (LCY)");
+                OnValidateCurrencyCodeOnBeforeTestBalanceFields(BankAccount);
                 BankAccount.TestField(Balance, 0);
                 BankAccount.TestField("Balance (LCY)", 0);
 
@@ -378,14 +383,6 @@ table 270 "Bank Account"
         field(85; "Telex Answer Back"; Text[20])
         {
             Caption = 'Telex Answer Back';
-        }
-        field(89; Picture; BLOB)
-        {
-            Caption = 'Picture';
-            ObsoleteReason = 'Replaced by Image field';
-            ObsoleteState = Removed;
-            SubType = Bitmap;
-            ObsoleteTag = '18.0';
         }
         field(91; "Post Code"; Code[20])
         {
@@ -659,13 +656,6 @@ table 270 "Bank Account"
         {
             Caption = 'Bank Clearing Standard';
             TableRelation = "Bank Clearing Standard";
-        }
-        field(1213; "Bank Name - Data Conversion"; Text[50])
-        {
-            Caption = 'Bank Name - Data Conversion';
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Changed to AMC Banking 365 Fundamentals Extension';
-            ObsoleteTag = '15.0';
         }
         field(1250; "Match Tolerance Type"; Option)
         {
@@ -1700,5 +1690,9 @@ table 270 "Bank Account"
     local procedure OnBeforeGetDirectDebitMessageNo(var DirectDebitMsgNo: Code[20]; var IsHandled: Boolean)
     begin
     end;
-}
 
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateCurrencyCodeOnBeforeTestBalanceFields(var BankAccount: Record "Bank Account")
+    begin
+    end;
+}

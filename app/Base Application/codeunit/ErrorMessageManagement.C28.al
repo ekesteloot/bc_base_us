@@ -61,7 +61,7 @@ codeunit 28 "Error Message Management"
 
     local procedure StopTransaction()
     begin
-        Error('')
+        Error('');
     end;
 
     procedure IsTransactionStopped(): Boolean
@@ -89,8 +89,7 @@ codeunit 28 "Error Message Management"
         Pos: Integer;
         SubString: Text;
     begin
-        if ThrowError() then;
-        CallStack := GetLastErrorCallStack();
+        CallStack := SessionInformation.Callstack;
         SubString := '"Error Message Management"(CodeUnit 28)';
         Len := StrLen(SubString);
         repeat
@@ -98,13 +97,6 @@ codeunit 28 "Error Message Management"
             CallStack := CopyStr(CallStack, Pos + Len);
         until Pos = 0;
         CallStack := CopyStr(CallStack, StrPos(CallStack, '\') + 1);
-    end;
-
-    [TryFunction]
-    local procedure ThrowError()
-    begin
-        // Throw an error to get the call stack by GetLastErrorCallstack
-        Error('');
     end;
 
     local procedure GetContextRecID(ContextVariant: Variant; var ContextRecID: RecordID)
@@ -409,17 +401,20 @@ codeunit 28 "Error Message Management"
     var
         ErrorList: list of [ErrorInfo];
         ErrInfo: ErrorInfo;
+        NextID: Integer;
     begin
         if HasCollectedErrors() then begin
             ErrorList := GetCollectedErrors(true);
+            NextID := TempLineErrorMessage.FindLastID() + 1;
             foreach ErrInfo in ErrorList do begin
                 TempLineErrorMessage.Init();
-                TempLineErrorMessage.ID := TempLineErrorMessage.ID + 1;
+                TempLineErrorMessage.ID := NextID;
                 TempLineErrorMessage."Message" := copystr(ErrInfo.Message, 1, MaxStrLen(TempLineErrorMessage."Message"));
                 TempLineErrorMessage.Validate("Context Record ID", ErrInfo.RecordId);
                 TempLineErrorMessage."Context Field Number" := ErrInfo.FieldNo;
                 TempLineErrorMessage.SetErrorCallStack(ErrInfo.Callstack);
                 TempLineErrorMessage.Insert();
+                NextID += 1;
             end;
         end;
     end;
@@ -552,6 +547,7 @@ codeunit 28 "Error Message Management"
         SupportURL: Text;
         DuplicateText: Text;
         CallStack: Text;
+        MessageTypeText: Text;
         NextID: Integer;
         JObject: JsonObject;
     begin
@@ -568,6 +564,7 @@ codeunit 28 "Error Message Management"
             AdditionalInfo := GetJsonKeyValue(JObject, 'AdditionalInfo');
             SupportURL := GetJsonKeyValue(JObject, 'SupportURL');
             CallStack := GetJsonKeyValue(JObject, 'CallStack');
+            MessageTypeText := GetJsonKeyValue(JObject, 'MessageType');
 
             NextID := TempErrorMessage.FindLastID() + 1;
             TempErrorMessage.Init();
@@ -583,6 +580,7 @@ codeunit 28 "Error Message Management"
             TempErrorMessage."Additional Information" := CopyStr(AdditionalInfo, 1, MaxStrLen(TempErrorMessage."Additional Information"));
             TempErrorMessage."Support Url" := CopyStr(SupportURL, 1, MaxStrLen(TempErrorMessage."Support Url"));
             TempErrorMessage.SetErrorCallStack(CallStack);
+            Evaluate(TempErrorMessage."Message Type", MessageTypeText);
             OnAddToErrorMessageFromJSON(TempErrorMessage, JObject);
             TempErrorMessage.Insert();
         end;
@@ -611,6 +609,7 @@ codeunit 28 "Error Message Management"
         JObject.Add('SupportURL', ErrorMessage."Support Url");
         JObject.Add('CallStack', ErrorMessage.GetErrorCallStack());
         JObject.Add('Duplicate', ErrorMessage.Duplicate);
+        JObject.Add('MessageType', ErrorMessage."Message Type");
         OnAddToJsonFromErrorMessage(JObject, ErrorMessage);
         JObject.WriteTo(JSON);
     end;

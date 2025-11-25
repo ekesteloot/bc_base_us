@@ -101,10 +101,10 @@ table 2000000260 "Agent"
             Caption = 'Can Current User Configure Agent';
             ToolTip = 'Specifies whether the current user can configure the agent.';
         }
-        field(15; "Properties"; Blob)
+        field(15; "Annotations"; Blob)
         {
-            Caption = 'Properties';
-            ToolTip = 'Specifies custom properties that can be set on the agent.';
+            Caption = 'Annotations';
+            ToolTip = 'Specifies the list of annotation that are set on the agent.';
         }
     }
 

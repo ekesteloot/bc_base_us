@@ -2,6 +2,7 @@
 
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Company;
 using Microsoft.Inventory.Location;
@@ -280,6 +281,7 @@ codeunit 5700 "User Setup Management"
     var
         VATSetup: Record "VAT Setup";
         UserSetup2: Record "User Setup";
+        VATReportingDateMgt: Codeunit "VAT Reporting Date Mgt";
         AllowPostingFrom: Date;
         AllowPostingTo: Date;
         IsHandled: Boolean;
@@ -287,6 +289,9 @@ codeunit 5700 "User Setup Management"
         OnBeforeIsVATDateValidWithSetup(VATDate, Result, IsHandled, SetupRecordID, FieldNo);
         if IsHandled then
             exit(Result);
+
+        if not VATReportingDateMgt.IsVATDateEnabled() then
+            exit(true);
 
         if UserId() <> '' then
             if UserSetup2.Get(UserId) then begin
@@ -421,14 +426,15 @@ codeunit 5700 "User Setup Management"
 
     procedure GetSalesInvoicePostingPolicy(var PostQty: Boolean; var PostAmount: Boolean)
     var
-        LocalUserSetup: Record "User Setup";
+        UserSetupForPostingPolicy: Record "User Setup";
     begin
         PostQty := false;
         PostAmount := false;
 
-        if UserId <> '' then
-            if LocalUserSetup.Get(UserId) then
-                case LocalUserSetup."Sales Invoice Posting Policy" of
+        if UserId() <> '' then begin
+            UserSetupForPostingPolicy.SetLoadFields("Sales Invoice Posting Policy");
+            if UserSetupForPostingPolicy.Get(UserId()) then
+                case UserSetupForPostingPolicy."Sales Invoice Posting Policy" of
                     Enum::"Invoice Posting Policy"::Prohibited:
                         begin
                             PostQty := true;
@@ -440,18 +446,22 @@ codeunit 5700 "User Setup Management"
                             PostAmount := true;
                         end;
                 end;
+        end;
+
+        OnAfterGetSalesInvoicePostingPolicy(UserSetupForPostingPolicy, PostQty, PostAmount);
     end;
 
     procedure GetPurchaseInvoicePostingPolicy(var PostQty: Boolean; var PostAmount: Boolean)
     var
-        LocalUserSetup: Record "User Setup";
+        UserSetupForPostingPolicy: Record "User Setup";
     begin
         PostQty := false;
         PostAmount := false;
 
-        if UserId <> '' then
-            if LocalUserSetup.Get(UserId) then
-                case LocalUserSetup."Purch. Invoice Posting Policy" of
+        if UserId() <> '' then begin
+            UserSetupForPostingPolicy.SetLoadFields("Purch. Invoice Posting Policy");
+            if UserSetupForPostingPolicy.Get(UserId()) then
+                case UserSetupForPostingPolicy."Purch. Invoice Posting Policy" of
                     Enum::"Invoice Posting Policy"::Prohibited:
                         begin
                             PostQty := true;
@@ -463,19 +473,23 @@ codeunit 5700 "User Setup Management"
                             PostAmount := true;
                         end;
                 end;
+        end;
+
+        OnAfterGetPurchaseInvoicePostingPolicy(UserSetupForPostingPolicy, PostQty, PostAmount);
     end;
 
     procedure GetServiceInvoicePostingPolicy(var Ship: Boolean; var Consume: Boolean; var Invoice: Boolean)
     var
-        LocalUserSetup: Record "User Setup";
+        UserSetupForPostingPolicy: Record "User Setup";
     begin
         Ship := false;
         Consume := false;
         Invoice := false;
 
-        if UserId <> '' then
-            if LocalUserSetup.Get(UserId) then
-                case LocalUserSetup."Service Invoice Posting Policy" of
+        if UserId() <> '' then begin
+            UserSetupForPostingPolicy.SetLoadFields("Service Invoice Posting Policy");
+            if UserSetupForPostingPolicy.Get(UserId()) then
+                case UserSetupForPostingPolicy."Service Invoice Posting Policy" of
                     Enum::"Invoice Posting Policy"::Prohibited:
                         begin
                             Ship := true;
@@ -489,6 +503,7 @@ codeunit 5700 "User Setup Management"
                             Invoice := true;
                         end;
                 end;
+        end;
     end;
 
     [IntegrationEvent(false, false)]
@@ -553,6 +568,16 @@ codeunit 5700 "User Setup Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeIsVATDateValidWithSetup(VATDate: Date; var Result: Boolean; var IsHandled: Boolean; var SetupRecordID: RecordID; var FieldNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetSalesInvoicePostingPolicy(var UserSetup: Record "User Setup"; var PostQty: Boolean; var PostAmount: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetPurchaseInvoicePostingPolicy(var UserSetup: Record "User Setup"; var PostQty: Boolean; var PostAmount: Boolean)
     begin
     end;
 }

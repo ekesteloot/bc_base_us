@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Finance.GeneralLedger.Journal;
+namespace Microsoft.Finance.GeneralLedger.Journal;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Check;
@@ -756,7 +756,13 @@ table 81 "Gen. Journal Line"
             Caption = 'Applies-to Doc. Type';
 
             trigger OnValidate()
+            var
+                IsHandled: Boolean;
             begin
+                IsHandled := false;
+                OnBeforeValidateAppliesToDocType(Rec, xRec, CurrFieldNo, IsHandled);
+                if IsHandled then
+                    exit;
                 if "Applies-to Doc. Type" <> xRec."Applies-to Doc. Type" then
                     Validate("Applies-to Doc. No.", '');
             end;
@@ -810,7 +816,12 @@ table 81 "Gen. Journal Line"
                 CustLedgEntry: Record "Cust. Ledger Entry";
                 VendLedgEntry: Record "Vendor Ledger Entry";
                 TempGenJnlLine: Record "Gen. Journal Line" temporary;
+                IsHandled: Boolean;
             begin
+                IsHandled := false;
+                OnBeforeValidateAppliesToDocNo(Rec, xRec, CurrFieldNo, SuppressCommit, IsHandled);
+                if IsHandled then
+                    exit;
                 if SuppressCommit then
                     PaymentToleranceMgt.SetSuppressCommit(true);
 
@@ -914,6 +925,7 @@ table 81 "Gen. Journal Line"
 
                 if "Applies-to Doc. Type" = "Applies-to Doc. Type"::Invoice then
                     UpdateAppliesToInvoiceID();
+                OnAfterValidateAppliesToDocNo(Rec, xRec, CurrFieldNo, SuppressCommit);
             end;
         }
         field(38; "Due Date"; Date)
@@ -2021,6 +2033,7 @@ table 81 "Gen. Journal Line"
         {
             Caption = 'IC Direction';
         }
+#if not CLEANSCHEMA25
         field(116; "IC Partner G/L Acc. No."; Code[20])
         {
             Caption = 'IC Partner G/L Acc. No.';
@@ -2029,6 +2042,7 @@ table 81 "Gen. Journal Line"
             ObsoleteState = Removed;
             ObsoleteTag = '25.0';
         }
+#endif
         field(117; "IC Partner Transaction No."; Integer)
         {
             Caption = 'IC Partner Transaction No.';
@@ -2255,13 +2269,6 @@ table 81 "Gen. Journal Line"
             begin
                 DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
             end;
-        }
-        field(827; "Credit Card No."; Code[20])
-        {
-            Caption = 'Credit Card No.';
-            ObsoleteReason = 'This field is not needed and it is not used anymore.';
-            ObsoleteState = Removed;
-            ObsoleteTag = '15.0';
         }
         field(1000; "Remit-to Code"; Code[20])
         {
@@ -2976,12 +2983,9 @@ table 81 "Gen. Journal Line"
             Caption = 'Bal. Non-Deductible VAT Amount LCY';
             Editable = false;
         }
-        field(8000; Id; Guid)
+        field(6230; "Non-Ded. VAT FA Cost"; Boolean)
         {
-            Caption = 'Id';
-            ObsoleteState = Removed;
-            ObsoleteReason = 'This functionality will be replaced by the systemID field';
-            ObsoleteTag = '22.0';
+            Caption = 'Non-Ded. VAT FA Cost';
         }
         field(8001; "Account Id"; Guid)
         {
@@ -3088,6 +3092,7 @@ table 81 "Gen. Journal Line"
             Caption = 'STE Transaction ID';
             Editable = false;
         }
+#if not CLEANSCHEMA28
         field(10020; "IRS 1099 Code"; Code[10])
         {
             Caption = 'IRS 1099 Code';
@@ -3114,6 +3119,8 @@ table 81 "Gen. Journal Line"
             end;
 #endif
         }
+#endif
+#if not CLEANSCHEMA28
         field(10021; "IRS 1099 Amount"; Decimal)
         {
             Caption = 'IRS 1099 Amount';
@@ -3126,6 +3133,7 @@ table 81 "Gen. Journal Line"
             ObsoleteTag = '28.0';
 #endif
         }
+#endif
         field(10030; "Foreign Exchange Indicator"; Option)
         {
             Caption = 'Foreign Exchange Indicator';
@@ -3196,14 +3204,6 @@ table 81 "Gen. Journal Line"
         field(10046; "EFT Export Sequence No."; Integer)
         {
             Caption = 'EFT Export Sequence No.';
-        }
-        field(27040; "DIOT-Type of Operation"; Option)
-        {
-            Caption = 'DIOT Type of Operation';
-            ObsoleteState = Removed;
-            ObsoleteReason = 'Moved to extension';
-            OptionMembers = " ","Prof. Services","Lease and Rent","Others";
-            ObsoleteTag = '15.0';
         }
     }
 
@@ -3343,7 +3343,7 @@ table 81 "Gen. Journal Line"
         SetLastModifiedDateTime();
 
         IsHandled := false;
-        OnModifyOnBeforeTestCheckPrinted(Rec, IsHandled);
+        OnModifyOnBeforeTestCheckPrinted(Rec, xRec, IsHandled);
         if not IsHandled then
             TestField("Check Printed", false);
 
@@ -3843,6 +3843,7 @@ table 81 "Gen. Journal Line"
         PrevDocNo: Code[20];
         FirstDocNo: Code[20];
         TempFirstDocNo: Code[20];
+        PrevCustVendNo: Code[20];
         First: Boolean;
         IsHandled: Boolean;
         PrevPostingDate: Date;
@@ -3875,12 +3876,14 @@ table 81 "Gen. Journal Line"
                 if not First and
                     ((GenJnlLine2."Document No." <> PrevDocNo) or
                       (GenJnlLine2."Posting Date" <> PrevPostingDate) or
+                      (not (GetCustVendNo(GenJnlLine2) in [PrevCustVendNo, ''])) or
                     ((GenJnlLine2."Bal. Account No." <> '') and (GenJnlLine2."Document No." = ''))) and
                     not LastGenJnlLine.EmptyLine()
                 then
                     DocNo := IncStr(DocNo);
                 PrevDocNo := GenJnlLine2."Document No.";
                 PrevPostingDate := GenJnlLine2."Posting Date";
+                PrevCustVendNo := GetCustVendNo(GenJnlLine2);
                 if GenJnlLine2."Document No." <> '' then begin
                     if GenJnlLine2."Applies-to ID" = GenJnlLine2."Document No." then
                         GenJnlLine2.RenumberAppliesToID(GenJnlLine2, GenJnlLine2."Document No.", DocNo);
@@ -5287,6 +5290,7 @@ table 81 "Gen. Journal Line"
 
             if Amount = 0 then begin
                 CustLedgEntry.CalcFields("Remaining Amount");
+                OnGetCustLedgerEntryOnAfterCalcRemainingAmount(CustLedgEntry);
 
                 if "Posting Date" <= CustLedgEntry."Pmt. Discount Date" then
                     Amount := -(CustLedgEntry."Remaining Amount" - CustLedgEntry."Remaining Pmt. Disc. Possible")
@@ -5334,6 +5338,7 @@ table 81 "Gen. Journal Line"
 
             if Amount = 0 then begin
                 VendLedgEntry.CalcFields("Remaining Amount");
+                OnGetVendLedgerEntryOnAfterCalcRemainingAmount(VendLedgEntry);
 
                 if "Posting Date" <= VendLedgEntry."Pmt. Discount Date" then
                     Amount := -(VendLedgEntry."Remaining Amount" - VendLedgEntry."Remaining Pmt. Disc. Possible")
@@ -6038,7 +6043,7 @@ table 81 "Gen. Journal Line"
         OnAfterCleanLine(Rec, xRec);
     end;
 
-    local procedure ReplaceDescription() Result: Boolean
+    procedure ReplaceDescription() Result: Boolean
     var
         IsHandled: Boolean;
     begin
@@ -7235,6 +7240,14 @@ table 81 "Gen. Journal Line"
         OnAfterAccountNoOnValidateGetVendorAccount(Rec, Vend, CurrFieldNo);
     end;
 
+    local procedure GetCustVendNo(GenJnlLineToCheck: Record "Gen. Journal Line"): Code[20]
+    begin
+        if GenJnlLineToCheck."Account Type" in [GenJnlLineToCheck."Account Type"::Customer, GenJnlLineToCheck."Account Type"::Vendor] then
+            exit(GenJnlLineToCheck."Account No.");
+        if GenJnlLineToCheck."Bal. Account Type" in [GenJnlLineToCheck."Bal. Account Type"::Customer, GenJnlLineToCheck."Bal. Account Type"::Vendor] then
+            exit(GenJnlLineToCheck."Bal. Account No.");
+    end;
+
     local procedure CheckConfirmDifferentVendorAndPayToVendor(Vend: Record Vendor; AccountNo: Code[20])
     var
         ConfirmManagement: Codeunit "Confirm Management";
@@ -7391,7 +7404,7 @@ table 81 "Gen. Journal Line"
                 "Currency Code" := BankAcc."Currency Code";
         ClearBalancePostingGroups();
 
-        OnAfterAccountNoOnValidateGetBankBalAccount(Rec, BankAcc, CurrFieldNo);
+        OnAfterAccountNoOnValidateGetBankBalAccount(Rec, xRec, BankAcc, CurrFieldNo);
     end;
 
     local procedure GetFAAccount()
@@ -8044,7 +8057,7 @@ table 81 "Gen. Journal Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterAccountNoOnValidateGetBankBalAccount(var GenJournalLine: Record "Gen. Journal Line"; var BankAccount: Record "Bank Account"; CallingFieldNo: Integer)
+    local procedure OnAfterAccountNoOnValidateGetBankBalAccount(var GenJournalLine: Record "Gen. Journal Line"; var xGenJournalLine: Record "Gen. Journal Line"; var BankAccount: Record "Bank Account"; CallingFieldNo: Integer)
     begin
     end;
 
@@ -8577,7 +8590,7 @@ table 81 "Gen. Journal Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnModifyOnBeforeTestCheckPrinted(var GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
+    local procedure OnModifyOnBeforeTestCheckPrinted(var GenJournalLine: Record "Gen. Journal Line"; var xGenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
     begin
     end;
 
@@ -9820,6 +9833,31 @@ table 81 "Gen. Journal Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnShowDimensionsOnAfterEditDimensionSet(var GenJournalLine: Record "Gen. Journal Line"; OldDimensionSetId: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetVendLedgerEntryOnAfterCalcRemainingAmount(var VendorLedgerEntry: Record "Vendor Ledger Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetCustLedgerEntryOnAfterCalcRemainingAmount(var CustLedgerEntry: Record "Cust. Ledger Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateAppliesToDocType(var GenJnlLine: Record "Gen. Journal Line"; xGenJnlLine: Record "Gen. Journal Line"; CurrentFieldNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateAppliesToDocNo(var GenJnlLine: Record "Gen. Journal Line"; xGenJnlLine: Record "Gen. Journal Line"; CurrentFieldNo: Integer; var SuppressCommit: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterValidateAppliesToDocNo(var GenJnlLine: Record "Gen. Journal Line"; xGenJnlLine: Record "Gen. Journal Line"; CurrentFieldNo: Integer; var SuppressCommit: Boolean)
     begin
     end;
 }

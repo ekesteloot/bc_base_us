@@ -4,6 +4,7 @@ using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Ledger;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.Dimension;
 
 table 7250 "Bank Acc. Rec. AI Proposal"
 {
@@ -81,7 +82,7 @@ table 7250 "Bank Acc. Rec. AI Proposal"
                 if not BankAccountLedgerEntry.Get("Bank Account Ledger Entry No.") then
                     exit;
 
-                "AI Proposal" := StrSubstNo(ApplyToLedgerEntryTxt, BankAccountLedgerEntry."Entry No.", BankAccountLedgerEntry.Description);
+                "AI Proposal" := StrSubstNo(ApplyToLedgerEntryTxt, Format(BankAccountLedgerEntry."Posting Date"), BankAccountLedgerEntry.Description, Format(BankAccountLedgerEntry."Remaining Amount"));
             end;
         }
         field(42; "AI Proposal"; Text[2048])
@@ -98,6 +99,12 @@ table 7250 "Bank Acc. Rec. AI Proposal"
         {
             Caption = 'Journal Batch Name';
             TableRelation = "Gen. Journal Batch".Name where("Journal Template Name" = field("Journal Template Name"));
+        }
+        field(480; "Dimension Set ID"; Integer)
+        {
+            Caption = 'Dimension Set ID';
+            Editable = false;
+            TableRelation = "Dimension Set Entry";
         }
     }
     keys
@@ -122,6 +129,6 @@ table 7250 "Bank Acc. Rec. AI Proposal"
     end;
 
     var
-        PostPaymentProposalTxt: label 'Post payment to account %1 (%2) and match with the resulting entry.', Comment = '%1 - G/L Account number, %2 - G/L Account name';
-        ApplyToLedgerEntryTxt: label 'Match with entry %1 (%2).', Comment = '%1 - bank accout ledger entry number, %2 bank account ledger entry description';
+        PostPaymentProposalTxt: label '%1 (%2)', Comment = '%1 - G/L Account number, %2 - G/L Account name';
+        ApplyToLedgerEntryTxt: label '%1; %2; %3', Comment = '%1 - bank accout ledger entry date, %2 bank account ledger entry description, , %3 bank account ledger entry amount';
 }

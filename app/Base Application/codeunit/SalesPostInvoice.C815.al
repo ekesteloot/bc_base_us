@@ -212,7 +212,10 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
         if InvoicePostingParameters."Tax Type" = InvoicePostingParameters."Tax Type"::"Sales Tax" then
             InvoicePostingBuffer.ClearVATFields();
         SalesPostInvoiceEvents.RunOnPrepareLineOnAfterFillInvoicePostingBuffer(InvoicePostingBuffer, SalesLine);
-        UpdateInvoicePostingBuffer(InvoicePostingBuffer, false);
+        IsHandled := false;
+        SalesPostInvoiceEvents.RunOnBeforeUpdateInvoicePostingBuffer(TempInvoicePostingBuffer, InvoicePostingBuffer, false, InvDefLineNo, DeferralLineNo, FALineNo, SalesLine, IsHandled);
+        if not IsHandled then
+            UpdateInvoicePostingBuffer(InvoicePostingBuffer, false);
 
         SalesPostInvoiceEvents.RunOnPrepareLineOnAfterUpdateInvoicePostingBuffer(
             SalesHeader, SalesLine, InvoicePostingBuffer, TempInvoicePostingBuffer);
@@ -338,7 +341,7 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
         InvoicePostingBuffer."Global Dimension 2 Code" := SalesLine."Shortcut Dimension 2 Code";
         InvoicePostingBuffer."Dimension Set ID" := SalesLine."Dimension Set ID";
         InvoicePostingBuffer."Job No." := SalesLine."Job No.";
-        InvoicePostingBuffer."VAT %" := SalesLine."VAT %";
+        InvoicePostingBuffer."VAT %" := SalesLine.GetVATPct();
         InvoicePostingBuffer."VAT Difference" := SalesLine."VAT Difference";
         if InvoicePostingBuffer.Type = InvoicePostingBuffer.Type::"Fixed Asset" then begin
             InvoicePostingBuffer."FA Posting Date" := SalesLine."FA Posting Date";
@@ -378,7 +381,8 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
             SalesSetup."Copy Line Descr. to G/L Entry",
             SalesLine."Line No.",
             SalesLine.Description,
-            SalesHeader."Posting Description", SalesSetup."Copy Line Descr. to G/L Entry");
+            SalesHeader."Posting Description",
+            (SalesLine.Type = SalesLine.Type::"Fixed Asset") or SalesSetup."Copy Line Descr. to G/L Entry");
     end;
 
     local procedure UpdateInvoicePostingBuffer(InvoicePostingBuffer: Record "Invoice Posting Buffer"; ForceGLAccountType: Boolean)
@@ -763,6 +767,7 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
                             DeferralPostingBuffer."Deferral Account" := DeferralAccount;
                             DeferralPostingBuffer."Period Description" := DeferralTemplate."Period Description";
                             DeferralPostingBuffer."Deferral Line No." := InvDefLineNo;
+                            SalesPostInvoiceEvents.RunOnPrepareDeferralLineOnBeforeDeferralPostingBufferUpdate(DeferralPostingBuffer, TempDeferralLine, RemainAmtToDefer);
                             DeferralPostingBuffer.Update(DeferralPostingBuffer);
                         end else
                             Error(ZeroDeferralAmtErr, SalesLine."No.", SalesLine."Deferral Code");
@@ -775,6 +780,7 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
                 Error(NoDeferralScheduleErr, SalesLine."No.", SalesLine."Deferral Code")
         end else
             Error(NoDeferralScheduleErr, SalesLine."No.", SalesLine."Deferral Code");
+        SalesPostInvoiceEvents.RunOnAfterPrepareDeferralLine(DeferralPostingBuffer, SalesHeader, SalesLine, InvoicePostingParameters."Document No.", DeferralAccount, SalesAccount, InvDefLineNo, DeferralLineNo, RemainAmtToDefer);
     end;
 
     procedure CalcDeferralAmounts(SalesHeaderVar: Variant; SalesLineVar: Variant; OriginalDeferralAmount: Decimal)

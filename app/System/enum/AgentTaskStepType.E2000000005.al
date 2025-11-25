@@ -7,7 +7,7 @@ namespace System.Agents;
 enum 2000000005 "Agent Task Step Type"
 {
     Extensible = false;
-    Caption = 'Agent Task Status';
+    Caption = 'Agent Task Step Type';
 
     /// <summary>
     /// An input message has been received.

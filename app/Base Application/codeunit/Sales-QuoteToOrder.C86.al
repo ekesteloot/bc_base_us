@@ -39,6 +39,7 @@ codeunit 86 "Sales-Quote to Order"
             Cust.CheckBlockedCustOnDocs(Cust, Rec."Document Type"::Order, true, false);
         end;
         Rec.CalcFields("Amount Including VAT", "Work Description");
+        OnRunOnAfterCalcAmountIncludingVAT(Rec);
 
         Rec.ValidateSalesPersonOnSalesHeader(Rec, true, false);
 
@@ -144,6 +145,7 @@ codeunit 86 "Sales-Quote to Order"
             SalesOrderHeader."VAT Registration No." := Customer."VAT Registration No.";
 
         SalesOrderHeader."VAT Reporting Date" := GlSetup.GetVATDate(SalesOrderHeader."Posting Date", SalesOrderHeader."Document Date");
+        SalesOrderHeader.Validate("Posting Date");
 
         SalesHeader.CalcFields("Work Description");
         SalesOrderHeader."Work Description" := SalesHeader."Work Description";
@@ -289,9 +291,6 @@ codeunit 86 "Sales-Quote to Order"
                         Opp."Sales Document No." := '';
                         Opp.Modify();
                     end;
-#if not CLEAN23
-            OnAfterMoveWonLostOpportunites(SalesQuoteHeader, SalesOrderHeader);
-#endif
         end;
         OnAfterMoveWonLostOpportunity(SalesQuoteHeader, SalesOrderHeader, Opp);
     end;
@@ -406,13 +405,6 @@ codeunit 86 "Sales-Quote to Order"
     begin
     end;
 
-#if not CLEAN23
-    [Obsolete('Replaces with OnAfterMoveWonLostOpportunity', '23.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterMoveWonLostOpportunites(var SalesQuoteHeader: Record "Sales Header"; var SalesOrderHeader: Record "Sales Header")
-    begin
-    end;
-#endif
     [IntegrationEvent(false, false)]
     local procedure OnAfterMoveWonLostOpportunity(var SalesQuoteHeader: Record "Sales Header"; var SalesOrderHeader: Record "Sales Header"; var Opportunity: Record Opportunity)
     begin
@@ -484,7 +476,7 @@ codeunit 86 "Sales-Quote to Order"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnTransferQuoteToOrderLinesOnBeforeUpdatePrepaymentPct(var SalesQuoteLine: Record "Sales Line"; var SalesQuoteHeader: Record "Sales Header"; var SalesOrderLine: Record "Sales Line"; var SalesOrderHeader: Record "Sales Header"; Customer: Record Customer)
+    local procedure OnTransferQuoteToOrderLinesOnBeforeUpdatePrepaymentPct(var SalesQuoteLine: Record "Sales Line"; var SalesQuoteHeader: Record "Sales Header"; var SalesOrderLine: Record "Sales Line"; var SalesOrderHeader: Record "Sales Header"; var Customer: Record Customer)
     begin
     end;
 
@@ -510,6 +502,11 @@ codeunit 86 "Sales-Quote to Order"
 
     [IntegrationEvent(false, false)]
     local procedure OnTransferQuoteToOrderLinesOnAfterSalesOrderLineReserve(var SalesLineOrder: Record "Sales Line"; SalesLineQuote: Record "Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnRunOnAfterCalcAmountIncludingVAT(var SalesHeader: Record "Sales Header")
     begin
     end;
 }

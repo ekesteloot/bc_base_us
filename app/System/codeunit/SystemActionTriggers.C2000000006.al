@@ -219,4 +219,15 @@ codeunit 2000000006 "System Action Triggers"
     procedure GetAgentTaskMessagePageId(var PageId: Integer)
     begin
     end;
+
+    /// <summary>
+    /// Gets the list of annotations to be displayed for the specified agents.
+    /// </summary>
+    /// <param name="AgentUserId">The agent user ID.</param>
+    /// <param name="Annotations">The annotations to be added to the agent.</param>
+    [Scope('OnPrem')]
+    [BusinessEvent(false)]
+    procedure GetAgentAnnotations(AgentUserId: Guid; var Annotations: JsonArray)
+    begin
+    end;
 }

@@ -1,4 +1,8 @@
-﻿namespace Microsoft.Foundation.ExtendedText;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Foundation.ExtendedText;
 
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Inventory.Item;
@@ -865,6 +869,9 @@ codeunit 378 "Transfer Extended Text"
                 ToJobPlanningLine."Job Task No." := JobPlanningLine."Job Task No.";
                 ToJobPlanningLine."Line No." := NextLineNo;
                 NextLineNo := NextLineNo + LineSpacing;
+                ToJobPlanningLine."Planning Date" := JobPlanningLine."Planning Date";
+                ToJobPlanningLine."Planned Delivery Date" := JobPlanningLine."Planned Delivery Date";
+                ToJobPlanningLine."Document No." := JobPlanningLine."Document No.";
                 ToJobPlanningLine.Description := TempExtTextLine.Text;
                 ToJobPlanningLine."Attached to Line No." := JobPlanningLine."Line No.";
 
@@ -895,7 +902,7 @@ codeunit 378 "Transfer Extended Text"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeToPurchLineInsert(var ToPurchLine: Record "Purchase Line"; PurchLine: Record "Purchase Line"; TempExtTextLine: Record "Extended Text Line" temporary; var NextLineNo: Integer; LineSpacing: Integer; var IsHandled: Boolean)
+    local procedure OnBeforeToPurchLineInsert(var ToPurchLine: Record "Purchase Line"; var PurchLine: Record "Purchase Line"; TempExtTextLine: Record "Extended Text Line" temporary; var NextLineNo: Integer; LineSpacing: Integer; var IsHandled: Boolean)
     begin
     end;
 
@@ -1143,7 +1150,7 @@ codeunit 378 "Transfer Extended Text"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInsertJobExtTextRetLastOnBeforeToJobPlanningLineInsert(var ToJobPlanningLine: Record "Job Planning Line"; JobPlanningLine: Record "Job Planning Line"; TempExtendedTextLine: Record "Extended Text Line" temporary; var NextLineNo: Integer; LineSpacing: Integer; var IsHandled: Boolean)
+    local procedure OnInsertJobExtTextRetLastOnBeforeToJobPlanningLineInsert(var ToJobPlanningLine: Record "Job Planning Line"; var JobPlanningLine: Record "Job Planning Line"; TempExtendedTextLine: Record "Extended Text Line" temporary; var NextLineNo: Integer; LineSpacing: Integer; var IsHandled: Boolean)
     begin
     end;
 

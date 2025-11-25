@@ -143,7 +143,7 @@ page 53 "Purchase List"
                 field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = Location;
-                    ToolTip = 'Specifies a code for the location where you want the items to be placed when they are received.';
+                    ToolTip = 'Specifies the location where the items are to be placed when they are received. This field acts as the default location for new lines. You can update the location code for individual lines as needed.';
                 }
                 field("Purchaser Code"; Rec."Purchaser Code")
                 {
@@ -192,24 +192,6 @@ page 53 "Purchase List"
             {
                 Caption = '&Line';
                 Image = Line;
-                action(Card)
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Card';
-                    Image = EditLines;
-                    ShortCutKey = 'Shift+F7';
-                    ToolTip = 'View or change detailed information about the record on the document or journal line.';
-                    ObsoleteReason = 'Replaced by "Show Document" action';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '22.0';
-
-                    trigger OnAction()
-                    var
-                        PageManagement: Codeunit "Page Management";
-                    begin
-                        PageManagement.PageRun(Rec);
-                    end;
-                }
                 action(ShowDocument)
                 {
                     ApplicationArea = Basic, Suite;

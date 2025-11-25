@@ -1,4 +1,8 @@
-﻿namespace Microsoft.Inventory.Item;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Item;
 
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.VAT.Setup;
@@ -121,10 +125,6 @@ codeunit 1336 "Item Templ. Mgt."
             end;
         end;
 
-#if not CLEAN23
-        OnApplyTemplateOnBeforeValidateFields(ItemRecRef, ItemTemplRecRef, FieldExclusionList, FieldValidationList);
-#endif    
-
         OnInitFromTemplateOnBeforeValidateFields(ItemRecRef, ItemTemplRecRef, FieldExclusionList, FieldValidationList);
 
         for i := 1 to FieldValidationList.Count do begin
@@ -141,8 +141,16 @@ codeunit 1336 "Item Templ. Mgt."
                 Error(VATPostingSetupErr, SalesReceivablesSetup."VAT Bus. Posting Gr. (Price)", ItemTempl."VAT Prod. Posting Group");
             Item.Validate("Price Includes VAT", ItemTempl."Price Includes VAT");
         end;
-        Item.Validate("Item Category Code", ItemTempl."Item Category Code");
+        if ShouldUpdateItemCategoryCode(Item, ItemTempl, UpdateExistingValues) then
+            Item.Validate("Item Category Code", ItemTempl."Item Category Code");
         Item.Validate("Indirect Cost %", ItemTempl."Indirect Cost %");
+    end;
+
+    local procedure ShouldUpdateItemCategoryCode(Item: Record Item; ItemTempl: Record "Item Templ."; UpdateExistingValues: Boolean): Boolean
+    begin
+        if UpdateExistingValues then
+            exit(ItemTempl."Item Category Code" <> Item."Item Category Code");
+        exit((Item."Item Category Code" = '') and (ItemTempl."Item Category Code" <> ''));
     end;
 
     local procedure ApplyTemplate(var Item: Record Item; ItemTempl: Record "Item Templ."; UpdateExistingValues: Boolean)
@@ -682,14 +690,6 @@ codeunit 1336 "Item Templ. Mgt."
     local procedure OnAfterCreateItemFromTemplate(var Item: Record Item; ItemTempl: Record "Item Templ.");
     begin
     end;
-
-#if not CLEAN23
-    [Obsolete('Replaced by the event OnInitFromTemplateOnBeforeValidateFields', '23.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnApplyTemplateOnBeforeValidateFields(var ItemRecRef: RecordRef; var ItemTemplRecRef: RecordRef; FieldExclusionList: List of [Integer]; var FieldValidationList: List of [Integer])
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnInitFromTemplateOnBeforeValidateFields(var ItemRecRef: RecordRef; var ItemTemplRecRef: RecordRef; FieldExclusionList: List of [Integer]; var FieldValidationList: List of [Integer])

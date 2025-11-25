@@ -1,17 +1,14 @@
-﻿namespace System.Telemetry;
+namespace System.Telemetry;
 
 using System.Security.AccessControl;
 using System.Reflection;
 using System.Threading;
 using System.IO;
 using Microsoft.Sales.History;
-using Microsoft.Purchases.Document;
-using Microsoft.Purchases.Posting;
-using Microsoft.Sales.Posting;
-using Microsoft.Sales.Document;
 using System.Environment;
 using Microsoft.Bank.Reconciliation;
 using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.FinancialReports;
 using System.Environment.Configuration;
 using System.Feedback;
 
@@ -40,8 +37,6 @@ codeunit 1351 "Telemetry Subscribers"
         PermissionSetRemovedFromUserTelemetryScopeAllTxt: Label 'Permission set removed from user: %1', Locked = true;
         EffectivePermsCalculatedTxt: Label 'Effective permissions were calculated for company %1, object type %2, object ID %3.', Locked = true, Comment = '%1 = company name, %2 = object type, %3 = object Id';
         TenantPermissionsChangedFromEffectivePermissionsPageTxt: Label 'Tenant permission set %1 was changed.', Locked = true, Comment = '%1 = permission set id';
-        NumberOfDocumentLinesMsg: Label 'Type of Document: %1, Number of Document Lines: %2', Locked = true;
-        RecordCountCategoryTxt: Label 'AL Record Count', Locked = true;
         JobQueueEntriesCategoryTxt: Label 'AL JobQueueEntries', Locked = true;
         ReusingExistingJobFromIdTxt: Label 'Reusing Job Queue', Locked = true;
         JobQueueEntryFinishedTxt: Label 'JobID = %1, ObjectType = %2, ObjectID = %3, Status = Finished, Result = %4, Company = %5, Scheduled Task Id = %6', Locked = true;
@@ -59,9 +54,14 @@ codeunit 1351 "Telemetry Subscribers"
         BankAccountRecPostedWithBankAccCurrencyCodeMsg: Label 'Bank Account Reconciliation posted with CurrencyCode set to: %1', Locked = true;
         BankAccountRecTextToAccountCountLbl: Label 'Number of lines where Text-To-Applied was used: %1', Locked = true;
         BankAccountRecTransferToGJMsg: Label 'Lines of Bank Statement to transfer to GJ: %1', Locked = true;
-        PurchaseDocumentInformationLbl: Label 'Purchase document posted: %1', Locked = true;
-        SalesDocumentInformationLbl: Label 'Sales document posted: %1 ', Locked = true;
-        SalesInvoiceInformationLbl: Label 'Sales invoice posted: %1', Locked = true;
+        FinancialReportFeatureTok: Label 'Financial Report', Locked = true;
+        FinancialReportEventTxt: Label 'Financial Report %1: %2', Comment = '%1 = event type, %2 = report', Locked = true;
+        FinancialReportRowEventTxt: Label 'Financial Report Row Definition %1: %2', Comment = '%1 = event type, %2 = row definition', Locked = true;
+        FinancialReportColumnEventTxt: Label 'Financial Report Column Definition %1: %2', Comment = '%1 = event type, %2 = column definition', Locked = true;
+        CreatedTok: Label 'created', Locked = true;
+        ModifiedTok: Label 'modified', Locked = true;
+        RenameTok: Label 'renamed', Locked = true;
+        DeletedTok: Label 'deleted', Locked = true;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Conf./Personalization Mgt.", 'OnProfileChanged', '', true, true)]
     local procedure SendTraceOnProfileChanged(PrevAllProfile: Record "All Profile"; CurrentAllProfile: Record "All Profile")
@@ -460,68 +460,7 @@ codeunit 1351 "Telemetry Subscribers"
         Session.LogMessage('000027G', StrSubstNo(TenantPermissionsChangedFromEffectivePermissionsPageTxt, PermissionSetId), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PermissionSetCategoryTxt);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Purch.-Post (Yes/No)", 'OnAfterPost', '', true, true)]
-    local procedure LogNumberOfPurchaseLines(PurchaseHeader: Record "Purchase Header")
-    var
-        PurchaseLine: Record "Purchase Line";
-        DocumentType: Integer;
-        DocumentNumber: Code[20];
-        Attributes: Dictionary of [Text, Text];
-    begin
-        DocumentType := PurchaseHeader."Document Type".AsInteger();
-        DocumentNumber := PurchaseHeader."No.";
-        PurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
-        PurchaseLine.SetRange("Document Type", PurchaseHeader."Document Type");
-
-        Attributes.Add('DocumentType', Format(DocumentType));
-        Attributes.Add('DocumentNumber', Format(DocumentNumber));
-        Attributes.Add('NumberOfLines', Format(PurchaseLine.Count()));
-        Session.LogMessage('0000CST', StrSubstNo(PurchaseDocumentInformationLbl, DocumentNumber), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, Attributes);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post (Yes/No)", 'OnAfterPost', '', true, true)]
-    local procedure LogNumberOfSalesLines(SalesHeader: Record "Sales Header")
-    var
-        SalesLine: Record "Sales Line";
-        DocumentType: Integer;
-        DocumentNumber: Code[20];
-        Attributes: Dictionary of [Text, Text];
-    begin
-        DocumentType := SalesHeader."Document Type".AsInteger();
-        DocumentNumber := SalesHeader."No.";
-        SalesLine.SetRange("Document No.", SalesHeader."No.");
-        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
-
-        Session.LogMessage('000085U', StrSubstNo(NumberOfDocumentLinesMsg, Format(DocumentType), SalesLine.Count), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', RecordCountCategoryTxt);
-
-        Attributes.Add('DocumentType', Format(DocumentType));
-        Attributes.Add('DocumentNumber', Format(DocumentnUmber));
-        Attributes.Add('NumberOfLines', Format(SalesLine.Count()));
-        Session.LogMessage('0000CSU', StrSubstNo(SalesDocumentInformationLbl, DocumentNumber), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, Attributes);
-    end;
-
-    [EventSubscriber(ObjectType::Report, Report::"Standard Sales - Invoice", 'OnAfterGetSalesHeader', '', true, true)]
-    local procedure LogNumberOfSalesInvoiceLinesForReport1306(SalesInvoiceHeader: Record "Sales Invoice Header")
-    begin
-        LogNumberOfSalesInvoiceLines(SalesInvoiceHeader);
-    end;
-
-    local procedure LogNumberOfSalesInvoiceLines(SalesInvoiceHeader: Record "Sales Invoice Header")
-    var
-        SalesInvoiceLine: Record "Sales Invoice Line";
-        DocumentNumber: Code[20];
-        Attributes: Dictionary of [Text, Text];
-    begin
-        SalesInvoiceLine.SetRange("Document No.", SalesInvoiceHeader."No.");
-        DocumentNumber := SalesInvoiceHeader."No.";
-        Session.LogMessage('000085V', StrSubstNo(NumberOfDocumentLinesMsg, 'Sales Invoice - export', SalesInvoiceLine.Count), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', RecordCountCategoryTxt);
-        Attributes.Add('DocumentNumber', Format(DocumentnUmber));
-        Attributes.Add('NumberOfLines', Format(SalesInvoiceLine.Count()));
-
-        Session.LogMessage('0000CZ0', StrSubstNo(SalesInvoiceInformationLbl, DocumentNumber), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, Attributes);
-    end;
-
-    local procedure IsSaas(): Boolean
+    local procedure IsSaaS(): Boolean
     var
         EnvironmentInfo: Codeunit "Environment Information";
     begin
@@ -623,5 +562,122 @@ codeunit 1351 "Telemetry Subscribers"
     begin
         Codeunit.Run(Codeunit::"Emit Database Wait Statistics");
         OnboardingSignal.CheckAndEmitOnboardingSignals();
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Financial Report", OnAfterInsertEvent, '', true, true)]
+    local procedure LogFinancialReportLifecycleInsert(var Rec: Record "Financial Report")
+    begin
+        LogFinancialReportTelemetry(Rec, '0000O77', StrSubstNo(FinancialReportEventTxt, CreatedTok, Rec.Name));
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Financial Report", OnAfterModifyEvent, '', true, true)]
+    local procedure LogFinancialReportLifecycleModify(var Rec: Record "Financial Report")
+    begin
+        LogFinancialReportTelemetry(Rec, '0000O78', StrSubstNo(FinancialReportEventTxt, ModifiedTok, Rec.Name));
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Financial Report", OnAfterRenameEvent, '', true, true)]
+    local procedure LogFinancialReportLifecycleRename(var Rec: Record "Financial Report")
+    begin
+        LogFinancialReportTelemetry(Rec, '0000O79', StrSubstNo(FinancialReportEventTxt, RenameTok, Rec.Name));
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Financial Report", OnAfterDeleteEvent, '', true, true)]
+    local procedure LogFinancialReportLifecycleDelete(var Rec: Record "Financial Report")
+    begin
+        LogFinancialReportTelemetry(Rec, '0000O80', StrSubstNo(FinancialReportEventTxt, DeletedTok, Rec.Name));
+    end;
+
+    local procedure LogFinancialReportTelemetry(FinancialReport: Record "Financial Report"; EventId: Text; EventName: Text)
+    var
+        FeatureTelemetry: Codeunit "Feature Telemetry";
+        TelemetryDimensions: Dictionary of [Text, Text];
+    begin
+        if FinancialReport.IsTemporary() then
+            exit;
+
+        if not IsSaaS() then
+            exit;
+
+        TelemetryDimensions.Add('ReportDefinitionCode', FinancialReport.Name);
+        FeatureTelemetry.LogUsage(EventId, FinancialReportFeatureTok, EventName, TelemetryDimensions);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Acc. Schedule Name", OnAfterInsertEvent, '', true, true)]
+    local procedure LogAccScheduleNameLifecycleInsert(var Rec: Record "Acc. Schedule Name")
+    begin
+        LogAccScheduleNameTelemetry(Rec, '0000O81', StrSubstNo(FinancialReportRowEventTxt, CreatedTok, Rec.Name));
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Acc. Schedule Name", OnAfterModifyEvent, '', true, true)]
+    local procedure LogAccScheduleNameLifecycleModify(var Rec: Record "Acc. Schedule Name")
+    begin
+        LogAccScheduleNameTelemetry(Rec, '0000O82', StrSubstNo(FinancialReportRowEventTxt, ModifiedTok, Rec.Name));
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Acc. Schedule Name", OnAfterRenameEvent, '', true, true)]
+    local procedure LogAccScheduleNameLifecycleRename(var Rec: Record "Acc. Schedule Name")
+    begin
+        LogAccScheduleNameTelemetry(Rec, '0000O83', StrSubstNo(FinancialReportRowEventTxt, RenameTok, Rec.Name));
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Acc. Schedule Name", OnAfterDeleteEvent, '', true, true)]
+    local procedure LogAccScheduleNameLifecycleDelete(var Rec: Record "Acc. Schedule Name")
+    begin
+        LogAccScheduleNameTelemetry(Rec, '0000O84', StrSubstNo(FinancialReportRowEventTxt, DeletedTok, Rec.Name));
+    end;
+
+    local procedure LogAccScheduleNameTelemetry(AccScheduleName: Record "Acc. Schedule Name"; EventId: Text; EventName: Text)
+    var
+        FeatureTelemetry: Codeunit "Feature Telemetry";
+        TelemetryDimensions: Dictionary of [Text, Text];
+    begin
+        if AccScheduleName.IsTemporary() then
+            exit;
+
+        if not IsSaaS() then
+            exit;
+
+        TelemetryDimensions.Add('RowDefinitionCode', AccScheduleName.Name);
+        FeatureTelemetry.LogUsage(EventId, FinancialReportFeatureTok, EventName, TelemetryDimensions);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Column Layout Name", OnAfterInsertEvent, '', true, true)]
+    local procedure LogColumnLayoutNameLifecycleInsert(var Rec: Record "Column Layout Name")
+    begin
+        LogColumnLayoutNameTelemetry(Rec, '0000O85', StrSubstNo(FinancialReportColumnEventTxt, CreatedTok, Rec.Name));
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Column Layout Name", OnAfterModifyEvent, '', true, true)]
+    local procedure LogColumnLayoutNameLifecycleModify(var Rec: Record "Column Layout Name")
+    begin
+        LogColumnLayoutNameTelemetry(Rec, '0000O86', StrSubstNo(FinancialReportColumnEventTxt, ModifiedTok, Rec.Name));
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Column Layout Name", OnAfterRenameEvent, '', true, true)]
+    local procedure LogColumnLayoutNameLifecycleRename(var Rec: Record "Column Layout Name")
+    begin
+        LogColumnLayoutNameTelemetry(Rec, '0000O87', StrSubstNo(FinancialReportColumnEventTxt, RenameTok, Rec.Name));
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Column Layout Name", OnAfterDeleteEvent, '', true, true)]
+    local procedure LogColumnLayoutNameLifecycleDelete(var Rec: Record "Column Layout Name")
+    begin
+        LogColumnLayoutNameTelemetry(Rec, '0000O88', StrSubstNo(FinancialReportColumnEventTxt, DeletedTok, Rec.Name));
+    end;
+
+    local procedure LogColumnLayoutNameTelemetry(ColumnLayoutName: Record "Column Layout Name"; EventId: Text; EventName: Text)
+    var
+        FeatureTelemetry: Codeunit "Feature Telemetry";
+        TelemetryDimensions: Dictionary of [Text, Text];
+    begin
+        if ColumnLayoutName.IsTemporary() then
+            exit;
+
+        if not IsSaaS() then
+            exit;
+
+        TelemetryDimensions.Add('ColumnDefinitionCode', ColumnLayoutName.Name);
+        FeatureTelemetry.LogUsage(EventId, FinancialReportFeatureTok, EventName, TelemetryDimensions);
     end;
 }

@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Assembly.Setup;
 
 using Microsoft.Finance.Dimension;
@@ -9,11 +13,14 @@ table 905 "Assembly Setup"
 {
     Caption = 'Assembly Setup';
     DataClassification = CustomerContent;
+    DrillDownPageID = "Assembly Setup";
+    LookupPageID = "Assembly Setup";
 
     fields
     {
         field(1; "Primary Key"; Code[10])
         {
+            AllowInCustomizations = Never;
             Caption = 'Primary Key';
             DataClassification = SystemMetadata;
         }

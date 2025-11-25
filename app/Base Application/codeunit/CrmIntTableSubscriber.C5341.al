@@ -556,8 +556,6 @@ codeunit 5341 "CRM Int. Table. Subscriber"
     procedure OnAfterInsertRecord(var SourceRecordRef: RecordRef; var DestinationRecordRef: RecordRef)
     var
         CRMConnectionSetup: Record "CRM Connection Setup";
-        CRMSalesorder: Record "CRM Salesorder";
-        SalesHeader: Record "Sales Header";
         SourceDestCode: Text;
     begin
         SourceDestCode := GetSourceDestCode(SourceRecordRef, DestinationRecordRef);
@@ -585,13 +583,14 @@ codeunit 5341 "CRM Int. Table. Subscriber"
             'Sales Header-CRM Salesorder':
                 if CRMConnectionSetup.IsBidirectionalSalesOrderIntEnabled() then begin
                     ResetCRMSalesorderdetailFromSalesOrderLine(SourceRecordRef, DestinationRecordRef);
-                    ChangeSalesOrderStateCode(DestinationRecordRef, CRMSalesorder.StateCode::Submitted);
+                    SetCRMSalesOrderStateCode(SourceRecordRef, DestinationRecordRef);
                 end;
             'CRM Salesorder-Sales Header':
                 if CRMConnectionSetup.IsBidirectionalSalesOrderIntEnabled() then begin
                     ResetSalesOrderLineFromCRMSalesorderdetail(SourceRecordRef, DestinationRecordRef);
                     ApplySalesOrderDiscounts(SourceRecordRef, DestinationRecordRef);
-                    ChangeValidateSalesOrderStatus(DestinationRecordRef, SalesHeader.Status::Released);
+                    CreateFreightLines(SourceRecordRef, DestinationRecordRef);
+                    SetSalesOrderStatus(DestinationRecordRef);
                     SetOrderNumberAndDocOccurenceNumber(SourceRecordRef, DestinationRecordRef);
                     CreateSalesOrderNotes(SourceRecordRef, DestinationRecordRef);
                 end;
@@ -599,6 +598,9 @@ codeunit 5341 "CRM Int. Table. Subscriber"
                 CreateUnitGroupAndItemUnitOfMeasure(SourceRecordRef, DestinationRecordRef);
             'CRM Product-Resource':
                 CreateUnitGroupAndResourceUnitOfMeasure(SourceRecordRef, DestinationRecordRef);
+            'CRM Salesorderdetail-Sales Line':
+                if CRMConnectionSetup.IsBidirectionalSalesOrderIntEnabled() then
+                    AutoReserveSalesLine(DestinationRecordRef);
         end;
     end;
 
@@ -732,6 +734,34 @@ codeunit 5341 "CRM Int. Table. Subscriber"
         SourceRecordRef.GetTable(SalesHeader);
     end;
 
+    local procedure SetSalesOrderStatus(var SourceRecordRef: RecordRef)
+    var
+        SalesHeader: Record "Sales Header";
+        NewStatus: Enum "Sales Document Status";
+    begin
+        SourceRecordRef.SetTable(SalesHeader);
+        if SalesHeader."Prepayment %" > 0 then
+            NewStatus := SalesHeader.Status::Open
+        else
+            NewStatus := SalesHeader.Status::Released;
+
+        ChangeValidateSalesOrderStatus(SourceRecordRef, NewStatus);
+    end;
+
+    local procedure SetCRMSalesOrderStateCode(var SourceRecordRef: RecordRef; var DestinationRecordRef: RecordRef)
+    var
+        SalesHeader: Record "Sales Header";
+        CRMSalesorder: Record "CRM Salesorder";
+    begin
+        SourceRecordRef.SetTable(SalesHeader);
+        DestinationRecordRef.SetTable(CRMSalesorder);
+        SalesHeader.CalcFields("Completely Shipped");
+        if SalesHeader."Completely Shipped" then
+            CRMSynchHelper.FulfillSalesOrder(CRMSalesorder.SalesOrderId)
+        else
+            ChangeSalesOrderStateCode(DestinationRecordRef, CRMSalesorder.StateCode::Submitted);
+    end;
+
     local procedure ChangeValidateSalesOrderStatus(var SourceRecordRef: RecordRef; NewStatus: Enum "Sales Document Status")
     var
         SalesHeader: Record "Sales Header";
@@ -796,7 +826,6 @@ codeunit 5341 "CRM Int. Table. Subscriber"
     var
         CRMConnectionSetup: Record "CRM Connection Setup";
         CRMSalesOrder: Record "CRM Salesorder";
-        SalesHeader: Record "Sales Header";
     begin
         case GetSourceDestCode(SourceRecordRef, DestinationRecordRef) of
 #if not CLEAN25
@@ -806,16 +835,17 @@ codeunit 5341 "CRM Int. Table. Subscriber"
             'Price List Header-CRM Pricelevel':
                 ResetCRMProductpricelevelFromPriceListHeader(SourceRecordRef);
             'Sales Header-CRM Salesorder':
-                begin
-                    if CRMConnectionSetup.IsBidirectionalSalesOrderIntEnabled() then
-                        ResetCRMSalesorderdetailFromSalesOrderLine(SourceRecordRef, DestinationRecordRef);
+                if CRMConnectionSetup.IsBidirectionalSalesOrderIntEnabled() then begin
+                    ResetCRMSalesorderdetailFromSalesOrderLine(SourceRecordRef, DestinationRecordRef);
+                    SetCRMSalesOrderStateCode(SourceRecordRef, DestinationRecordRef);
+                end else
                     ChangeSalesOrderStateCode(DestinationRecordRef, CRMSalesOrder.StateCode::Submitted);
-                end;
             'CRM Salesorder-Sales Header':
                 if CRMConnectionSetup.IsBidirectionalSalesOrderIntEnabled() then begin
                     ResetSalesOrderLineFromCRMSalesorderdetail(SourceRecordRef, DestinationRecordRef);
                     ApplySalesOrderDiscounts(SourceRecordRef, DestinationRecordRef);
-                    ChangeValidateSalesOrderStatus(DestinationRecordRef, SalesHeader.Status::Released);
+                    CreateFreightLines(SourceRecordRef, DestinationRecordRef);
+                    SetSalesOrderStatus(DestinationRecordRef);
                     CreateSalesOrderNotes(SourceRecordRef, DestinationRecordRef);
                 end;
         end;
@@ -844,6 +874,7 @@ codeunit 5341 "CRM Int. Table. Subscriber"
                 if CRMConnectionSetup.IsBidirectionalSalesOrderIntEnabled() then begin
                     ChangeSalesOrderStatus(DestinationRecordRef, SalesHeader.Status::Open);
                     ResetSalesOrderLineFromCRMSalesorderdetail(SourceRecordRef, DestinationRecordRef);
+                    CreateFreightLines(SourceRecordRef, DestinationRecordRef);
                     ChangeSalesOrderStatus(DestinationRecordRef, SalesHeader.Status::Released);
                     CreateSalesOrderNotes(SourceRecordRef, DestinationRecordRef);
                 end;
@@ -899,6 +930,8 @@ codeunit 5341 "CRM Int. Table. Subscriber"
             Database::"CRM Salesorder":
                 IgnoreArchievedCRMSalesordersOnQueryPostFilterIgnoreRecord(SourceRecordRef, IgnoreRecord);
         end;
+
+        OnAfterHandlePostFilterIgnoreRecord(SourceRecordRef, IgnoreRecord);
     end;
 
     local procedure IgnoreArchievedSalesOrdersOnQueryPostFilterIgnoreRecord(SourceRecordRef: RecordRef; var IgnoreRecord: Boolean)
@@ -1826,6 +1859,20 @@ codeunit 5341 "CRM Int. Table. Subscriber"
         SalesCalcDiscountByType.ApplyInvDiscBasedOnAmt(CRMDiscountAmount, ChangedSalesHeader);
 
         DestinationRecordRef.GetTable(ChangedSalesHeader);
+    end;
+
+    local procedure CreateFreightLines(SourceRecordRef: RecordRef; DestinationRecordRef: RecordRef)
+    var
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        CRMSalesorder: Record "CRM Salesorder";
+    begin
+        SourceRecordRef.SetTable(CRMSalesorder);
+        DestinationRecordRef.SetTable(SalesHeader);
+
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        if SalesLine.FindFirst() then
+            SalesLine.InsertFreightLine(CRMSalesorder.FreightAmount);
     end;
 
 #if not CLEAN25
@@ -3116,6 +3163,15 @@ codeunit 5341 "CRM Int. Table. Subscriber"
         end;
     end;
 
+    local procedure AutoReserveSalesLine(var DestinationRecordRef: RecordRef)
+    var
+        SalesLine: Record "Sales Line";
+    begin
+        DestinationRecordRef.SetTable(SalesLine);
+        if (SalesLine.Type = SalesLine.Type::Item) and (SalesLine.Reserve = SalesLine.Reserve::Always) then
+            SalesLine.AutoReserve();
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"CRM Integration Management", 'OnIsCRMIntegrationRecord', '', false, false)]
     local procedure HandleOnIsCRMIntegrationRecord(TableID: Integer; var isIntegrationRecord: Boolean)
     var
@@ -3234,6 +3290,11 @@ codeunit 5341 "CRM Int. Table. Subscriber"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeFindQuoteSalesHeader(var QuoteSalesHeader: Record "Sales Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterHandlePostFilterIgnoreRecord(SourceRecordRef: RecordRef; var IgnoreRecord: Boolean)
     begin
     end;
 }

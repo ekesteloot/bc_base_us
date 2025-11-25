@@ -36,12 +36,10 @@ page 9106 "Customer Ledger Entry FactBox"
             field("Due Date"; Rec."Due Date")
             {
                 ApplicationArea = Basic, Suite;
-                ToolTip = 'Specifies the due date on the entry.';
             }
             field("Pmt. Discount Date"; Rec."Pmt. Discount Date")
             {
                 ApplicationArea = Basic, Suite;
-                ToolTip = 'Specifies the date on which the amount in the entry must be paid for a payment discount to be granted.';
             }
             field(NoOfReminderFinEntries; NoOfReminderFinEntries)
             {
@@ -147,7 +145,14 @@ page 9106 "Customer Ledger Entry FactBox"
     end;
 
     local procedure GetNoOfAppliedEntries(CustLedgerEntry: Record "Cust. Ledger Entry"): Integer
+    var
+        IsHandled: Boolean;
+        ReturnedValue: Integer;
     begin
+        IsHandled := false;
+        OnBeforeGetNoOfAppliedEntries(CustLedgerEntry, ReturnedValue, IsHandled);
+        if IsHandled then
+            exit(ReturnedValue);
         GetAppliedEntries(CustLedgerEntry);
         exit(CustLedgerEntry.Count);
     end;
@@ -224,6 +229,11 @@ page 9106 "Customer Ledger Entry FactBox"
             Heading := Format(CustLedgerEntry."Document Type");
         Heading := Heading + ' ' + CustLedgerEntry."Document No.";
         exit(Heading);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetNoOfAppliedEntries(CustLedgerEntry: Record "Cust. Ledger Entry"; var ReturnedValue: Integer; var IsHandled: Boolean)
+    begin
     end;
 }
 

@@ -52,7 +52,6 @@ page 143 "Posted Sales Invoices"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Customer No.';
-                    ToolTip = 'Specifies the number of the customer the invoice concerns.';
                 }
                 field("Sell-to Customer Name"; Rec."Sell-to Customer Name")
                 {
@@ -118,7 +117,6 @@ page 143 "Posted Sales Invoices"
                 field("Bill-to Customer No."; Rec."Bill-to Customer No.")
                 {
                     ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the number of the customer that you send or sent the invoice or credit memo to.';
                     Visible = false;
                 }
                 field("Bill-to Name"; Rec."Bill-to Name")
@@ -331,17 +329,6 @@ page 143 "Posted Sales Invoices"
                         DocExchServDocStatus.DocExchStatusDrillDown(Rec);
                     end;
                 }
-#if not CLEAN23                
-                field("<Document Exchange Status>"; Rec."Coupled to CRM")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies that the posted sales order is coupled to a sales order in Dynamics 365 Sales.';
-                    Visible = false;
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by flow field Coupled to Dataverse';
-                    ObsoleteTag = '23.0';
-                }
-#endif
                 field("Coupled to Dataverse"; Rec."Coupled to Dataverse")
                 {
                     ApplicationArea = All;

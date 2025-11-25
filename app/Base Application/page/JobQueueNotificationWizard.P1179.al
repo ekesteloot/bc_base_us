@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -8,6 +8,7 @@ namespace Microsoft.System.Threading;
 using Microsoft.Integration.Dataverse;
 #endif
 using System.Environment;
+using System.Telemetry;
 using System.Environment.Configuration;
 using System.Threading;
 using System.Utilities;
@@ -16,7 +17,7 @@ page 1179 "Job Queue Notification Wizard"
 {
     PageType = NavigatePage;
     RefreshOnActivate = true;
-    Caption = 'Set Up Job Queue notifications';
+    Caption = 'Set Up Job Queue Notifications';
     SourceTable = "Job Queue Notification Setup";
     Editable = true;
     Extensible = false;
@@ -249,6 +250,12 @@ page 1179 "Job Queue Notification Wizard"
                 {
                     Caption = 'To enable notifications using Power Automate:';
                     Visible = PowerAutomateFlowNotification;
+                    field(CreateFlowFromTemplateTip; CreateFlowFromTemplateTipLbl)
+                    {
+                        ApplicationArea = All;
+                        Editable = false;
+                        ShowCaption = false;
+                    }
                     field(CreateFlowFromTemplate; CreateFlowFromTemplateLbl)
                     {
                         ApplicationArea = All;
@@ -326,8 +333,14 @@ page 1179 "Job Queue Notification Wizard"
 
                 trigger OnAction()
                 var
+                    FeatureTelemetry: Codeunit "Feature Telemetry";
                     GuidedExperience: Codeunit "Guided Experience";
                 begin
+                    if Rec.InProductNotification then
+                        FeatureTelemetry.LogUptake('0000OK8', 'JobQueueFailedNotification-InProd ', Enum::"Feature Uptake Status"::"Set up");
+                    if Rec.PowerAutomateFlowNotification then
+                        FeatureTelemetry.LogUptake('0000OK9', 'JobQueueFailedNotification-External ', Enum::"Feature Uptake Status"::"Set up");
+
                     GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"Job Queue Notification Wizard");
                     UpdateJobQueueNotificationSetup();
                     CurrPage.Close();
@@ -367,7 +380,8 @@ page 1179 "Job Queue Notification Wizard"
         VTAndBEEnabledLbl: Label 'Virtual tables and Business Events are enabled.';
         VTAndBEDisabledLbl: Label 'Virtual tables and Business Events are disabled.';
 #endif
-        CreateFlowFromTemplateLbl: Label 'Create an automated flow from Job Queue Notification template.';
+        CreateFlowFromTemplateTipLbl: Label 'You can set up automated flow to be used to notify users of Job Queue issues on Job Queue Entries page.';
+        CreateFlowFromTemplateLbl: Label 'Open Job Queue Entries page to create an automated flow for Job Queue failure notification.';
         Threshold1MustBeGreaterThanOrEqualTo0Err: Label 'Threshold 1 must be greater than or equal to 0.';
         Threshold2MustBeGreaterThanOrEqualTo0Err: Label 'Threshold 2 must be greater than or equal to 0.';
         Threshold1MustBeLessThanOrEqualToThreshold2Err: Label 'Threshold 1 must be less than or equal to Threshold 2.';
@@ -461,7 +475,12 @@ page 1179 "Job Queue Notification Wizard"
     end;
 
     trigger OnOpenPage()
+    var
+        FeatureTelemetry: Codeunit "Feature Telemetry";
     begin
+        FeatureTelemetry.LogUptake('0000OKA', 'JobQueueFailedNotification-InProd ', Enum::"Feature Uptake Status"::Discovered);
+        FeatureTelemetry.LogUptake('0000OKB', 'JobQueueFailedNotification-External ', Enum::"Feature Uptake Status"::Discovered);
+
         if Rec.IsEmpty() then
             Rec.Insert(true);
 

@@ -1,4 +1,8 @@
-﻿namespace Microsoft.FixedAssets.Ledger;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.FixedAssets.Ledger;
 
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Account;
@@ -538,6 +542,7 @@ codeunit 5601 "FA Insert G/L Account"
         DisposalEntryNo := TempFAGLPostBuf."Entry No.";
         FADeprBook.Get(FALedgEntry."FA No.", FALedgEntry."Depreciation Book Code");
         FADeprBook.CalcFields("Proceeds on Disposal", "Gain/Loss");
+        OnCalcDisposalAmountOnAfterCalcFields(FADeprBook);
         DisposalAmount := FADeprBook."Proceeds on Disposal";
         GainLossAmount := FADeprBook."Gain/Loss";
         FAPostingGr2.Get(FALedgEntry."FA Posting Group");
@@ -562,6 +567,7 @@ codeunit 5601 "FA Insert G/L Account"
     begin
         TempFAGLPostBuf.Get(DisposalEntryNo);
         FADeprBook.CalcFields("Gain/Loss");
+        OnCorrectDisposalEntryOnAfterCalcGainLoss(FADeprBook);
         LastDisposal := CalcLastDisposal(FADeprBook);
         if LastDisposal then
             GLAmount := GainLossAmount
@@ -953,6 +959,16 @@ codeunit 5601 "FA Insert G/L Account"
 
     [IntegrationEvent(false, false)]
     local procedure OnCorrectBookValueEntryOnAfterCheckIdenticalGainLossAmtSign(FADepreciationBook: Record "FA Depreciation Book"; FAPostingGroup: Record "FA Posting Group"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCalcDisposalAmountOnAfterCalcFields(var FADepreciationBook: Record "FA Depreciation Book")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCorrectDisposalEntryOnAfterCalcGainLoss(var FADepreciationBook: Record "FA Depreciation Book")
     begin
     end;
 }

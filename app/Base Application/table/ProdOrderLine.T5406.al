@@ -1,7 +1,12 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Manufacturing.Document;
 
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Warehouse.Activity;
 using Microsoft.Foundation.UOM;
 using Microsoft.Foundation.Navigate;
 using Microsoft.Inventory.Item;
@@ -45,7 +50,7 @@ table 5406 "Prod. Order Line"
         field(11; "Item No."; Code[20])
         {
             Caption = 'Item No.';
-            TableRelation = Item where(Type = const(Inventory));
+            TableRelation = Item where(Type = const(Inventory), "Production Blocked" = filter(<> Output));
 
             trigger OnValidate()
             var
@@ -124,7 +129,8 @@ table 5406 "Prod. Order Line"
         {
             Caption = 'Variant Code';
             TableRelation = "Item Variant".Code where("Item No." = field("Item No."),
-                                                       Code = field("Variant Code"));
+                                                       Code = field("Variant Code"),
+                                                       "Production Blocked" = filter(<> Output));
 
             trigger OnValidate()
             var
@@ -135,6 +141,7 @@ table 5406 "Prod. Order Line"
                 CalcFields("Reserved Quantity");
                 TestField("Reserved Quantity", 0);
                 ProdOrderWarehouseMgt.ProdOrderLineVerifyChange(Rec, xRec);
+                OnValidateVariantCodeOnAfterVerifyChange(Rec, xRec, CurrFieldNo);
 
                 ItemVariant.SetLoadFields(Blocked, Description, "Description 2");
                 if ItemVariant.Get("Item No.", "Variant Code") then begin
@@ -167,6 +174,7 @@ table 5406 "Prod. Order Line"
             begin
                 ProdOrderLineReserve.VerifyChange(Rec, xRec);
                 ProdOrderWarehouseMgt.ProdOrderLineVerifyChange(Rec, xRec);
+                ProdOrderWarehouseMgt.ValidateWarehousePutAwayLocation(Rec);
                 GetUpdateFromSKU();
                 GetDefaultBin();
                 OnValidateLocationCodeOnBeforeCreateDim(Rec);
@@ -722,6 +730,52 @@ table 5406 "Prod. Order Line"
             Caption = 'Unit Cost (ACY)';
             Editable = false;
         }
+        field(5850; "Qty. Put Away"; Decimal)
+        {
+            Caption = 'Qty. Put Away';
+            DecimalPlaces = 0 : 5;
+            Editable = false;
+        }
+        field(5851; "Qty. Put Away (Base)"; Decimal)
+        {
+            Caption = 'Qty. Put Away (Base)';
+            DecimalPlaces = 0 : 5;
+            Editable = false;
+        }
+        field(5852; "Put-away Qty."; Decimal)
+        {
+            CalcFormula = sum("Warehouse Activity Line"."Qty. Outstanding" where("Activity Type" = const("Put-away"),
+                                                                                  "Whse. Document Type" = const(Production),
+                                                                                  "Whse. Document No." = field("Prod. Order No."),
+                                                                                  "Whse. Document Line No." = field("Line No."),
+                                                                                  "Unit of Measure Code" = field("Unit of Measure Code"),
+                                                                                  "Action Type" = filter(" " | Take),
+                                                                                  "Original Breakbulk" = const(false)));
+            Caption = 'Put-away Qty.';
+            DecimalPlaces = 0 : 5;
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(5853; "Put-away Qty. (Base)"; Decimal)
+        {
+            CalcFormula = sum("Warehouse Activity Line"."Qty. Outstanding (Base)" where("Activity Type" = const("Put-away"),
+                                                                                         "Whse. Document Type" = const(Production),
+                                                                                         "Whse. Document No." = field("Prod. Order No."),
+                                                                                         "Whse. Document Line No." = field("Line No."),
+                                                                                         "Action Type" = filter(" " | Take),
+                                                                                         "Original Breakbulk" = const(false)));
+            Caption = 'Put-away Qty. (Base)';
+            DecimalPlaces = 0 : 5;
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(66; "Put-away Status"; Option)
+        {
+            Caption = 'Status';
+            Editable = false;
+            OptionCaption = ' ,Partially Put Away,Completely Put Away';
+            OptionMembers = " ","Partially Put Away","Completely Put Away";
+        }
         field(99000750; "Production BOM Version Code"; Code[20])
         {
             Caption = 'Production BOM Version Code';
@@ -1128,6 +1182,17 @@ table 5406 "Prod. Order Line"
 
         Item.Get("Item No.");
         OnAfterGetItem(Item, Rec);
+    end;
+
+    procedure GetLineStatus(): Integer
+    begin
+        if "Qty. Put Away" > 0 then
+            if "Qty. Put Away" < "Finished Quantity" then
+                "Put-away Status" := "Put-away Status"::"Partially Put Away"
+            else
+                "Put-away Status" := "Put-away Status"::"Completely Put Away";
+
+        exit("Put-away Status");
     end;
 
     local procedure GetSKU() Result: Boolean
@@ -1594,6 +1659,12 @@ table 5406 "Prod. Order Line"
         CalledFromHeader := Suspend;
     end;
 
+    procedure GetRemainingPutAwayQty(): Decimal
+    begin
+        Rec.CalcFields("Put-away Qty. (Base)");
+        exit(Rec."Finished Qty. (Base)" - (Rec."Put-away Qty. (Base)" + Rec."Qty. Put Away (Base)"));
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitDefaultDimensionSources(var ProdOrderLine: Record "Prod. Order Line"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; CallingFieldNo: Integer)
     begin
@@ -1801,6 +1872,11 @@ table 5406 "Prod. Order Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnShowDimensionsOnAfterEditDimensionSet(var ProdOrderLine: Record "Prod. Order Line"; OldDimSetID: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateVariantCodeOnAfterVerifyChange(var ProdOrderLine: Record "Prod. Order Line"; xProdOrderLine: Record "Prod. Order Line"; CurrFieldNo: Integer)
     begin
     end;
 }

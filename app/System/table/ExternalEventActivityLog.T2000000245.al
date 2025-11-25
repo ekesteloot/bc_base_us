@@ -37,6 +37,16 @@ table 2000000245 "External Event Activity Log"
         {
             Caption = 'Activity Message';
         }
+        field(6; "Company Id"; Guid)
+        {
+            DataClassification = OrganizationIdentifiableInformation;
+            Caption = 'Company Id';
+        }
+        field(7; "Company Name"; Text[30])
+        {
+            DataClassification = OrganizationIdentifiableInformation;
+            Caption = 'Company Name';
+        }
     }
 
     keys

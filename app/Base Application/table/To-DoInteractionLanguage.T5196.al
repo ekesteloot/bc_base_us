@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.CRM.Task;
 
 using Microsoft.CRM.Interaction;
@@ -157,6 +161,8 @@ table 5196 "To-do Interaction Language"
                         Attachment.ExportAttachmentToServerFile(FileName);
                 end;
 
+            OnImportAttachmentOnAfterExportAttachmentToServerFile(Rec, Attachment, TempAttachment, MarketingSetup, FileName);
+
             Attachment."Storage Type" := TempAttachment."Storage Type";
             Attachment."Storage Pointer" := TempAttachment."Storage Pointer";
             Attachment."Attachment File" := TempAttachment."Attachment File";
@@ -200,6 +206,11 @@ table 5196 "To-do Interaction Language"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeOpenAttachment(var TodoInteractionLanguage: Record "To-do Interaction Language"; var PageNotEditable: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnImportAttachmentOnAfterExportAttachmentToServerFile(var TodoInteractionLanguage: Record "To-do Interaction Language"; var Attachment: Record Attachment; var TempAttachment: Record Attachment temporary; var MarketingSetup: Record "Marketing Setup"; var FileName: Text)
     begin
     end;
 }

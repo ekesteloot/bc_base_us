@@ -246,17 +246,6 @@ page 27 "Vendor List"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the sum of payments paid to the vendor.';
                 }
-#if not CLEAN23
-                field("Coupled to CRM"; Rec."Coupled to CRM")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies that the vendor is coupled to an account in Dataverse.';
-                    Visible = false;
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by flow field Coupled to Dataverse';
-                    ObsoleteTag = '23.0';
-                }
-#endif
                 field("Coupled to Dataverse"; Rec."Coupled to Dataverse")
                 {
                     ApplicationArea = All;
@@ -1314,6 +1303,7 @@ page 27 "Vendor List"
                     end;
                 }
 #endif
+#if not CLEAN25
                 action("Vendor - Top 10 List")
                 {
                     ApplicationArea = Suite;
@@ -1325,6 +1315,7 @@ page 27 "Vendor List"
                     ObsoleteState = Pending;
                     ObsoleteTag = '25.0';
                 }
+#endif
             }
             group(Action5)
             {
