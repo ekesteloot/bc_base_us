@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Security.User;
 #if not CLEAN24
 using System.Environment.Configuration;
+using System.Environment;
 #endif
 
 page 20 "General Ledger Entries"
@@ -162,6 +163,15 @@ page 20 "General Ledger Entries"
                     ApplicationArea = Basic, Suite;
                     Editable = false;
                     ToolTip = 'Specifies the source currency amount for general ledger entries.';
+#if not CLEAN24
+                    Visible = SourceCurrencyVisible;
+#endif
+                }
+                field("Source Currency VAT Amount"; Rec."Source Currency VAT Amount")
+                {
+                    ApplicationArea = VAT;
+                    Editable = false;
+                    ToolTip = 'Specifies the source currency VAT amount for general ledger entries.';
 #if not CLEAN24
                     Visible = SourceCurrencyVisible;
 #endif
@@ -388,6 +398,7 @@ page 20 "General Ledger Entries"
             {
                 ApplicationArea = Basic, Suite;
                 ShowFilter = false;
+                UpdatePropagation = Both;
                 SubPageLink = "Posting Date" = field("Posting Date"), "Document No." = field("Document No.");
             }
             part(GLEntriesPart; "G/L Entries Part")
@@ -789,6 +800,7 @@ page 20 "General Ledger Entries"
     var
         GLSetup: Record "General Ledger Setup";
 #if not CLEAN24
+        ClientTypeManagement: Codeunit "Client Type Management";
         FeatureKeyManagement: Codeunit "Feature Key Management";
 #endif
     begin
@@ -796,7 +808,11 @@ page 20 "General Ledger Entries"
         AmountVisible := not (GLSetup."Show Amounts" = GLSetup."Show Amounts"::"Debit/Credit Only");
         DebitCreditVisible := not (GLSetup."Show Amounts" = GLSetup."Show Amounts"::"Amount Only");
 #if not CLEAN24
-        SourceCurrencyVisible := FeatureKeyManagement.IsGLCurrencyRevaluationEnabled();
+        if ClientTypeManagement.GetCurrentClientType() in [CLIENTTYPE::SOAP, CLIENTTYPE::OData, CLIENTTYPE::ODataV4, ClientType::Api]
+        then
+            SourceCurrencyVisible := false
+        else
+            SourceCurrencyVisible := FeatureKeyManagement.IsGLCurrencyRevaluationEnabled();
 #endif
     end;
 

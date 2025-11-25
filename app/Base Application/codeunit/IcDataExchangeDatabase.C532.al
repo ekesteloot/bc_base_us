@@ -298,6 +298,8 @@ codeunit 532 "IC Data Exchange Database" implements "IC Data Exchange"
         MoveICTransToPartnerComp: Report "Move IC Trans. to Partner Comp";
 #endif
         FeatureTelemetry: Codeunit "Feature Telemetry";
+        ICMapping: Codeunit "IC Mapping";
+        CustomDimensions: Dictionary of [Text, Text];
     begin
         if not PartnerInboxTransaction.ChangeCompany(ICPartner."Inbox Details") then
             Error(FailedToChangeCompanyErr, PartnerInboxTransaction.TableCaption, ICPartner.Name);
@@ -308,7 +310,8 @@ codeunit 532 "IC Data Exchange Database" implements "IC Data Exchange"
         if not TempICPartnerICInboxTransaction.IsEmpty() then begin
             TempICPartnerICInboxTransaction.FindSet();
             repeat
-                FeatureTelemetry.LogUsage('0000LKS', ICDataExchangeDatabaseFeatureTelemetryNameTok, StrSubstNo(SentTransactionTelemetryTxt, ICPartner.Code, TempICPartnerICInboxTransaction."IC Partner Code"));
+                CustomDimensions.Add('Transaction Details', StrSubstNo(SentTransactionTelemetryTxt, ICPartner.Code, TempICPartnerICInboxTransaction."IC Partner Code"));
+                FeatureTelemetry.LogUsage('0000LKS', ICMapping.GetFeatureTelemetryName(), ICDataExchangeDatabaseFeatureTelemetryNameTok, CustomDimensions);
                 PartnerInboxTransaction.TransferFields(TempICPartnerICInboxTransaction, true);
 #if not CLEAN23
                 MoveICTransToPartnerComp.OnTransferToPartnerOnBeforePartnerInboxTransactionInsert(PartnerInboxTransaction, ICPartner);
@@ -506,9 +509,10 @@ codeunit 532 "IC Data Exchange Database" implements "IC Data Exchange"
         if not JobQueueEntry.ReadPermission() then
             Error(MissingPermissionToReadTableErr, JobQueueEntry.TableCaption, ICPartner.Name);
 
-        JobQueueEntry.Init();
         JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
         JobQueueEntry."Object ID to Run" := Codeunit::"IC Inbox Outbox Subs. Runner";
+        JobQueueEntry."Maximum No. of Attempts to Run" := 3;
+        JobQueueEntry."Recurring Job" := false;
         JobQueueEntry."Record ID to Process" := ICInboxTransaction.RecordId;
         JobQueueEntry."Job Queue Category Code" := JobQueueCategoryCodeTxt;
         JobQueueEntry."Run in User Session" := false;

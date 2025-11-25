@@ -14,6 +14,7 @@ using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Finance.SalesTax;
 using Microsoft.Finance.VAT.Setup;
+using Microsoft.EServices.EDocument;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Company;
@@ -49,7 +50,6 @@ using System.Reflection;
 using System.Security.User;
 using System.Threading;
 using System.Utilities;
-using Microsoft.eServices.EDocument;
 
 table 5900 "Service Header"
 {
@@ -310,6 +310,9 @@ table 5900 "Service Header"
 
                 if not SkipBillToContact then
                     UpdateBillToCont("Bill-to Customer No.");
+		    
+                if Rec."Customer No." <> Rec."Bill-to Customer No." then
+                    UpdateShipToSalespersonCode();		    
 
                 if xRec."Bill-to Customer No." <> "Bill-to Customer No." then
                     CopyCFDIFieldsFromCustomer();
@@ -1653,6 +1656,23 @@ table 5900 "Service Header"
                     InitVATDate();
             end;
         }
+        field(165; "Incoming Document Entry No."; Integer)
+        {
+            Caption = 'Incoming Document Entry No.';
+            TableRelation = "Incoming Document";
+
+            trigger OnValidate()
+            var
+                IncomingDocument: Record "Incoming Document";
+            begin
+                if "Incoming Document Entry No." = xRec."Incoming Document Entry No." then
+                    exit;
+                if "Incoming Document Entry No." = 0 then
+                    IncomingDocument.RemoveReferenceToWorkingDocument(xRec."Incoming Document Entry No.")
+                else
+                    IncomingDocument.SetServiceDoc(Rec);
+            end;
+        }
         field(178; "Journal Templ. Name"; Code[10])
         {
             Caption = 'Journal Template Name';
@@ -2629,6 +2649,9 @@ table 5900 "Service Header"
         {
             MaintainSQLIndex = false;
         }
+        key(Key9; "Incoming Document Entry No.")
+        {
+        }
     }
 
     fieldgroups
@@ -2665,6 +2688,7 @@ table 5900 "Service Header"
         if not IsHandled then
             ServPost.DeleteHeader(Rec, ServShptHeader, ServInvHeader, ServCrMemoHeader);
         Validate("Applies-to ID", '');
+        Rec.Validate("Incoming Document Entry No.", 0);
 
         ServLine.Reset();
         ServLine.LockTable();
@@ -3028,6 +3052,7 @@ table 5900 "Service Header"
         OldDimSetID := "Dimension Set ID";
         DimMgt.ValidateShortcutDimValues(FieldNumber, ShortcutDimCode, "Dimension Set ID");
 
+        OnValidateShortcutDimCodeOnBeforeUpdateUpdateAllLineDim(Rec, xRec);
         if ServItemLineExists() or ServLineExists() then
             UpdateAllLineDim("Dimension Set ID", OldDimSetID);
 
@@ -3866,9 +3891,9 @@ table 5900 "Service Header"
                 NoSeriesMgt.RaiseObsoleteOnBeforeInitSeries("No. Series", xRec."No. Series", "Posting Date", "No.", "No. Series", IsHandled);
                 if not IsHandled then begin
 #endif
-                if NoSeries.AreRelated("No. Series", xRec."No. Series") then
-                    "No. Series" := xRec."No. Series";
-                "No." := NoSeries.GetNextNo("No. Series", "Posting Date");
+                    if NoSeries.AreRelated("No. Series", xRec."No. Series") then
+                        "No. Series" := xRec."No. Series";
+                    "No." := NoSeries.GetNextNo("No. Series", "Posting Date");
 #if not CLEAN24
                     NoSeriesMgt.RaiseObsoleteOnAfterInitSeries("No. Series", GetNoSeriesCode(), "Posting Date", "No.");
                 end;
@@ -4828,6 +4853,7 @@ table 5900 "Service Header"
     procedure UpdateShipToSalespersonCode()
     var
         ShipToAddress: Record "Ship-to Address";
+        SalespersonCode: Code[20];
         IsHandled: Boolean;
         IsSalesPersonCodeAssigned: Boolean;
     begin
@@ -4840,7 +4866,8 @@ table 5900 "Service Header"
             ShipToAddress.SetLoadFields("Salesperson Code");
             ShipToAddress.Get("Customer No.", "Ship-to Code");
             if ShipToAddress."Salesperson Code" <> '' then begin
-                SetSalespersonCode(ShipToAddress."Salesperson Code", "Salesperson Code");
+                SetSalespersonCode(ShipToAddress."Salesperson Code", SalespersonCode);
+                Validate("Salesperson Code", SalespersonCode);
                 IsSalesPersonCodeAssigned := true;
             end;
         end;
@@ -4851,7 +4878,10 @@ table 5900 "Service Header"
             if not IsHandled then
                 if ("Bill-to Customer No." <> '') then begin
                     GetCust("Bill-to Customer No.");
-                    SetSalespersonCode(Cust."Salesperson Code", "Salesperson Code");
+                    SetSalespersonCode(Cust."Salesperson Code", SalespersonCode);
+                    Validate("Salesperson Code", SalespersonCode);
+                    if Rec."Customer No." <> '' then
+                        GetCust(Rec."Customer No.");
                 end else
                     SetDefaultSalesperson();
         end;
@@ -5687,6 +5717,11 @@ table 5900 "Service Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnValidateBillToCustomerNoOnBeforeRecreateServLines(var ServiceHeader: Record "Service Header"; xServiceHeader: Record "Service Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateShortcutDimCodeOnBeforeUpdateUpdateAllLineDim(var ServiceHeader: Record "Service Header"; xServiceHeader: Record "Service Header");
     begin
     end;
 

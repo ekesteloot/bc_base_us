@@ -78,6 +78,11 @@ table 475 "Vendor Payment Buffer"
             Caption = 'Vendor Posting Group';
             DataClassification = SystemMetadata;
         }
+        field(20; "Ledg. Entry System Id"; Guid)
+        {
+            Caption = 'Ledg. Entry System Id';
+            DataClassification = SystemMetadata;
+        }
         field(170; "Creditor No."; Code[20])
         {
             Caption = 'Creditor No.';
@@ -147,6 +152,7 @@ table 475 "Vendor Payment Buffer"
         "Remit-to Code" := VendorLedgerEntry."Remit-to Code";
 
         OnCopyFieldsFromVendorLedgerEntry(VendorLedgerEntry, Rec);
+        OnAfterCopyFieldsFromVendorLedgerEntry(VendorLedgerEntry, Rec);
     end;
 
     procedure CopyFieldsToGenJournalLine(var GenJournalLine: Record "Gen. Journal Line")
@@ -159,6 +165,7 @@ table 475 "Vendor Payment Buffer"
         GenJournalLine."Remit-to Code" := "Remit-to Code";
 
         OnCopyFieldsToGenJournalLine(Rec, GenJournalLine);
+        OnAfterCopyFieldsToGenJournalLine(Rec, GenJournalLine);
     end;
 
 #if not CLEAN22
@@ -176,6 +183,16 @@ table 475 "Vendor Payment Buffer"
 
     [IntegrationEvent(false, false)]
     local procedure OnCopyFieldsToGenJournalLine(PaymentBufferSource: Record "Vendor Payment Buffer"; var GenJournalLineTarget: Record "Gen. Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCopyFieldsFromVendorLedgerEntry(VendorLedgerEntrySource: Record "Vendor Ledger Entry"; var VendorPaymentBufferTarget: Record "Vendor Payment Buffer")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCopyFieldsToGenJournalLine(VendorPaymentBufferSource: Record "Vendor Payment Buffer"; var GenJournalLineTarget: Record "Gen. Journal Line")
     begin
     end;
 }

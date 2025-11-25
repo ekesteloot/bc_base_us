@@ -745,7 +745,7 @@ report 595 "Adjust Exchange Rates"
             exit;
 
         if not EnvironmentInformation.IsOnPrem() then
-            if FeatureKeyManagement.IsExtensibleExchangeRateAdjustmentEnabled() then begin
+            if FeatureKeyManagement.IsExtensibleExchangeRateAdjustmentEnabled(false) then begin
                 Report.Run(Report::"Exch. Rate Adjustment");
                 CurrReport.Quit();
             end;

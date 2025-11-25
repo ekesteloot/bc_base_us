@@ -101,16 +101,16 @@ page 837 "Reminder Terms List"
 
                 trigger OnAction()
                 var
-                    ReminderHeader: Record "Reminder Header";
+                    IssuedReminderHeader: Record "Issued Reminder Header";
                 begin
-                    FilterIssuedRemindersBasedOnSelectedReminderTerms(ReminderHeader);
-                    Page.Run(Page::"Issued Reminder List", ReminderHeader);
+                    FilterIssuedRemindersBasedOnSelectedReminderTerms(IssuedReminderHeader);
+                    Page.Run(Page::"Issued Reminder List", IssuedReminderHeader);
                 end;
             }
             action(TransferOldTexts)
             {
                 ApplicationArea = Basic, Suite;
-                Caption = 'Transfer old texts';
+                Caption = 'Transfer texts';
                 Image = Reminder;
                 Tooltip = 'Copy the existing reminder text and translations to the new communication tables.';
 
@@ -174,7 +174,7 @@ page 837 "Reminder Terms List"
             ReminderHeader.FindSet();
     end;
 
-    local procedure FilterIssuedRemindersBasedOnSelectedReminderTerms(var ReminderHeader: Record "Reminder Header")
+    local procedure FilterIssuedRemindersBasedOnSelectedReminderTerms(var IssuedReminderHeader: Record "Issued Reminder Header")
     var
         ReminderTerms: Record "Reminder Terms";
         RemindersTermCodeFilter: Text;
@@ -194,9 +194,9 @@ page 837 "Reminder Terms List"
             else
                 RemindersTermCodeFilter += '|' + ReminderTerms.Code;
         until ReminderTerms.Next() = 0;
-        ReminderHeader.SetFilter("Reminder Terms Code", RemindersTermCodeFilter);
-        if not ReminderHeader.IsEmpty() then
-            ReminderHeader.FindSet();
+        IssuedReminderHeader.SetFilter("Reminder Terms Code", RemindersTermCodeFilter);
+        if not IssuedReminderHeader.IsEmpty() then
+            IssuedReminderHeader.FindSet();
     end;
 }
 

@@ -791,6 +791,7 @@ report 393 "Suggest Vendor Payments"
                                 TempVendorPaymentBuffer."Applies-to Ext. Doc. No." := '';
                                 if TempVendorPaymentBuffer.Find() then begin
                                     TempVendorPaymentBuffer.Amount := TempVendorPaymentBuffer.Amount + TempPayableVendorLedgerEntry.Amount;
+                                    TempVendorPaymentBuffer.Validate("Vendor Ledg. Entry Doc. Type", VendLedgEntry."Document Type");
                                     OnMakeGenJnlLinesOnBeforeVendorPaymentBufferModify(TempVendorPaymentBuffer, VendLedgEntry);
 #if not CLEAN22
                                     TempPaymentBuffer.CopyFieldsFromVendorPaymentBuffer(TempVendorPaymentBuffer);
@@ -803,6 +804,7 @@ report 393 "Suggest Vendor Payments"
                                     if DocNoPerLine then
                                         RunIncrementDocumentNo(true);
                                     TempVendorPaymentBuffer.Amount := TempPayableVendorLedgerEntry.Amount;
+                                    TempVendorPaymentBuffer.Validate("Vendor Ledg. Entry Doc. Type", VendLedgEntry."Document Type");
                                     Window2.Update(1, VendLedgEntry."Vendor No.");
                                     OnMakeGenJnlLinesOnBeforeVendorPaymentBufferInsert(TempVendorPaymentBuffer, VendLedgEntry, TempPayableVendorLedgerEntry);
 #if not CLEAN22
@@ -816,6 +818,7 @@ report 393 "Suggest Vendor Payments"
                             end else begin
                                 TempVendorPaymentBuffer."Vendor Ledg. Entry Doc. Type" := VendLedgEntry."Document Type";
                                 TempVendorPaymentBuffer."Vendor Ledg. Entry Doc. No." := VendLedgEntry."Document No.";
+                                TempVendorPaymentBuffer."Ledg. Entry System Id" := VendLedgEntry.SystemId;
                                 TempVendorPaymentBuffer."Global Dimension 1 Code" := VendLedgEntry."Global Dimension 1 Code";
                                 TempVendorPaymentBuffer."Global Dimension 2 Code" := VendLedgEntry."Global Dimension 2 Code";
                                 TempVendorPaymentBuffer."Dimension Set ID" := VendLedgEntry."Dimension Set ID";
@@ -923,6 +926,7 @@ report 393 "Suggest Vendor Payments"
         GenJnlLine.Validate(Amount, TempVendorPaymentBuffer.Amount);
         GenJnlLine."Applies-to Doc. Type" := TempVendorPaymentBuffer."Vendor Ledg. Entry Doc. Type";
         GenJnlLine."Applies-to Doc. No." := TempVendorPaymentBuffer."Vendor Ledg. Entry Doc. No.";
+        GenJnlLine."Applies-to Invoice Id" := TempVendorPaymentBuffer."Ledg. Entry System Id";
         GenJnlLine."Payment Method Code" := TempVendorPaymentBuffer."Payment Method Code";
         GenJnlLine."Remit-to Code" := TempVendorPaymentBuffer."Remit-to Code";
 
@@ -1221,9 +1225,9 @@ report 393 "Suggest Vendor Payments"
 
     local procedure IsNotAppliedEntry(GenJournalLine: Record "Gen. Journal Line"; VendorLedgerEntry: Record "Vendor Ledger Entry"): Boolean
     begin
-        exit(
-          IsNotAppliedToCurrentBatchLine(GenJournalLine, VendorLedgerEntry) and
-          IsNotAppliedToOtherBatchLine(GenJournalLine, VendorLedgerEntry));
+        if not IsNotAppliedToCurrentBatchLine(GenJournalLine, VendorLedgerEntry) then
+            exit(false);
+        exit(IsNotAppliedToOtherBatchLine(GenJournalLine, VendorLedgerEntry));
     end;
 
     local procedure IsNotAppliedToCurrentBatchLine(GenJournalLine: Record "Gen. Journal Line"; VendorLedgerEntry: Record "Vendor Ledger Entry"): Boolean

@@ -947,14 +947,18 @@ table 5409 "Prod. Order Routing Line"
     end;
 
     local procedure WorkCenterTransferFields()
+    var
+        SkipUpdateDescription: Boolean;
     begin
+        OnBeforeWorkCenterTransferFields(Rec, WorkCenter, SkipUpdateDescription);
         "Work Center No." := WorkCenter."No.";
         "Work Center Group Code" := WorkCenter."Work Center Group Code";
         "Setup Time Unit of Meas. Code" := WorkCenter."Unit of Measure Code";
         "Run Time Unit of Meas. Code" := WorkCenter."Unit of Measure Code";
         "Wait Time Unit of Meas. Code" := WorkCenter."Unit of Measure Code";
         "Move Time Unit of Meas. Code" := WorkCenter."Unit of Measure Code";
-        Description := WorkCenter.Name;
+        if not SkipUpdateDescription then
+            Description := WorkCenter.Name;
         "Flushing Method" := WorkCenter."Flushing Method";
         "Unit Cost per" := WorkCenter."Unit Cost";
         "Direct Unit Cost" := WorkCenter."Direct Unit Cost";
@@ -966,11 +970,16 @@ table 5409 "Prod. Order Routing Line"
     end;
 
     local procedure MachineCtrTransferFields()
+    var
+        SkipUpdateDescription: Boolean;
     begin
         WorkCenter.Get(MachineCenter."Work Center No.");
         WorkCenterTransferFields();
 
-        Description := MachineCenter.Name;
+        SkipUpdateDescription := false;
+        OnMachineCtrTransferFieldsOnAfterWorkCenterTransferFields(Rec, WorkCenter, MachineCenter, SkipUpdateDescription);
+        if not SkipUpdateDescription then
+            Description := MachineCenter.Name;
         "Setup Time" := MachineCenter."Setup Time";
         "Wait Time" := MachineCenter."Wait Time";
         "Move Time" := MachineCenter."Move Time";
@@ -1095,8 +1104,15 @@ table 5409 "Prod. Order Routing Line"
         OnAfterSetRecalcStatus(Rec, ProdOrderLine);
     end;
 
-    procedure RunTimePer(): Decimal
+    procedure RunTimePer() Result: Decimal
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeRunTimePer(Rec, IsHandled, Result);
+        if IsHandled then
+            exit(Result);
+
         if "Lot Size" = 0 then
             "Lot Size" := 1;
 
@@ -1710,6 +1726,21 @@ table 5409 "Prod. Order Routing Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnCalculateRoutingForwardOnAfterCalculateProdOrderDates(var ProdOrderRoutingLine: Record "Prod. Order Routing Line"; var ProdOrderLine: Record "Prod. Order Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeRunTimePer(var ProdOrderRoutingLine: Record "Prod. Order Routing Line"; var IsHandled: Boolean; var Result: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnMachineCtrTransferFieldsOnAfterWorkCenterTransferFields(var ProdOrderRoutingLine: Record "Prod. Order Routing Line"; WorkCenter: Record "Work Center"; MachineCenter: Record "Machine Center"; var SkipUpdateDescription: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeWorkCenterTransferFields(var ProdOrderRoutingLine: Record "Prod. Order Routing Line"; WorkCenter: Record "Work Center"; var SkipUpdateDescription: Boolean)
     begin
     end;
 }

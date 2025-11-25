@@ -289,8 +289,7 @@ codeunit 13 "Gen. Jnl.-Post Batch"
         if GLRegNo <> 0 then
             UpdateAndDeleteLines(GenJnlLine);
 
-        if GenJnlBatch."No. Series" <> '' then
-            NoSeriesBatch.SaveState();
+        NoSeriesBatch.SaveState();
 
         DeleteDimBalBatch(GenJnlLine, true);
 
@@ -348,7 +347,8 @@ codeunit 13 "Gen. Jnl.-Post Batch"
             if GenJnlTemplate."Force Doc. Balance" then
                 GenJnlLine.SetCurrentKey("Document No.", "Posting Date")
             else
-                GenJnlLine.SetCurrentKey("Journal Template Name", "Journal Batch Name", "Bal. Account No.");
+                if CheckIfDiffPostingDatesExist(GenJnlBatch, GenJnlLine."Posting Date") then
+                    GenJnlLine.SetCurrentKey("Journal Template Name", "Journal Batch Name", "Bal. Account No.");
         LineCount := 0;
         LastDate := 0D;
         LastDocType := LastDocType::" ";
@@ -831,18 +831,23 @@ codeunit 13 "Gen. Jnl.-Post Batch"
     end;
 
     local procedure CheckDocumentNo(var GenJnlLine2: Record "Gen. Journal Line")
+    var
+        IsHandled: Boolean;
     begin
-        if GenJnlLine2."Posting No. Series" = '' then
-            GenJnlLine2."Posting No. Series" := GenJnlBatch."No. Series"
-        else
-            if not GenJnlLine2.EmptyLine() then
-                if ShouldSetDocNoToLastPosted(GenJnlLine2) then
-                    GenJnlLine2."Document No." := LastPostedDocNo
-                else begin
-                    LastDocNo := GenJnlLine2."Document No.";
-                    GenJnlLine2."Document No." := NoSeriesBatch.GetNextNo(GenJnlLine2."Posting No. Series", GenJnlLine2."Posting Date");
-                    LastPostedDocNo := GenJnlLine2."Document No.";
-                end;
+        IsHandled := false;
+        OnBeforeCheckDocumentNo(GenJnlLine2, LastDocNo, LastPostedDocNo, NoSeriesBatch, IsHandled);
+        if not IsHandled then
+            if GenJnlLine2."Posting No. Series" = '' then
+                GenJnlLine2."Posting No. Series" := GenJnlBatch."No. Series"
+            else
+                if not GenJnlLine2.EmptyLine() then
+                    if ShouldSetDocNoToLastPosted(GenJnlLine2) then
+                        GenJnlLine2."Document No." := LastPostedDocNo
+                    else begin
+                        LastDocNo := GenJnlLine2."Document No.";
+                        GenJnlLine2."Document No." := NoSeriesBatch.GetNextNo(GenJnlLine2."Posting No. Series", GenJnlLine2."Posting Date");
+                        LastPostedDocNo := GenJnlLine2."Document No.";
+                    end;
         OnAfterCheckDocumentNo(GenJnlLine2, LastDocNo, LastPostedDocNo);
     end;
 
@@ -986,11 +991,17 @@ codeunit 13 "Gen. Jnl.-Post Batch"
     end;
 
     local procedure CopyGenJnlLineBalancingData(var GenJnlLineTo: Record "Gen. Journal Line"; var GenJnlLineFrom: Record "Gen. Journal Line")
+    var
+        IsHandled: Boolean;
     begin
-        GenJnlLineTo."Bill-to/Pay-to No." := GenJnlLineFrom."Bill-to/Pay-to No.";
-        GenJnlLineTo."Ship-to/Order Address Code" := GenJnlLineFrom."Ship-to/Order Address Code";
-        GenJnlLineTo."VAT Registration No." := GenJnlLineFrom."VAT Registration No.";
-        GenJnlLineTo."Country/Region Code" := GenJnlLineFrom."Country/Region Code";
+        IsHandled := false;
+        OnBeforeCopyGenJnlLineBalancingData(IsHandled, GenJnlLineTo, GenJnlLineFrom);
+        if not IsHandled then begin
+            GenJnlLineTo."Bill-to/Pay-to No." := GenJnlLineFrom."Bill-to/Pay-to No.";
+            GenJnlLineTo."Ship-to/Order Address Code" := GenJnlLineFrom."Ship-to/Order Address Code";
+            GenJnlLineTo."VAT Registration No." := GenJnlLineFrom."VAT Registration No.";
+            GenJnlLineTo."Country/Region Code" := GenJnlLineFrom."Country/Region Code";
+        end;
 
         OnAfterCopyGenJnlLineBalancingData(GenJnlLineTo, GenJnlLineFrom);
     end;
@@ -1860,6 +1871,17 @@ codeunit 13 "Gen. Jnl.-Post Batch"
         end;
     end;
 
+    local procedure CheckIfDiffPostingDatesExist(GenJournalBatch: Record "Gen. Journal Batch"; PostingDate: Date): Boolean
+    var
+        GenJournalLine: Record "Gen. Journal Line";
+    begin
+        GenJournalLine.SetLoadFields("Journal Template Name", "Journal Batch Name", "Posting Date");
+        GenJournalLine.SetRange("Journal Template Name", GenJournalBatch."Journal Template Name");
+        GenJournalLine.SetRange("Journal Batch Name", GenJournalBatch.Name);
+        GenJournalLine.SetFilter("Posting Date", '<>%1', PostingDate);
+        exit(not GenJournalLine.IsEmpty());
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterCheckDocumentNo(var GenJournalLine: Record "Gen. Journal Line"; LastDocNo: code[20]; LastPostedDocNo: code[20])
     begin
@@ -2207,6 +2229,16 @@ codeunit 13 "Gen. Jnl.-Post Batch"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCalcReversePostingDate(var GenJournalLine: Record "Gen. Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCopyGenJnlLineBalancingData(var IsHandled: Boolean; GenJnlLineTo: Record "Gen. Journal Line"; GenJnlLineFrom: Record "Gen. Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckDocumentNo(var GenJournalLine: Record "Gen. Journal Line"; var LastDocumentNo: code[20]; var LastPostedDocumentNo: code[20]; var NoSeriesBatch: Codeunit "No. Series - Batch"; var IsHandled: Boolean)
     begin
     end;
 }

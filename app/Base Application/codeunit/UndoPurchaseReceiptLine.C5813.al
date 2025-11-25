@@ -184,9 +184,13 @@ codeunit 5813 "Undo Purchase Receipt Line"
             PurchRcptLine.TestField("Sales Order Line No.", 0);
 
             UndoPostingMgt.TestPurchRcptLine(PurchRcptLine);
-            UndoPostingMgt.CollectItemLedgEntries(TempItemLedgEntry, DATABASE::"Purch. Rcpt. Line",
-              PurchRcptLine."Document No.", PurchRcptLine."Line No.", PurchRcptLine."Quantity (Base)", PurchRcptLine."Item Rcpt. Entry No.");
-            UndoPostingMgt.CheckItemLedgEntries(TempItemLedgEntry, PurchRcptLine."Line No.", PurchRcptLine."Qty. Rcd. Not Invoiced" <> PurchRcptLine.Quantity);
+            IsHandled := false;
+            OnCheckPurchRcptLineOnBeforeCollectItemLedgEntries(PurchRcptLine, TempItemLedgEntry, IsHandled);
+            if not IsHandled then begin
+                UndoPostingMgt.CollectItemLedgEntries(TempItemLedgEntry, DATABASE::"Purch. Rcpt. Line",
+                  PurchRcptLine."Document No.", PurchRcptLine."Line No.", PurchRcptLine."Quantity (Base)", PurchRcptLine."Item Rcpt. Entry No.");
+                UndoPostingMgt.CheckItemLedgEntries(TempItemLedgEntry, PurchRcptLine."Line No.", PurchRcptLine."Qty. Rcd. Not Invoiced" <> PurchRcptLine.Quantity);
+            end;
         end;
     end;
 
@@ -233,7 +237,7 @@ codeunit 5813 "Undo Purchase Receipt Line"
         NewDocLineNo: Integer;
     begin
         IsHandled := false;
-        OnBeforePostItemJnlLine(PurchRcptLine, DocLineNo, ItemLedgEntryNo, IsHandled, NewDocLineNo);
+        OnBeforePostItemJnlLine(PurchRcptLine, DocLineNo, ItemLedgEntryNo, IsHandled, NewDocLineNo, TempWhseJnlLine);
         if NewDocLineNo > DocLineNo then
             DocLineNo := NewDocLineNo;
         if IsHandled then
@@ -276,7 +280,9 @@ codeunit 5813 "Undo Purchase Receipt Line"
         ItemJnlLine.Quantity := -(PurchRcptLine.Quantity - PurchRcptLine."Quantity Invoiced");
         ItemJnlLine."Quantity (Base)" := -(PurchRcptLine."Quantity (Base)" - PurchRcptLine."Qty. Invoiced (Base)");
 
-        OnAfterCopyItemJnlLineFromPurchRcpt(ItemJnlLine, PurchRcptHeader, PurchRcptLine, WhseUndoQty);
+        OnAfterCopyItemJnlLineFromPurchRcpt(ItemJnlLine, PurchRcptHeader, PurchRcptLine, WhseUndoQty, ItemLedgEntryNo, NextLineNo, TempWhseJnlLine, TempGlobalItemLedgEntry, TempGlobalItemEntryRelation, IsHandled);
+        if IsHandled then
+            exit(ItemLedgEntryNo);
 
         WhseUndoQty.InsertTempWhseJnlLine(ItemJnlLine,
           DATABASE::"Purchase Line", PurchLine."Document Type"::Order.AsInteger(), PurchRcptLine."Order No.", PurchRcptLine."Order Line No.",
@@ -363,6 +369,7 @@ codeunit 5813 "Undo Purchase Receipt Line"
     local procedure InsertNewReceiptLine(OldPurchRcptLine: Record "Purch. Rcpt. Line"; ItemRcptEntryNo: Integer; DocLineNo: Integer)
     var
         NewPurchRcptLine: Record "Purch. Rcpt. Line";
+        SkipInsertItemEntryRelation: Boolean;
     begin
         NewPurchRcptLine.Init();
         NewPurchRcptLine.Copy(OldPurchRcptLine);
@@ -378,9 +385,10 @@ codeunit 5813 "Undo Purchase Receipt Line"
         NewPurchRcptLine."Dimension Set ID" := OldPurchRcptLine."Dimension Set ID";
         OnBeforeNewPurchRcptLineInsert(NewPurchRcptLine, OldPurchRcptLine);
         NewPurchRcptLine.Insert();
-        OnAfterNewPurchRcptLineInsert(NewPurchRcptLine, OldPurchRcptLine);
-
-        InsertItemEntryRelation(TempGlobalItemEntryRelation, NewPurchRcptLine);
+        SkipInsertItemEntryRelation := false;
+        OnAfterNewPurchRcptLineInsert(NewPurchRcptLine, OldPurchRcptLine, TempGlobalItemEntryRelation, SkipInsertItemEntryRelation);
+        if not SkipInsertItemEntryRelation then
+            InsertItemEntryRelation(TempGlobalItemEntryRelation, NewPurchRcptLine);
     end;
 
     procedure UpdateOrderLine(PurchRcptLine: Record "Purch. Rcpt. Line")
@@ -530,7 +538,7 @@ codeunit 5813 "Undo Purchase Receipt Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCopyItemJnlLineFromPurchRcpt(var ItemJournalLine: Record "Item Journal Line"; PurchRcptHeader: Record "Purch. Rcpt. Header"; var PurchRcptLine: Record "Purch. Rcpt. Line"; var WhseUndoQty: Codeunit "Whse. Undo Quantity")
+    local procedure OnAfterCopyItemJnlLineFromPurchRcpt(var ItemJournalLine: Record "Item Journal Line"; PurchRcptHeader: Record "Purch. Rcpt. Header"; var PurchRcptLine: Record "Purch. Rcpt. Line"; var WhseUndoQty: Codeunit "Whse. Undo Quantity"; var ItemLedgEntryNo: Integer; var NextLineNo: Integer; var TempWhseJnlLine: Record "Warehouse Journal Line" temporary; var TempGlobalItemLedgerEntry: Record "Item Ledger Entry" temporary; var TempGlobalItemEntryRelation: Record "Item Entry Relation" temporary; var IsHandled: Boolean)
     begin
     end;
 
@@ -540,7 +548,7 @@ codeunit 5813 "Undo Purchase Receipt Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterNewPurchRcptLineInsert(var NewPurchRcptLine: Record "Purch. Rcpt. Line"; OldPurchRcptLine: Record "Purch. Rcpt. Line")
+    local procedure OnAfterNewPurchRcptLineInsert(var NewPurchRcptLine: Record "Purch. Rcpt. Line"; OldPurchRcptLine: Record "Purch. Rcpt. Line"; var TempGlobalItemEntryRelation: Record "Item Entry Relation" temporary; var SkipInsertItemEntryRelation: Boolean)
     begin
     end;
 
@@ -590,7 +598,7 @@ codeunit 5813 "Undo Purchase Receipt Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforePostItemJnlLine(var PurchRcptLine: Record "Purch. Rcpt. Line"; DocLineNo: Integer; var ItemLedgEntryNo: Integer; var IsHandled: Boolean; var NewDocLineNo: Integer)
+    local procedure OnBeforePostItemJnlLine(var PurchRcptLine: Record "Purch. Rcpt. Line"; DocLineNo: Integer; var ItemLedgEntryNo: Integer; var IsHandled: Boolean; var NewDocLineNo: Integer; var TempWarehouseJournalLine: Record "Warehouse Journal Line" temporary)
     begin
     end;
 
@@ -646,6 +654,11 @@ codeunit 5813 "Undo Purchase Receipt Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnCheckPurchRcptLinesAfterPurchRcptLineSetFilters(var PurchRcptLine: Record "Purch. Rcpt. Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCheckPurchRcptLineOnBeforeCollectItemLedgEntries(var PurchRcptLine: Record "Purch. Rcpt. Line"; var TempItemLedgEntry: Record "Item Ledger Entry" temporary; var IsHandled: Boolean)
     begin
     end;
 }

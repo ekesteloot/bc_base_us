@@ -160,7 +160,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCreateTempSKUForLocation(TempSKU, LocationCode, IsHandled);
+        OnBeforeCreateTempSKUForLocation(TempSKU, LocationCode, IsHandled, ItemNo);
         if IsHandled then
             exit;
 
@@ -634,6 +634,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
                         InventoryProfile."Transfer Location Not Planned" := TransferLocationIsFilteredOut(Item, TransLine);
                     InsertSupplyInvtProfile(InventoryProfile, ToDate);
                     InsertTempTransferSKU(TransLine);
+                    OnTransRcptTransLineToProfileOnAfterInsertInventoryProfile(TransLine, InventoryProfile);
                 end;
             until TransLine.Next() = 0;
     end;
@@ -1449,6 +1450,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
         NeedOfPublishSurplus: Boolean;
         IsHandled: Boolean;
         DemandForAdditionalProfile: Boolean;
+        ProcessSupplyBeforeStartDate: Boolean;
     begin
         ReqLine.Reset();
         ReqLine.SetRange("Worksheet Template Name", CurrTemplateName);
@@ -1590,6 +1592,13 @@ codeunit 99000854 "Inventory Profile Offsetting"
 
                     SupplyInvtProfile.SetFilter("Untracked Quantity", '>=0');
                     SupplyExists := SupplyInvtProfile.FindSet();
+
+                    ProcessSupplyBeforeStartDate := SupplyExists;
+                    while ProcessSupplyBeforeStartDate do begin
+                        if (SupplyInvtProfile."Due Date" < PlanningStartDate) and (SupplyInvtProfile."Due Date" > 0D) and (SupplyInvtProfile."Untracked Quantity" = 0) then
+                            SupplyExists := SupplyInvtProfile.Next() <> 0;
+                        ProcessSupplyBeforeStartDate := SupplyExists and (SupplyInvtProfile."Due Date" < PlanningStartDate) and (SupplyInvtProfile."Due Date" > 0D) and (SupplyInvtProfile."Untracked Quantity" = 0);
+                    end;
 
                     SupplyInvtProfile.SetRange("Untracked Quantity");
                     SupplyInvtProfile.SetRange("Due Date");
@@ -2328,8 +2337,8 @@ codeunit 99000854 "Inventory Profile Offsetting"
                               TempSKU."Reorder Quantity";
                 end;
 
-            if not ((TempSKU."Reordering Policy" = TempSKU."Reordering Policy"::"Lot-for-Lot")
-                and (TempSKU."Manufacturing Policy" = TempSKU."Manufacturing Policy"::"Make-to-Order")) then
+            if ((TempSKU."Replenishment System" = TempSKU."Replenishment System"::"Prod. Order") and (TempSKU."Manufacturing Policy" = TempSKU."Manufacturing Policy"::"Make-to-Stock"))
+                or (TempSKU."Replenishment System" = TempSKU."Replenishment System"::Purchase) then
                 ReorderQty += AdjustReorderQty(ReorderQty, TempSKU, SupplyInvtProfile."Line No.", SupplyInvtProfile."Min. Quantity");
             SupplyInvtProfile."Max. Quantity" := TempSKU."Maximum Order Quantity";
         end;
@@ -2668,26 +2677,27 @@ codeunit 99000854 "Inventory Profile Offsetting"
     begin
         IsHandled := false;
         OnBeforeCommitTracking(TempTrkgReservEntry, IsHandled);
-        if IsHandled then
-            exit;
+        if not IsHandled then begin
+            if not TempTrkgReservEntry.Find('-') then
+                exit;
 
-        if not TempTrkgReservEntry.Find('-') then
-            exit;
+            repeat
+                ReservEntry := TempTrkgReservEntry;
+                if TempTrkgReservEntry."Entry No." = PrevTempEntryNo then
+                    ReservEntry."Entry No." := PrevInsertedEntryNo
+                else
+                    ReservEntry."Entry No." := 0;
+                ReservEntry.UpdateItemTracking();
+                UpdateAppliedItemEntry(ReservEntry);
+                ReservEntry.Insert();
+                PrevTempEntryNo := TempTrkgReservEntry."Entry No.";
+                PrevInsertedEntryNo := ReservEntry."Entry No.";
+                TempTrkgReservEntry.Delete();
+            until TempTrkgReservEntry.Next() = 0;
+            Clear(TempTrkgReservEntry);
+        end;
 
-        repeat
-            ReservEntry := TempTrkgReservEntry;
-            if TempTrkgReservEntry."Entry No." = PrevTempEntryNo then
-                ReservEntry."Entry No." := PrevInsertedEntryNo
-            else
-                ReservEntry."Entry No." := 0;
-            ReservEntry.UpdateItemTracking();
-            UpdateAppliedItemEntry(ReservEntry);
-            ReservEntry.Insert();
-            PrevTempEntryNo := TempTrkgReservEntry."Entry No.";
-            PrevInsertedEntryNo := ReservEntry."Entry No.";
-            TempTrkgReservEntry.Delete();
-        until TempTrkgReservEntry.Next() = 0;
-        Clear(TempTrkgReservEntry);
+        OnAfterCommitTracking(TempItemTrkgEntry);
     end;
 
     procedure MaintainPlanningLine(var SupplyInvtProfile: Record "Inventory Profile"; DemandInvtProfile: Record "Inventory Profile"; NewPhase: Option " ","Line Created","Routing Created",Exploded,Obsolete; Direction: Option Forward,Backward)
@@ -4366,10 +4376,12 @@ codeunit 99000854 "Inventory Profile Offsetting"
         DemandInvtProfile.SetFilter("Due Date", '%1..', PlanningStartDate);
         if DemandInvtProfile.FindSet() then
             repeat
-                if TempSafetyStockInvtProfile."Due Date" <> DemandInvtProfile."Due Date" then
+                if TempSafetyStockInvtProfile."Due Date" <> DemandInvtProfile."Due Date" then begin
                     CreateDemand(
-                      TempSafetyStockInvtProfile, TempSKU, TempSKU."Safety Stock Quantity",
-                      DemandInvtProfile."Due Date", OrderRelation::"Safety Stock");
+                        TempSafetyStockInvtProfile, TempSKU, TempSKU."Safety Stock Quantity", DemandInvtProfile."Due Date", OrderRelation::"Safety Stock");
+                    TempSafetyStockInvtProfile."MPS Order" := DemandInvtProfile."MPS Order";
+                    TempSafetyStockInvtProfile.Modify();
+                end;
             until DemandInvtProfile.Next() = 0;
 
         DemandInvtProfile.SetRange("Due Date", PlanningStartDate);
@@ -6010,7 +6022,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateTempSKUForLocation(var TempStockkeeping: Record "Stockkeeping Unit" temporary; LocationCode: Code[10]; var IsHandled: Boolean)
+    local procedure OnBeforeCreateTempSKUForLocation(var TempStockkeeping: Record "Stockkeeping Unit" temporary; LocationCode: Code[10]; var IsHandled: Boolean; ItemNo: Code[20])
     begin
     end;
 
@@ -6201,6 +6213,16 @@ codeunit 99000854 "Inventory Profile Offsetting"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCheckForecastExist(var ProductionForecastEntry: Record "Production Forecast Entry"; ExcludeForecastBefore: Date; OrderDate: Date; ToDate: Date; var ForecastExist: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCommitTracking(var TempReservationEntryItemTrkgEntry: Record "Reservation Entry" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnTransRcptTransLineToProfileOnAfterInsertInventoryProfile(var TransferLine: Record "Transfer Line"; var InventoryProfile: Record "Inventory Profile")
     begin
     end;
 }
